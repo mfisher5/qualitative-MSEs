@@ -1,0 +1,121 @@
+---
+title: "All HCRs x All OMs"
+date: "Last Run `r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+**Date written: Sept 14 2023**
+
+## Description
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+## Functions
+library(here)
+library(tidyverse)
+library(ggplot2)
+
+#Load XML first--dependency not included in QPress
+#To install QPress: 
+#   library(remotes)
+#   remotes::install_github("SWotherspoon/QPress")
+library(QPress)
+library(XML)
+library(tcltk2)
+library(gridExtra)
+library(cowplot)
+
+
+## custom functions
+source(here('../R/parse.constraints.SWotherspoon.R'))
+source(here('../R/prepare.dia.R'))
+source(here('../R/impact.table.R'))
+source(here('../R/compare.baseline.impact.table.R'))
+source(here('../R/compare.models.impact.table.R'))
+source(here('../R/compare.models.impact.dataframe.R'))
+source(here('../R/alternating.list.R'))
+
+
+## 
+set.seed(555)
+```
+
+```{r load_models}
+# Models ------------------------------------------------------------------
+
+## create a list of lists, so that each operating model scenario (0-5) 
+##        is run with the five management strategies (A-E)
+##        management strategies A-B,D-E use the same underlying QNM structure
+##        but strategy C requires a separate dia object.
+
+
+##### 0. A baseline scenario #####
+mlist0 <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Sep_00-constantF',dia_path=here('data'))[[1]],  # no constraints
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_00C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+)
+
+#### 2. Effort scales according to the Thorson effort model (Thorson et al., 2013) ####
+mlist2 <- list(
+  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Sep_2-thorsonF',dia_path=here('data'))[[1]],  # no constraints
+  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_2C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+)
+
+#### 3. Climate reduces productivity ####
+mlist3 <- mlist0
+
+#### 4. Animals move into the “far offshore” area ####
+mlist4 <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Sep_004-movement-to-inaccessible',dia_path=here('data'))[[1]],  # no constraints
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_004C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+)
+
+#### 5. Climate increases growth rate ####
+mlist5 <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Sep_005-growth-perturb',dia_path=here('data'))[[1]],  # no constraints
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_005C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+)
+
+
+mlist_all <- list(mlist0,mlist2,mlist3,mlist4,mlist5)
+names(mlist_all) <- c("OM O","OM 2 Thorson Effort","OM 3", "OM 4 Offshore Inaccessible","OM 5 Faster Growth")
+
+```
+
+
+## HCR Overview
+
+These are the HCRs and the associated perturbations to the QNMs:
+
+HCR A: Status Quo
+```{r echo=TRUE}
+PertA <-  c(`inshore small mesh effort`=0)
+```
+
+HCR B: Remove small mesh fleet
+```{r echo=TRUE}
+PertB <- c(`inshore small mesh effort`=-1,`offshore small mesh effort`=-1)
+```
+
+HCR C: Remove inshore small mesh fleet, allow effort redistribution to offshore small mesh fishery
+```{r echo=TRUE}
+PertC <- c(`inshore small mesh effort`=-1)
+```
+
+HCR D: Increase the mesh size for fishery #1
+```{r echo=TRUE}
+PertD <- c(`inshore mesh size`=1,`offshore mesh size`=1)
+```
+
+HCR E: remove fishery #1 from the inshore area
+```{r echo=TRUE}
+PertE <- c(`inshore small mesh effort`=-1)
+```
+
+
+

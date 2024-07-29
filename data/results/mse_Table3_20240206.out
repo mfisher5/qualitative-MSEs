@@ -1,0 +1,36 @@
+
+Results//Resu00A.out,S pos,S neg,S neg,S neg,S neg,S neg,S neg,S pos,S neg,S neg,S neg,S neg,S neg,S neg
+Results//Resu00B.out,S pos,S neg,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu00C.out,S pos,S pos,S pos,S neg,S pos,S pos,S neg,S pos,S neg,S neg,S pos,S pos,S pos,S neg
+Results//Resu00D.out,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu00E.out,S pos,W neg,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu20A.out,S pos,S neg,S neg,S neg,S neg,S neg,S neg,S pos,S neg,S neg,S neg,S neg,S neg,S neg
+Results//Resu20B.out,S pos,S pos,S neg,S pos,S pos,S neg,S pos,S pos,S neg,S neg,S pos,S pos,S neg,S pos
+Results//Resu20C.out,S pos,S pos,S pos,S neg,S neg,S pos,S neg,S pos,W neg,Equiv,S neg,S pos,S pos,S neg
+Results//Resu20D.out,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S pos,S pos,S pos
+Results//Resu20E.out,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S pos,S pos,S pos
+Results//Resu30A.out,S pos,S neg,S neg,S neg,S neg,S neg,S neg,S pos,S neg,S neg,S neg,S neg,S neg,S neg
+Results//Resu30B.out,S pos,S neg,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu30C.out,S pos,S pos,S pos,S neg,S pos,S pos,S neg,S pos,S neg,S neg,S pos,S pos,S pos,S neg
+Results//Resu30D.out,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu30E.out,S pos,S pos,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu40A.out,S pos,S neg,S neg,S neg,S neg,S neg,S neg,S pos,S neg,S neg,S neg,S neg,S neg,S neg
+Results//Resu40B.out,S pos,S neg,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu40C.out,S pos,S pos,S pos,S neg,S pos,S pos,S neg,S pos,S neg,S neg,S pos,S pos,S pos,S neg
+Results//Resu40D.out,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu40E.out,S pos,S neg,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu50A.out,S pos,S neg,S neg,S neg,S neg,S neg,S neg,S pos,S neg,S neg,S neg,S neg,S neg,S neg
+Results//Resu50B.out,S pos,S neg,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu50C.out,S pos,S pos,S pos,S neg,S pos,S pos,S neg,S pos,S neg,S neg,S pos,S pos,S pos,S neg
+Results//Resu50D.out,S pos,S pos,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu50E.out,S pos,S neg,S neg,S pos,S pos,S neg,S neg,S pos,S neg,S neg,S pos,S pos,S neg,S neg
+Results//Resu60A.out,S pos,S neg,S neg,S neg,S neg,S neg,S neg,S pos,S neg,S neg,S neg,S neg,S neg,S neg
+Results//Resu60B.out,S pos,S pos,S neg,S pos,S pos,S neg,S pos,S pos,S neg,S neg,S pos,S pos,S neg,S pos
+Results//Resu60C.out,S pos,S pos,S pos,S neg,W neg,S pos,S neg,S pos,S neg,W neg,S neg,S pos,S pos,S neg
+Results//Resu60D.out,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S pos,S pos,S pos
+Results//Resu60E.out,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S pos,S pos,S pos
+Results//Resu70A.out,S pos,S neg,S neg,S neg,S neg,S neg,S neg,S pos,S neg,S neg,S neg,S neg,S neg,S neg
+Results//Resu70B.out,S pos,W pos,S neg,S pos,W pos,S neg,S pos,S pos,S neg,S neg,S pos,S pos,S neg,S pos
+Results//Resu70C.out,S pos,S pos,S pos,S neg,S neg,S pos,S neg,S pos,W pos,S pos,S neg,Equiv,S pos,S neg
+Results//Resu70D.out,S pos,S pos,W pos,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S pos,S pos,S pos
+Results//Resu70E.out,S pos,S pos,W pos,S pos,S pos,S pos,S pos,S pos,S neg,S neg,S pos,S pos,W pos,S pos

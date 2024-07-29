@@ -1,0 +1,21 @@
+x,Fishery 1,Fishery 2,inshore biomass large,inshore biomass small,inshore mesh size,inshore recruits,inshore small mesh effort,inshore small mesh fishing lg fish,inshore small mesh fishing sm fish,offshore biomass large,offshore biomass small,offshore large mesh effort,offshore large mesh fishing,offshore mesh size,offshore small mesh effort,offshore small mesh fishing lg fish,offshore small mesh fishing sm fish,spawning biomass,total biomass,Total catch
+Fishery 1,-1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0
+Fishery 2,0,-1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0
+inshore biomass large,0,0,-1,1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0
+inshore biomass small,0,0,0,-1,0,1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0
+inshore mesh size,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+inshore recruits,0,0,1,0,0,-1,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+inshore small mesh effort,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0
+inshore small mesh fishing lg fish,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,0,0,0,0,0
+inshore small mesh fishing sm fish,0,0,0,0,-1,0,1,0,-1,0,0,0,0,0,0,0,0,0,0,0
+offshore biomass large,0,0,1,0,0,0,0,0,0,-1,1,0,-1,0,0,-1,0,0,0,0
+offshore biomass small,0,0,0,1,0,0,0,0,0,0,-1,0,0,0,0,0,-1,0,0,0
+offshore large mesh effort,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0
+offshore large mesh fishing,0,0,0,0,0,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0
+offshore mesh size,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0
+offshore small mesh effort,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0
+offshore small mesh fishing lg fish,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,-1,0,0,0,0
+offshore small mesh fishing sm fish,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,1,0,-1,0,0,0
+spawning biomass,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,-1,0,0
+total biomass,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,-1,0
+Total catch,0,0,0,0,0,0,0,1,1,1,0,0,1,0,0,1,1,0,0,-1
