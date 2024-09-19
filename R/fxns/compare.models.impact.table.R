@@ -31,7 +31,7 @@ compare.models.impact.tbl <- function(sim.list,perturb.list=0,monitor.list=NA,
                                       common.variables=FALSE,variable.key=NA,variable.order=NA,
                                       plot=FALSE, main.axis="X",
                                       plot.perturbed=TRUE, common.perturbed=FALSE,
-                                      table.palette=c("#04BC09", "#ABF1AD","#BBBBBB", "#B0BED8","#587AB6","black")) {
+                                      table.palette=c("#04BC09", "#ABF1AD","#BBBBBB", "#dfc27d","#a6611a","black")) {
   
   
   ## Utility functions

@@ -1,0 +1,26 @@
+QNM,HCR,Code,Operating model,Management strategy,Network file
+0,A,0-A,0. Baseline,A. Status-quo,MSE-QNM_2023-Oct_00-constantF
+0,B,0-B,0. Baseline,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh
+0,C,0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small
+0,D,0-D,0. Baseline,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF
+0,E,0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh
+2,A,2-A,2. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF
+2,B,2-B,2. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh
+2,C,2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small
+2,D,2-D,2. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF
+2,E,2-E,2. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh
+3,A,3-A,3. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF
+3,B,3-B,3. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh
+3,C,3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small
+3,D,3-D,3. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF
+3,E,3-E,3. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh
+4,A,4-A,"4. Move ""far offshore""",A. Status-quo,MSE-QNM_2023-Oct_004-movement-to-inaccessible
+4,B,4-B,"4. Move ""far offshore""",B. Eliminate fishery 1,MSE-QNM_2023-Oct_004B-rm-small-mesh
+4,C,4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small
+4,D,4-D,"4. Move ""far offshore""",D. Increase fishery mesh size,MSE-QNM_2023-Oct_004-movement-to-inaccessible
+4,E,4-E,"4. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh
+5,A,5-A,5. Lower growth rate,A. Status-quo,MSE-QNM_2023-Oct_005-growth-perturb
+5,B,5-B,5. Lower growth rate,B. Eliminate fishery 1,MSE-QNM_2023-Oct_005B-rm-small-mesh
+5,C,5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small
+5,D,5-D,5. Lower growth rate,D. Increase fishery mesh size,MSE-QNM_2023-Oct_005-growth-perturb
+5,E,5-E,5. Lower growth rate,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh

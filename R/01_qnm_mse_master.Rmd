@@ -11,6 +11,7 @@ output:
 
 ## Description
 
+Master Rmd for running the qualitative MSEs.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -18,6 +19,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Functions
 library(here)
 library(tidyverse)
+library(magrittr)
 library(ggplot2)
 
 #Load XML first--dependency not included in QPress
@@ -38,85 +40,727 @@ source(here('R/fxns/compare.baseline.impact.table.R'))
 source(here('R/fxns/compare.models.impact.table.R'))
 source(here('R/fxns/alternating.list.R'))
 
+## let's time things
+end.timer <- function(s){round(Sys.time()-s,2)}
 
+
+## model variable key: I use this to order the variables in the output tables.
+vkey <- read_csv(here('data','qnm_models','om_variable_key.csv'))
+vkey %<>% bind_rows(
+  data.frame(variable=c("offshore biomass inaccessible large","offshore biomass inaccessible small"),
+             group=rep("ecosystem",2),
+             group_order=rep(1,2),specific_order=rep(6,2))
+  )
 ```
 
 ## QNM overview
-create a list of lists, so that each operating model scenario (0-5) 
-has its own QNM list.
+
+create a list of lists, so that each operating model scenario (0-5) has its own QNM list.
 management strategies A/D use the same underlying QNM structure
 but strategies B,C,E require their own unique QNM.
-
 ```{r load_models}
+s <- Sys.time()
+
+
 ##### 0. A baseline scenario #####
-mlist0 <- list(
-  m <- prepare.dia(dia_name='MSE-QNM_2023-Sep_00-constantF',dia_path=here('data'))[[1]],  # no constraints
-  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_00C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+m0list <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00-constantF',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]  # no constraints
 )
 
 #### 2. Effort scales according to the Thorson effort model (Thorson et al., 2013) ####
-mlist2 <- list(
-  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Sep_2-thorsonF',dia_path=here('data'))[[1]],  # no constraints
-  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_2C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+m2list <- list(
+  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m2.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]] , # no constraints
+  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]] , # no constraints
+  m2.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]] # no constraints
 )
 
 #### 3. Climate reduces productivity ####
-mlist3 <- mlist0
+m3list <- m0list
 
 #### 4. Animals move into the “far offshore” area ####
-mlist4 <- list(
-  m <- prepare.dia(dia_name='MSE-QNM_2023-Sep_004-movement-to-inaccessible',dia_path=here('data'))[[1]],  # no constraints
-  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_004C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+m4list <- list(
+  m4 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-movement-to-inaccessible',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m4.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m4.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],
+  m4.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]
 )
 
 #### 5. Climate increases growth rate ####
-mlist5 <- list(
-  m <- prepare.dia(dia_name='MSE-QNM_2023-Sep_005-growth-perturb',dia_path=here('data'))[[1]],  # no constraints
-  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Sep_005C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+m5list <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005-growth-perturb',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],
+  m.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]  # no constraints
 )
 
 
-mlist_all <- list(mlist0,mlist2,mlist3,mlist4,mlist5)
-names(mlist_all) <- c("OM O","OM 2 Thorson Effort","OM 3", "OM 4 Offshore Inaccessible","OM 5 Faster Growth")
-
+end.timer(s)
 ```
+*Time difference of 2.24 secs*
+
+```{r}
+mlist_all <- list(m0list,m2list,m3list,m4list,m5list)
+names(mlist_all) <- c("OM O","OM 2 Thorson Effort","OM 3", "OM 4 Offshore Inaccessible","OM 5 Faster Growth")
+```
+
+
+Some models require perturbations
+```{r}
+# OM 3:  There is a negative perturbation on “inshore recruits”
+PertOM3 <- c(`inshore recruits`=-1)
+
+# OM 4:  There a positive perturbation on “climate pressure"
+PertOM4 <- c(`Climate pressure`=1)
+
+# OM 5: There is a positive perturbation on "growth"
+PertOM5 <- c(`Growth`=1)
+```
+
+
+Optional: write out models as matrices (for use in other programs, building FCMs)
+```{r eval=FALSE, echo=FALSE}
+## all
+for(i in seq(1,length(mlist_all))){
+  tmp_name <- names(mlist_all)[i]
+  tmp_list <- mlist_all[[i]]
+  for(j in seq(1:4)){
+      m.mat.out <- adjacency.matrix(tmp_list[[j]],labels=TRUE)
+      m.mat.df <- as.data.frame(m.mat.out) %>% rownames_to_column("x")
+      
+      if(j==2){suffix <- "_hcrB"} else if(j==3){
+        suffix <- "_hcrC"}else if(j==4){
+        suffix <- "_hcrE"}else{suffix <- ""}
+      
+      m.mat.name <- paste0(str_replace_all(tmp_name, " ", "_"),suffix,'.csv')
+      
+      write_csv(m.mat.df, file=here('data','CSVs',m.mat.name))
+  }
+  print(i)
+}
+
+
+## specific OMs
+tmp_list <- mlist4
+tmp_name <- "QNM 4 Offshore Inaccessible"
+for(j in seq(1:4)){
+  m.mat.out <- adjacency.matrix(tmp_list[[j]],labels=TRUE)
+  m.mat.df <- as.data.frame(m.mat.out) %>% rownames_to_column("x")
+  
+  if(j==2){suffix <- "_hcrB"} else if(j==3){
+    suffix <- "_hcrC"}else if(j==4){
+      suffix <- "_hcrE"}else{suffix <- ""}
+  
+  m.mat.name <- paste0(str_replace_all(tmp_name, " ", "_"),suffix,'.csv')
+  
+  write_csv(m.mat.df, file=here('data','CSVs',m.mat.name))
+}
+```
+
+
 
 
 ## HCR Overview
 
 These are the HCRs and the associated perturbations to the QNMs:
 
-HCR A: Status Quo
+HCR A: Status Quo (empty perturbation)
 ```{r echo=TRUE}
 PertA <-  c(`inshore small mesh effort`=0)
 ```
 
-HCR B: Remove small mesh fleet
+HCR B: Remove small mesh fleet, (fishery #1)
 ```{r echo=TRUE}
 PertB <- c(`inshore small mesh effort`=-1,`offshore small mesh effort`=-1)
 ```
 
-HCR C: Remove inshore small mesh fleet, allow effort redistribution to offshore small mesh fishery
+HCR C: Remove *inshore* small mesh fleet, allow effort redistribution to offshore small mesh fishery
 ```{r echo=TRUE}
 PertC <- c(`inshore small mesh effort`=-1)
 ```
 
-HCR D: Increase the mesh size for fishery #1
+HCR D: Increase the mesh size for the small mesh fleet (fishery #1)
 ```{r echo=TRUE}
 PertD <- c(`inshore mesh size`=1,`offshore mesh size`=1)
 ```
 
-HCR E: remove fishery #1 from the inshore area
+HCR E: remove the small mesh fleet from the inshore area
 ```{r echo=TRUE}
 PertE <- c(`inshore small mesh effort`=-1)
 ```
 
+Save into a list
+```{r}
+Pert.list <- list(PertA,PertB,PertC,PertD,PertE)
+names(Pert.list) <- c("A:Status Quo","B:Rmv sm mesh fleet","C:Rmv inshore sm mesh fleet\nEffort redistribution",
+                "D:Increase mesh size","E:Rmv inshore sm mesh fleet")
+```
 
 
-## Run sims
+## Run each HCR across Operating Models
 
+Compare outcomes from different HCRs for each operating model
+```{r}
+hcr_run_times <- c()
+```
 
-
-
-## 
+Run things
+```{r}
 set.seed(555)
+
+
+# HCR A -------------------------------------------------------------------
+# simulation prep
+p_hcr <- PertA   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",1)  # we only need the first version of the OM for HCR A
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+s <- Sys.time()  # start timer
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                            edges=tmp_om, # the qnm
+                            sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                            validators=list(press.validate(
+                              tmp_om, # the qnm
+                              perturb = p_hcr, # the perturbation
+                              monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # reset perturbation
+  p_hcr <- PertA
+}
+
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- "HCR A"
+
+# HCR A 
+# 15.79955s
+
+# save simulation outputs for future use
+saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+
+# save simulation output as an image
+pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                          perturb.list=pert_list,
+                                          monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                          strong_lower=0.8, weak_lower=0.6,
+                                          epsilon=1.0E-5,
+                                          plot=TRUE, main.axis="Y",
+                                          variable.key=vkey,variable.order="specific_order")
+## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+plot.out <- compare.table[[3]] + ggtitle("HCR A: Status Quo")
+plot.out
+
+png(here('data','qnm_out',paste0('mse0-5_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+plot.out
+dev.off()
+
+
+# HCR B -------------------------------------------------------------------
+# simulation prep
+p_hcr <- PertB   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",2)  # we only need the first version of the OM for HCR B for **all but QNM 2 thorson effort**
+names(mlist_hcr) <- names(mlist_all)
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+s <- Sys.time()  # start timer
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # reset perturbation
+  p_hcr <- PertB
+}
+
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- "HCR B"
+
+# save simulation outputs for future use
+saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+
+# save simulation output as an image
+pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                          perturb.list=pert_list,
+                                          monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                          strong_lower=0.8, weak_lower=0.6,
+                                          epsilon=1.0E-5,
+                                          plot=TRUE, main.axis="Y",
+                                        variable.key=vkey,variable.order="specific_order")
+## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+plot.out <- compare.table[[3]] +
+  ggtitle("HCR B: Remove Fishery 1 (Small Mesh)")
+plot.out
+
+png(here('data','qnm_out', paste0('mse0-5_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+plot.out
+dev.off()
+
+
+# HCR C -------------------------------------------------------------------
+
+# simulation prep
+p_hcr <- PertC   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",3)  # we  need the FIRST version of the OM for HCR C
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+s <- Sys.time()  # start timer
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # reset perturbation
+  p_hcr <- PertC
+}
+
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- "HCR C"
+
+# save simulation outputs for future use
+saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+
+# save simulation output as an image
+pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                          perturb.list=pert_list,
+                                          monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                          strong_lower=0.8, weak_lower=0.6,
+                                          epsilon=1.0E-5,
+                                          plot=TRUE, main.axis="Y",
+                                          variable.key=vkey,variable.order="specific_order")
+## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+plot.out <- compare.table[[3]] +
+  ggtitle("HCR C: Remove inshore small mesh, allow effort redistribution")
+plot.out
+
+png(here('data','qnm_out', paste0('mse0-5_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+plot.out
+dev.off()
+
+
+# HCR D -------------------------------------------------------------------
+
+# simulation prep
+p_hcr <- PertD   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",1)  # we  need the FIRST version of the OM for HCR D
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+s <- Sys.time()  # start timer
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # reset perturbation
+  p_hcr <- PertD
+}
+
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- "HCR D"
+
+# save simulation outputs for future use
+saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+
+# save simulation output as an image
+pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                          perturb.list=pert_list,
+                                          monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                          strong_lower=0.8, weak_lower=0.6,
+                                          epsilon=1.0E-5,
+                                          plot=TRUE, main.axis="Y",
+                                          variable.key=vkey,variable.order="specific_order")
+## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+plot.out <- compare.table[[3]] +
+  ggtitle("HCR D: Increase Mesh Size")
+plot.out
+
+png(here('data','qnm_out', paste0('mse0-5_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+plot.out
+dev.off()
+
+
+
+# HCR E -------------------------------------------------------------------
+
+# simulation prep
+p_hcr <- PertE   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",4)  # we  need the FIRST version of the OM for HCR D
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+s <- Sys.time()  # start timer
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # reset perturbation
+  p_hcr <- PertE
+}
+
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- "HCR E"
+
+# save simulation outputs for future use
+saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+
+# save simulation output as an image
+pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                          perturb.list=pert_list,
+                                          monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                          strong_lower=0.8, weak_lower=0.6,
+                                          epsilon=1.0E-5,
+                                          plot=TRUE, main.axis="Y",
+                                          variable.key=vkey,variable.order="specific_order")
+## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+plot.out <- compare.table[[3]] + ggtitle("HCR E: Remove Inshore Small Mesh Fishery 1")
+plot.out
+
+png(here('data','qnm_out', paste0('mse0-5_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+plot.out
+dev.off()
+
+```
+
+so, how long did everything take?
+```{r}
+hcr_run_times
+```
+
+|.HCR A.|.HCR B.|.HCR C.|.HCR D.|.HCR E.|
+| 28.97 | 29.93 | 29.73 | 29.14 | 28.20 |
+
+
+## Run each OM for every HCR
+
+I mostly use this when there were iterative structural changes made to the QNMs
+
+### OM 2
+
+do you want to load new models?
+```{r}
+# m1 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data'))[[1]]
+# mb <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data'))[[1]] 
+# mc <- prepare.dia(dia_name='MSE-QNM_2023-Sep_2C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]
+
+m1 <- m2list[[1]]
+mb <- m2list[[2]]
+mc <- m2list[[3]]
+me <- m2list[[4]]
+
+```
+
+```{r}
+# simulation prep
+om_out <- list()   # empty list for simulation output
+pert_list <- Pert.list
+om_run_times <- list()
+
+# run simulation
+for(i in seq(1,length(pert_list))){
+  
+  # load 'i' operating model
+  tmp_p <- pert_list[[i]]
+  tmp_p_name <- names(pert_list)[i]
+  
+  # run simulation for HCR C
+  if(grepl("B:",tmp_p_name)){
+    s <- Sys.time()  # start timer
+    om_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                   edges=mb, # the qnm
+                                   sampler=community.sampler(mb, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                   validators=list(press.validate(
+                                     mb, # the qnm
+                                     perturb = tmp_p, # the perturbation
+                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+    names(om_out)[i] <- tmp_p_name
+    
+  } else if(grepl("C:",tmp_p_name)){
+    s <- Sys.time()  # start timer
+    om_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                   edges=mc, # the qnm
+                                   sampler=community.sampler(mc, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                   validators=list(press.validate(
+                                     mc, # the qnm
+                                     perturb = tmp_p, # the perturbation
+                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+    names(om_out)[i] <- tmp_p_name
+    
+  } else if(grepl("E:",tmp_p_name)){
+    s <- Sys.time()  # start timer
+    om_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                   edges=me, # the qnm
+                                   sampler=community.sampler(me, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                   validators=list(press.validate(
+                                     me, # the qnm
+                                     perturb = tmp_p, # the perturbation
+                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+    names(om_out)[i] <- tmp_p_name
+    } else{
+    # run simulation for HCR A-B, D-E
+    s <- Sys.time()  # start timer
+    om_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                   edges=m1, # the qnm
+                                   sampler=community.sampler(m1, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                   validators=list(press.validate(
+                                     m1, # the qnm
+                                     perturb = tmp_p, # the perturbation
+                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+    names(om_out)[i] <- tmp_p_name
+  }
+  
+  # save time info
+  om_run_times[length(om_run_times)+1] <- end.timer(s)    # end timer
+  names(om_run_times)[length(om_run_times)]
+  
+}
+compare.table <- compare.models.impact.tbl(sim.list=om_out, # **named** list of simulations to look at
+                                          perturb.list=pert_list,
+                                          monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                          strong_lower=0.8, weak_lower=0.6,
+                                          epsilon=1.0E-5,
+                                          plot=TRUE, main.axis="Y",
+                                          variable.key=vkey,variable.order="specific_order")
+## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+plot.out <- compare.table[[3]] +
+  labs(subtitle="OM 2 Thorson Effort")
+plot.out
+```
+
+How long did this take?
+```{r}
+om_run_times
+```
+[[1]] 5.14
+
+[[2]] 4.04
+
+[[3]] 4.64
+
+[[4]] 5.62
+
+[[5]] 4.57
+
+Save? 
+```{r eval=TRUE}
+# save simulation outputs for future use
+saveRDS(om_out, here('data','qnm_out',paste0('mse2_hcrA-E_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+
+png(here('data','qnm_out',paste0('mse2_hcrA-E_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+print(plot.out)
+dev.off()
+```
+
+
+
+### OM 4
+
+
+do you want to load new models?
+```{r}
+# m1 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-2-movement-to-inaccessible',dia_path=here('data'))[[1]]  # no constraints
+# mc <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-2C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]]  # no constraints
+
+m1 <- mlist4[[1]]
+mc <- mlist4[[2]]
+
+Pert.list.sub <- list(PertA, PertC)
+```
+
+```{r}
+# simulation prep
+om_out <- list()   # empty list for simulation output
+pert_list <- lapply(Pert.list.sub, FUN=function(x){return(c(x,PertOM4))})     # OM 4:  There a positive perturbation on “climate pressure"
+om_run_times <- list()
+
+# run simulation
+for(i in seq(1,length(pert_list))){
+  
+  # load 'i' operating model
+  tmp_p <- pert_list[[i]]
+  tmp_p_name <- names(pert_list)[i]
+  
+  # run simulation for HCR C
+  if(grepl("Effort redistribution",tmp_p_name)){
+    s <- Sys.time()  # start timer
+    om_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                    edges=mc, # the qnm
+                                    sampler=community.sampler(mc, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                    validators=list(press.validate(
+                                      mc, # the qnm
+                                      perturb = tmp_p, # the perturbation
+                                      monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+    names(om_out)[i] <- tmp_p_name
+    
+  } else{
+    # run simulation for HCR A-B, D-E
+    s <- Sys.time()  # start timer
+    om_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                    edges=m1, # the qnm
+                                    sampler=community.sampler(m1, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                    validators=list(press.validate(
+                                      m1, # the qnm
+                                      perturb = tmp_p, # the perturbation
+                                      monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+    names(om_out)[i] <- tmp_p_name
+  }
+  
+  # save time info
+  om_run_times[length(om_run_times)+1] <- end.timer(s)    # end timer
+  names(om_run_times)[length(om_run_times)]
+  
+}
+
+compare.table <- compare.models.impact.df(sim.list=om_out, # **named** list of simulations to look at
+                                          perturb.list=pert_list,
+                                          monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                          strong_lower=0.8, weak_lower=0.6,
+                                          epsilon=1.0E-5,
+                                          plot=TRUE, main.axis="Y",
+                                          variable.key=vkey,variable.order="specific_order")
+## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+plot.out <- compare.models.impact.tbl[[3]] +
+  labs(subtitle="OM 4 Offshore inaccessible biomass") 
+plot.out
+```
+
+How long did this take?
+```{r}
+om_run_times  # ~ 4s each
+```
+
+
+Save? 
+```{r eval=TRUE}
+# save simulation outputs for future use
+saveRDS(om_out, here('data','qnm_out',paste0('mse4_hcrA-E_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+
+# save simulation output as an image
+png(here('data','qnm_out',paste0('mse4_hcrA-E_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+plot.out
+dev.off()
+```
+
+
+#### Re-save by Perturbation
+
+after running (or re-running) certain OMs, 
+save the new versions into the simulation lists
+```{r eval=FALSE}
+om <- 4
+
+# simulation output saved as lists from above
+hcrA_out <- readRDS(here('data','qnm_out','mse0-5_hcrA_10K_20240919.rds'))
+# hcrB_out <- readRDS(here('data','qnm_out','mse0-5_hcrB_10K_20240919.rds'))
+hcrC_out <- readRDS(here('data','qnm_out','mse0-5_hcrC_10K_20240919.rds'))
+# hcrD_out <- readRDS(here('data','qnm_out','mse0-5_hcrD_10K_20240919.rds'))
+# hcrE_out <- readRDS(here('data','qnm_out','mse0-5_hcrE_10K_20240919.rds'))
+
+all_old_lists <- list(hcrA_out,hcrC_out)
+names(all_old_lists) <- c("A","C")
+# all_old_lists <- list(hcrA_out,hcrB_out,hcrC_out,hcrD_out,hcrE_out)
+# names(all_old_lists) <- c("A","B","C","D","E")
+
+  
+# add in new OM 4, Save again
+for(i in seq(1:length(all_old_lists))){
+  all_old_lists[[i]][[om]] <- om_out[[i]]
+  length(all_old_lists[[i]]) == 5
+  saveRDS(all_old_lists, here('data','qnm_out',paste0('mse0-5_hcr',names(all_old_lists)[i],'_10K_20240919.rds')))
+}
+```
+
+
+

@@ -28,7 +28,7 @@ compare.baseline.impact.tbl <- function(sim.list,perturb.list=0,monitor.list=NA,
                                         strong_lower=0.8, weak_lower=0.6, epsilon=1.0E-5,
                                         common.variables=FALSE,variable.key=NA,variable.order=NA,
                                         plot=FALSE, main.axis="X",
-                                        table.palette=c("#04BC09", "#ABF1AD","#BBBBBB", "#B0BED8","#587AB6","black")) {
+                                        table.palette=c("#04BC09", "#ABF1AD","#BBBBBB", "#dfc27d","#a6611a","black")) {
   
   
   ## Utility functions
