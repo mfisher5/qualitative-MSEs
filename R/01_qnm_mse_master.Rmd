@@ -32,28 +32,22 @@ library(cowplot)
 
 
 ## custom functions
-source(here('../R/parse.constraints.SWotherspoon.R'))
-source(here('../R/prepare.dia.R'))
-source(here('../R/impact.table.R'))
-source(here('../R/compare.baseline.impact.table.R'))
-source(here('../R/compare.models.impact.table.R'))
-source(here('../R/compare.models.impact.dataframe.R'))
-source(here('../R/alternating.list.R'))
+source(here('R/fxns/parse.constraints.SWotherspoon.R'))
+source(here('R/fxns/prepare.dia.R'))
+source(here('R/fxns/compare.baseline.impact.table.R'))
+source(here('R/fxns/compare.models.impact.table.R'))
+source(here('R/fxns/alternating.list.R'))
 
 
-## 
-set.seed(555)
 ```
 
+## QNM overview
+create a list of lists, so that each operating model scenario (0-5) 
+has its own QNM list.
+management strategies A/D use the same underlying QNM structure
+but strategies B,C,E require their own unique QNM.
+
 ```{r load_models}
-# Models ------------------------------------------------------------------
-
-## create a list of lists, so that each operating model scenario (0-5) 
-##        is run with the five management strategies (A-E)
-##        management strategies A-B,D-E use the same underlying QNM structure
-##        but strategy C requires a separate dia object.
-
-
 ##### 0. A baseline scenario #####
 mlist0 <- list(
   m <- prepare.dia(dia_name='MSE-QNM_2023-Sep_00-constantF',dia_path=here('data'))[[1]],  # no constraints
@@ -119,3 +113,10 @@ PertE <- c(`inshore small mesh effort`=-1)
 
 
 
+## Run sims
+
+
+
+
+## 
+set.seed(555)
