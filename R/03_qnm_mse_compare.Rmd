@@ -22,9 +22,13 @@ library(magrittr)
 library(ggplot2)
 library(QPress)
 library(janitor)
+library(kableExtra)
 
 ## custom functions
 source(here('R/fxns/compare.models.MSEtable.R'))
+
+## read in which version of the data from qpress?
+sim.date <- '20240919'
 
 ```
 
@@ -34,7 +38,7 @@ source(here('R/fxns/compare.models.MSEtable.R'))
 
 The QNM table is from script 02
 ```{r}
-qnm <- read_csv(here('data','results','qnm0-5_hcra-e_pSims_20240919.csv')) %>% clean_names()
+qnm <- read_csv(here('data','results',paste0('qnm0-5_hcra-e_pSims_',sim.date,'.csv'))) %>% clean_names()
 ```
 
 The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
@@ -192,7 +196,7 @@ summarise_mismatches <- speciesALL_compare %>%
   mutate(qnm_equiv=ifelse(abs(psims) < 60, 1,0)) %>%
   mutate(directional_mismatch=ifelse(qnm_direction==mse_direction,0,
                                      ifelse(qnm_equiv==1,1,2))) %>%
-  dplyr::select(code,model.y,variable_out,directional_msmatch) %>%
+  dplyr::select(code,model.y,variable_out,directional_mismatch) %>%
   pivot_wider(id_cols=c(code,model.y), names_from=variable_out,values_from=directional_mismatch)
 ```
 
@@ -209,20 +213,39 @@ out1 <- summarise_mismatches %>%
          `mismatch - qnm equivocal`=round(`1`,2),
          `mismatch`=round(`2`,2)) %>% dplyr::select(-c(`0`,`1`,`2`))
 
-out1
+kbl(out1)
 ```
 
+Add a list column that saves exactly which OM-HCRs were true mismatches
 ```{r}
-out1 %>%
+out1 %<>%
   left_join(
     summarise_mismatches %>% 
       pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
       group_by(model.y,variable,mismatch_type) %>%
-      summarise(mismatch_codes=paste0(code,collapse="..")) %>%
+      summarise(mismatch_codes=paste0(code,collapse=", ")) %>%
       filter(mismatch_type==2) %>%
       dplyr::select(model.y,variable,mismatch_codes)
-  ) %>%
+  )
+```
+save to file
+```{r eval=FALSE}
+# as csv
 write_csv(here('data','results','qnmVmse_mismatches_bySpbyVar.csv'))
+
+# as nice table
+out1 %>%
+  mutate(across(match:mismatch, as.character)) %>%
+  pivot_longer(cols=c("match","mismatch - qnm equivocal","mismatch","mismatch_codes"), names_to="Qual v Quant", values_to="tmp_p") %>%
+  pivot_wider(id_cols=c("model.y","Qual v Quant"), names_from="variable",values_from="tmp_p") %>%
+  ungroup() %>% dplyr::select(`Qual v Quant`, total_catch, fishery_1_catch, fishery_2_catch,spawning_biomass) %>%
+  rename(Total=total_catch, `Fishery 1`=fishery_1_catch, `Fishery 2`=fishery_2_catch, `Spawning Biomass`=spawning_biomass) %>%
+    kbl() %>%
+    kable_classic_2(full_width = F) %>%
+      add_header_above(c(" ", "Catch" = 3, " " = 1)) %>%
+  pack_rows("Species 1", 1, 4) %>%
+  pack_rows("Species 2", 5, 8)
+  
 ```
 
 
@@ -240,22 +263,22 @@ out2 <- summarise_mismatches %>%
   dplyr::select(model.y,code,mismatch) %>%
   separate(code, into=c("OM","HCR")) %>%
   pivot_wider(names_from="HCR",values_from="mismatch",values_fill=0) %>%
-  dplyr::select(model.y,OM, A,B,C,D,E)
- out2 
+  dplyr::select(model.y,OM, A,B,C,D,E) 
+ out2 %>%
+   ungroup() %>% dplyr::select(-model.y) %>%
+   kbl() %>%
+    kable_paper(full_width = T) %>%
+   pack_rows("Species 1", 1, 4) %>%
+  pack_rows("Species 2", 5, 9) %>%
+   column_spec(1, bold=T)
 ```
  
 ```{r eval=FALSE}
   write_csv(out2, here('data','results','qnmVmse_mismatches_byOMbyHCR.csv'))
 ```
 
-
-
-
-
-
-
 plotting. aggregate across HCRs; look at OMs (x facet) by species (y facet)
-```{r}
+```{r eval=FALSE}
 ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
   geom_hline(aes(yintercept=60), col="orange", lty=2) +
@@ -284,7 +307,7 @@ dev.off()
 ```
 
 for each species, look at OM (x facet) by hcr (y facet)
-```{r}
+```{r eval=FALSE}
 png(here('data','results','qnmVmse_scatterplot_sp2_OM_by_HCR_2024-03-28.png'), width=2600,height=2000,res=300)
 ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
@@ -320,6 +343,42 @@ dev.off()
 
 The Thorson effort quant MSE was run with different values of a parameter. Do quant MSE / QNM results match better at certain values of that parameter?
 ```{r}
+thorson_mismatches <- compareThorson %>%
+  filter(`ms-code` != "A") %>%
+  mutate(qnm_direction=ifelse(psims < 0 & abs(psims) != 50, "negative", 
+                              ifelse(psims > 0 & abs(psims) != 50, "positive","split")),
+         mse_direction=ifelse(prob < 0, "negative","positive")) %>%
+  mutate(qnm_equiv=ifelse(abs(psims) < 60, 1,0)) %>%
+  mutate(directional_mismatch=ifelse(qnm_direction==mse_direction,0,
+                                     ifelse(qnm_equiv==1,1,2))) %>%
+  dplyr::select(code,mse_code,operating_model,model.y, variable_out,directional_mismatch) %>%
+  pivot_wider(id_cols=c(code,mse_code,operating_model,model.y), names_from=variable_out,values_from=directional_mismatch) %>%
+  rename(species=model.y)
+
+thorson_mismatches_summary <- thorson_mismatches %>%
+  pivot_longer(cols=5:8, names_to="variable",values_to="mismatch_type") %>%
+  group_by(species,operating_model,mismatch_type) %>%
+  summarise(n=n()) %>%
+  pivot_wider(names_from="mismatch_type",values_from="n", values_fill = 0) %>%
+  rename(match=`0`,
+         `mismatch - qnm equivocal`=`1`,
+         `mismatch`=`2`) %>%
+  mutate(sum = as.character(rowSums(across(where(is.numeric))))) %>%
+  adorn_percentages(denominator="row")
+
+thorson_mismatches_summary %>% kbl() %>% 
+    kable_paper()
+```
+
+Save tables.
+```{r}
+write_csv(thorson_mismatches_summary, here('data','results','qnm2Vmse2_mismatches_byTarget.csv'))
+write_csv(thorson_mismatches, here('data','results','qnm2Vmse2_mismatches_byVar.csv'))
+```
+
+
+
+```{r eval=FALSE}
 png(here('data','results','qnmVmse_OM2ThorsonEffort_scatterplot_20240919.png'), width=3300,height=1600,res=300)
 compareThorson %>%
   filter(`ms-code` != "A") %>%
@@ -370,9 +429,10 @@ speciesALL_equiv %>% filter(grepl("Species1",model.y)) %>%
   ungroup() %>%
   group_by(variable_out,var_n,match_direction) %>%
   summarise(ndiff=n()) %>%
-  mutate(pdiff=ndiff/var_n) %>%
+  mutate(pdiff=round(ndiff/var_n,2)) %>%
   dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
-  pivot_wider(names_from=match_direction, values_from=pdiff)
+  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
+  kbl() %>% kable_paper(full_width=T)
 ```
 
  
@@ -394,9 +454,10 @@ speciesALL_equiv %>% filter(grepl("Species2",model.y)) %>%
   ungroup() %>%
   group_by(variable_out,var_n,match_direction) %>%
   summarise(ndiff=n()) %>%
-  mutate(pdiff=ndiff/var_n) %>%
+  mutate(pdiff=round(ndiff/var_n,2)) %>%
   dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
-  pivot_wider(names_from=match_direction, values_from=pdiff)
+  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
+  kbl() %>% kable_paper(full_width=T)
 ```
 match_direction
           match negQNM-->posMSE posQNM-->negMSE           split 
@@ -407,7 +468,7 @@ match_direction
 ## Explore Results: each operating model
 
 for specific operating models, break out comparisons by management strategies and species
-```{r}
+```{r eval=FALSE}
 png(here('results','QNM_v_MSE_0BaseModel_quantitative_scatterplot_2024-02-01.png'), width=3200,height=1500,res=300)
 speciesALL_compare %>%
   filter(grepl('0',operating_model)) %>%

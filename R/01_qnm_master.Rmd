@@ -211,6 +211,7 @@ Run things
 ```{r}
 set.seed(555)
 
+plot_out <- FALSE
 
 # HCR A -------------------------------------------------------------------
 # simulation prep
@@ -268,9 +269,9 @@ compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of
 plot.out <- compare.table[[3]] + ggtitle("HCR A: Status Quo")
 plot.out
 
-png(here('data','qnm_out',paste0('mse0-5_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+if(plot_out){png(here('data','qnm_out',paste0('mse0-5_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
 plot.out
-dev.off()
+dev.off()}
 
 
 # HCR B -------------------------------------------------------------------
@@ -328,9 +329,9 @@ plot.out <- compare.table[[3]] +
   ggtitle("HCR B: Remove Fishery 1 (Small Mesh)")
 plot.out
 
-png(here('data','qnm_out', paste0('mse0-5_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+if(plot_out){png(here('data','qnm_out', paste0('mse0-5_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
 plot.out
-dev.off()
+dev.off()}
 
 
 # HCR C -------------------------------------------------------------------
@@ -388,9 +389,9 @@ plot.out <- compare.table[[3]] +
   ggtitle("HCR C: Remove inshore small mesh, allow effort redistribution")
 plot.out
 
-png(here('data','qnm_out', paste0('mse0-5_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+if(plot_out){png(here('data','qnm_out', paste0('mse0-5_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
 plot.out
-dev.off()
+dev.off()}
 
 
 # HCR D -------------------------------------------------------------------
@@ -448,9 +449,9 @@ plot.out <- compare.table[[3]] +
   ggtitle("HCR D: Increase Mesh Size")
 plot.out
 
-png(here('data','qnm_out', paste0('mse0-5_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+if(plot_out){png(here('data','qnm_out', paste0('mse0-5_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
 plot.out
-dev.off()
+dev.off()}
 
 
 
@@ -508,9 +509,9 @@ compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of
 plot.out <- compare.table[[3]] + ggtitle("HCR E: Remove Inshore Small Mesh Fishery 1")
 plot.out
 
-png(here('data','qnm_out', paste0('mse0-5_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+if(plot_out){png(here('data','qnm_out', paste0('mse0-5_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
 plot.out
-dev.off()
+dev.off()}
 
 ```
 

@@ -30,20 +30,114 @@ library(magrittr)
 library(ggplot2)
 library(QPress)
 library(janitor)
+library(kableExtra)
 
 ## custom functions
+source(here('R/fxns/prepare.dia.R'))
+source(here('R/fxns/impact.ss.R'))
 source(here('R/fxns/qnm.sensitivity.R'))
+
+## let's time things
+end.timer <- function(s){round(Sys.time()-s,2)}
+
+## read in which version of the data from qpress?
+sim.date <- '20240920' ## 9/20/2024 and 9/19/2024 are the same, just run on different computers
 
 ```
 
 
 ## Data
 
-Read in qnms and the output fromperturbations
+Read in qnms and the output from perturbations
+`system.simulate` output should have been saved as lists from qnm_mse_master.R
+```{r load_models}
+s <- Sys.time()
+
+
+##### 0. A baseline scenario #####
+m0list <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00-constantF',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]  # no constraints
+)
+
+#### 2. Effort scales according to the Thorson effort model (Thorson et al., 2013) ####
+m2list <- list(
+  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m2.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]] , # no constraints
+  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]] , # no constraints
+  m2.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]] # no constraints
+)
+
+#### 3. Climate reduces productivity ####
+m3list <- m0list
+
+#### 4. Animals move into the “far offshore” area ####
+m4list <- list(
+  m4 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-movement-to-inaccessible',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m4.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m4.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],
+  m4.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]
+)
+
+#### 5. Climate increases growth rate ####
+m5list <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005-growth-perturb',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],
+  m.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]  # no constraints
+)
+
+
+end.timer(s)
+```
+
+```{r load_sims}
+s <- Sys.time()
+
+hcrA_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrA_10K_',sim.date,'.rds')))
+hcrB_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrB_10K_',sim.date,'.rds')))
+hcrC_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrC_10K_',sim.date,'.rds')))
+hcrD_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrD_10K_',sim.date,'.rds')))
+hcrE_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrE_10K_',sim.date,'.rds')))
+
+hcr_out_all <- list(hcrA_out,hcrB_out,hcrC_out,hcrD_out,hcrE_out)
+names(hcr_out_all) <- c("A","B","C","D","E")
+
+end.timer(s)
+```
+
 
 ## Linkage influence: Total catch
 
+Use boosted regression trees to examine the relative importance of model edges (linkages) in determining the response of a given well-being variable to a HAB simulation in the Status Quo model based on Melbourne-Thomas et al. (2012): https://esapubs.org/archive/mono/M082/019/tree.r
 
+
+### Fishery 1 catch
+First, create a list object to save influence dataframes
+```{r}
+fish1.list <- list()
+```
+
+
+Use a custom function to produce two matrices: (1) the perturbation response (+1/-1/0) of each variable (column) in each simulation iteration (row); and (2) the randomly simulated weight of each edge (column) in each simulation iteration (row). Bind them together.
+```{r, message=TRUE, eval=FALSE}
+temp <- impact.ss(sim=cft.HABhi.sim,perturb=c("HAB"=1),monitor=NA)
+temp2 <- cbind(temp[[1]],temp[[2]])
+write_csv(temp2, here('omf-paper-1','data','HAB_sim_out','sensitivity','gbmIn_perturbmat_StatusQuoHAB.csv'))
+```
+```{r echo=FALSE}
+temp2 <- read_csv(here('omf-paper-1','data','HAB_sim_out','sensitivity','gbmIn_perturbmat_StatusQuoHAB.csv'))
+```
+
+Test: Fit classification tree model with the variable *Emotional & mental health* as the response, for the Status Quo. 
+```{r}
+d <- cbind(temp2[,"Emotional & mental health"],temp2[,42:161])
+fit3 <- gbm.step(data=d,gbm.x=2:121,gbm.y=1,family="gaussian",tree.complexity=5, learning.rate = 0.01,bag.fraction = 0.5)
+
+saveRDS(fit3,file=here('omf-paper-1','data','HAB_sim_out','sensitivity','gbm_emotional-and-mental-health_StatusQuoHAB.rds'))
+```
 
 
 
