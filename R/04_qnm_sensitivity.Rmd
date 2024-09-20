@@ -1,0 +1,49 @@
+---
+title: "Sensitivity Analysis"
+date: "Last Run `r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+**Author:  M Fisher**
+
+**Date written: 2024-09-19**
+
+# Description
+
+Certain output variables don't have similar results between the QNMs and the MSEs. Run sensitivity analyses for the following variables in the specific QNMs:
+
+
+Fishery 1 - all. aggregate results separately for QNMs that did / didn't match the MSE direction. 
+
+Total Catch - all. aggregate results separately for QNMs that did / didn't match the MSE direction. 
+
+Fishery 2 & spawning biomass - Start with 2-C and 5-A, where both were mismatched.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+library(tidyverse)
+library(magrittr)
+library(ggplot2)
+library(QPress)
+library(janitor)
+
+## custom functions
+source(here('R/fxns/qnm.sensitivity.R'))
+
+```
+
+
+## Data
+
+Read in qnms and the output fromperturbations
+
+## Linkage influence: Total catch
+
+
+
+
+

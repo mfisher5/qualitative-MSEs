@@ -1,7 +1,7 @@
 ########### Create Figure 6 ###########
 #
 # Fig 6 compares the MSE output "probability increase / decrease"  
-#    to the QNM output "proportion of simulations" 
+#    to the QNM output "proportion of matrices" 
 #    Data required for this script are created in "03_qnm_mse_compare.R"
 #
 # Written 2024-02-06 M Fisher

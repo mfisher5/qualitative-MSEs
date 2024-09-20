@@ -1,0 +1,446 @@
+---
+title: "Compare QNM and MSE output"
+date: "Last Run `r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+**Author:  M Fisher**
+
+**Date written: 2023-12-20**
+
+Last Updated: 2024-02-06 mcf
+
+## Description
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+library(tidyverse)
+library(magrittr)
+library(ggplot2)
+library(QPress)
+library(janitor)
+
+## custom functions
+source(here('R/fxns/compare.models.MSEtable.R'))
+
+```
+
+
+
+## Data
+
+The QNM table is from script 02
+```{r}
+qnm <- read_csv(here('data','results','qnm0-5_hcra-e_pSims_20240919.csv')) %>% clean_names()
+```
+
+The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
+```{r}
+mse_format <- read_csv(here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
+```
+
+
+First time running the script? We need to clean up a little and re-format the original MSE output table.
+```{r eval=FALSE}
+mse <- read_csv(here('data','results','raw','mse_Table4_Species12_20240206.csv')) %>% clean_names()
+mse_column_key <- data.frame(mse_column=c("total_c","cat_fl1","cat_fl2","ssb_ssb",
+                                          "eff_fl1","eff_fl2"),
+                             new_name=c("total_catch","fishery_1_catch","fishery_2_catch","spawning_biomass",
+                                        "fishery_1_effort","fishery_2_effort"))
+
+# clean up MSE output table
+mse %<>% mutate(trial=str_replace(trial,'Results//Resu',''))
+mse %<>% mutate(trial=str_replace(trial,'.out',''))
+mse %<>% separate(col='trial',into=c('tmp1','tmp2','tmp3','tmp4'), sep='') %>%
+  unite(tmp2,tmp4,col='code',sep="-") %>% dplyr::select(-tmp1,-tmp3)
+
+mse_format <- mse %>% pivot_longer(cols=2:(dim(mse)[2]),names_to="variable",values_to="prob") %>%
+  mutate(variable=ifelse(grepl("ssb",variable), paste0("ssb_",variable),variable)) %>%
+  separate(variable,into=c("v1","v2","col_num"),sep="_") %>%
+  filter(!is.na(col_num)) %>%    ## gets rid of column that just lists sim coutn (num_s1)
+  mutate(model=ifelse(as.numeric(col_num) < 9, "MSE-Species1","MSE-Species2")) %>%
+  unite(v1,v2, col="variable",sep="_") %>%
+  left_join(mse_column_key,by=c("variable"="mse_column")) %>%
+  dplyr::select(-col_num, -variable) %>% rename(variable_out=new_name)
+
+## save
+write_csv(mse_format, here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
+```
+
+
+
+## Prep data
+
+### rerunning script
+
+If this isn't the first time running the script, read in the data frames from the next section. set code chunks to false.
+
+```{r eval=TRUE}
+
+speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv'))) %>% 
+  filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
+
+compareThorson <- read_csv(here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'.csv')))
+
+```
+
+
+### first run of script
+
+melt tables so that they can be combined
+```{r eval=FALSE}
+qnm %<>% pivot_longer(cols=c(total_catch, fishery_1,fishery_2,spawning_biomass), names_to="variable_out", values_to="psims") %>%
+  mutate(model="QNM") %>%
+  mutate(variable_out=ifelse(variable_out=="fishery_1","fishery_1_catch",
+                             ifelse(variable_out=="fishery_2","fishery_2_catch",variable_out)))
+
+mse1 <- mse_format %>% filter(model=="MSE-Species1") %>%
+  filter(variable_out %in% qnm$variable_out) %>%
+  filter(code != "2-A")
+
+mse2 <- mse_format %>% filter(model=="MSE-Species2") %>%
+  filter(variable_out %in% qnm$variable_out) %>%
+  filter(code != "2-A")
+```
+
+match mse species 1 / qnm
+```{r eval=FALSE}
+species1_compare <- qnm %>% left_join(mse1, by=c("code","variable_out"))
+ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(operating_model)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  labs(x="MSE: Probability of Increase",y="QNM: Proportion Matrices with Increase/Decrease",
+       title="MSE Species 1 v. QNM") +
+  theme_bw()
+```
+
+match mse species 2 / qnm
+```{r eval=FALSE}
+species2_compare <- qnm %>% left_join(mse2, by=c("code","variable_out"))
+ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(operating_model)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Matrices with Increase/Decrease",
+       title="MSE Species 2 v. QNM") +
+  theme_bw()
+```
+
+match multiple MSE versions of 2 Thorson Effort to QNM
+```{r eval=FALSE}
+compareThorson <- qnm %>% filter(operating_model=="2. Thorson effort") %>% 
+  separate(code, into=c("om-code","ms-code"),sep="-",remove=FALSE) %>%
+  dplyr::select(-"om-code") %>%
+  left_join(mse_format %>% rename(mse_code=code) %>%
+              separate(mse_code, into=c("om-code","ms-code"),sep="-",remove=FALSE) %>%
+              filter(`om-code` %in% c("2","6","7")),
+            by=c("ms-code","variable_out"))
+              
+compareThorson %<>% mutate(operating_model = ifelse(`om-code`=="6","Target 0.75x Biomass",
+                                                    ifelse(`om-code`=="7","Target 1.25x Biomass","Target 1x Biomass (OG)")))
+compareThorson$operating_model <- factor(compareThorson$operating_model, levels=c("Target 0.75x Biomass",
+                                                                                  "Target 1x Biomass (OG)",
+                                                                                  "Target 1.25x Biomass"))
+```
+
+
+save 
+
+```{r eval=FALSE}
+## all hcrs, oms
+speciesALL_compare <- bind_rows(species1_compare, species2_compare)
+write_csv(speciesALL_compare, here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv')))
+
+## thorson
+write_csv(compareThorson, here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'.csv')))
+```
+
+
+
+
+## Explore results: across OMs
+
+
+I find it more helpful to look at tables, but I'll also do some plotting below.
+
+For each variable, look at cases where the direction of change was not a match. then break this down to determine whether the QNM was equivocal (aka, we wouldn't want to make a decision off of the QNM response direction) or not (aka we would make a 'wrong' decision from the QNM response direction).
+
+check: was any output 50/50?
+```{r}
+any(abs(speciesALL_compare$prob) == 50)
+any(abs(speciesALL_compare$psims) == 50)
+```
+
+ok, we need to account for 50/50 output (which shouldn't be considered positive/negative) in the QNMs.
+```{r}
+summarise_mismatches <- speciesALL_compare %>%
+  mutate(qnm_direction=ifelse(psims < 0 & abs(psims) != 50, "negative", 
+                              ifelse(psims > 0 & abs(psims) != 50, "positive","split")),
+         mse_direction=ifelse(prob < 0, "negative","positive")) %>%
+  mutate(qnm_equiv=ifelse(abs(psims) < 60, 1,0)) %>%
+  mutate(directional_mismatch=ifelse(qnm_direction==mse_direction,0,
+                                     ifelse(qnm_equiv==1,1,2))) %>%
+  dplyr::select(code,model.y,variable_out,directional_msmatch) %>%
+  pivot_wider(id_cols=c(code,model.y), names_from=variable_out,values_from=directional_mismatch)
+```
+
+
+mismatches summarized across OMs/HCRs for each variable:
+```{r}
+out1 <- summarise_mismatches %>% 
+  pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
+  group_by(model.y,variable,mismatch_type) %>%
+  summarise(n=n()) %>%
+  pivot_wider(names_from="mismatch_type",values_from="n", values_fill = 0) %>%
+  adorn_percentages(denominator="row") %>%
+  mutate(match=round(`0`,2),
+         `mismatch - qnm equivocal`=round(`1`,2),
+         `mismatch`=round(`2`,2)) %>% dplyr::select(-c(`0`,`1`,`2`))
+
+out1
+```
+
+```{r}
+out1 %>%
+  left_join(
+    summarise_mismatches %>% 
+      pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
+      group_by(model.y,variable,mismatch_type) %>%
+      summarise(mismatch_codes=paste0(code,collapse="..")) %>%
+      filter(mismatch_type==2) %>%
+      dplyr::select(model.y,variable,mismatch_codes)
+  ) %>%
+write_csv(here('data','results','qnmVmse_mismatches_bySpbyVar.csv'))
+```
+
+
+mismatches summarized across variables for OMs/HCRs:
+```{r}
+out2 <- summarise_mismatches %>% 
+  pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
+  group_by(model.y,code,mismatch_type) %>%
+  summarise(n=n()) %>%
+  pivot_wider(names_from="mismatch_type",values_from="n", values_fill = 0) %>%
+  rename(match=`0`,
+         `mismatch - qnm equivocal`=`1`,
+         `mismatch`=`2`) %>%
+  filter(`mismatch` > 0) %>%
+  dplyr::select(model.y,code,mismatch) %>%
+  separate(code, into=c("OM","HCR")) %>%
+  pivot_wider(names_from="HCR",values_from="mismatch",values_fill=0) %>%
+  dplyr::select(model.y,OM, A,B,C,D,E)
+ out2 
+```
+ 
+```{r eval=FALSE}
+  write_csv(out2, here('data','results','qnmVmse_mismatches_byOMbyHCR.csv'))
+```
+
+
+
+
+
+
+
+plotting. aggregate across HCRs; look at OMs (x facet) by species (y facet)
+```{r}
+ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(operating_model), rows=vars(model.y)) +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Simulations with Increase/Decrease",
+       title="MSE v. QNM") +
+  theme_bw() + theme(legend.title=element_blank())
+
+
+png(here('data','results','qnmVmse_scatterplot_OM_by_species_2024-03-28.png'), width=2800,height=2000,res=300)
+ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(operating_model), rows=vars(model.y)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion with Increase/Decrease",
+       title="MSE v. QNM") +
+  theme_bw() + theme(legend.title=element_blank())
+dev.off()
+```
+
+for each species, look at OM (x facet) by hcr (y facet)
+```{r}
+png(here('data','results','qnmVmse_scatterplot_sp2_OM_by_HCR_2024-03-28.png'), width=2600,height=2000,res=300)
+ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(operating_model), rows=vars(management_strategy)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  labs(x="MSE: Probability of Increase",y="QNM: Proportion Simulations with Increase/Decrease",
+       title="MSE Species 2 v. QNM") +
+  theme_bw() + theme(strip.text.y=element_text(hjust=0))
+dev.off()
+# 
+# png(here('data','results','qnmVmse_scatterplot_sp1_OM_by_HCR_2024-03-28.png'), width=2800,height=2000,res=300)
+# ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
+#   geom_point() +
+#   geom_hline(aes(yintercept=60), col="orange", lty=2) +
+#   geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+#   geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+#   geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+#   scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+#   facet_grid(cols=vars(operating_model), rows=vars(management_strategy)) +
+#   labs(x="MSE: Probability of Increase",y="QNM: Proportion Simulations with Increase/Decrease",
+#        title="MSE Species 1 v. QNM") +
+#   theme_bw() + theme(strip.text.y=element_text(hjust=0))
+# dev.off()
+```
+
+
+
+### Explore results: Thorson Effort
+
+The Thorson effort quant MSE was run with different values of a parameter. Do quant MSE / QNM results match better at certain values of that parameter?
+```{r}
+png(here('data','results','qnmVmse_OM2ThorsonEffort_scatterplot_20240919.png'), width=3300,height=1600,res=300)
+compareThorson %>%
+  filter(`ms-code` != "A") %>%
+  ggplot(aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(management_strategy), rows=vars(operating_model)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion with Increase/Decrease",
+       title="MSE 2 v. QNM 2 (Thorson Effort)") +
+  theme_bw() + theme(legend.title=element_blank())
+dev.off()
+```
+QNM 2 x HCR C seems to perform better when target set to 1.25x biomass in the quant MSE, although the probability of increase for some of the variables is nearly 50%.
+
+
+
+## Explore results: equivocal QNM
+
+when the QNM was qualitatively *equivocal* ( <60% stable matrices had same response direction), did the direction generally agree with the quant MSE?
+
+```{r}
+speciesALL_equiv <- speciesALL_compare %>%
+  filter((psims < 60 & psims > 0) | (psims > -60 & psims < 0))
+
+speciesALL_equiv %<>% mutate(match_direction=ifelse(psims==50 | psims==-50,"split",
+                                                    ifelse(psims < 0 & prob > 0, "negQNM-->posMSE",
+                                                    ifelse(psims > 0 & prob < 0, "posQNM-->negMSE","match"))))
+```
+
+
+#### Species 1
+
+"split" = the QNM output was 50/50
+
+"match" = the QNM direction was the same as the MSE direction (+/+ or -/-)
+
+"QNM-->MSE" = the QNM direction was different than the MSE direction. Directional difference in heading.
+```{r echo=FALSE}
+with(filter(speciesALL_equiv,grepl("Species1",model.y)), table(match_direction)/dim(filter(speciesALL_equiv,grepl("Species1",model.y)))[1])
+
+speciesALL_equiv %>% filter(grepl("Species1",model.y)) %>%
+  group_by(variable_out) %>%
+  mutate(var_n=n()) %>%
+  ungroup() %>%
+  group_by(variable_out,var_n,match_direction) %>%
+  summarise(ndiff=n()) %>%
+  mutate(pdiff=ndiff/var_n) %>%
+  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
+  pivot_wider(names_from=match_direction, values_from=pdiff)
+```
+
+ 
+
+#### Species 2
+
+"split" = the QNM output was 50/50
+
+"match" = the QNM direction was the same as the MSE direction (+/+ or -/-)
+
+"QNM-->MSE" = the QNM direction was different than the MSE direction. Directional difference in heading.
+
+```{r echo=FALSE}
+with(filter(speciesALL_equiv,grepl("Species2",model.y)), table(match_direction)/dim(filter(speciesALL_equiv,grepl("Species2",model.y)))[1])
+
+speciesALL_equiv %>% filter(grepl("Species2",model.y)) %>%
+  group_by(variable_out) %>%
+  mutate(var_n=n()) %>%
+  ungroup() %>%
+  group_by(variable_out,var_n,match_direction) %>%
+  summarise(ndiff=n()) %>%
+  mutate(pdiff=ndiff/var_n) %>%
+  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
+  pivot_wider(names_from=match_direction, values_from=pdiff)
+```
+match_direction
+          match negQNM-->posMSE posQNM-->negMSE           split 
+     0.40909091      0.09090909      0.40909091      0.09090909 
+     
+
+
+## Explore Results: each operating model
+
+for specific operating models, break out comparisons by management strategies and species
+```{r}
+png(here('results','QNM_v_MSE_0BaseModel_quantitative_scatterplot_2024-02-01.png'), width=3200,height=1500,res=300)
+speciesALL_compare %>%
+  filter(grepl('0',operating_model)) %>%
+  ggplot(aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(management_strategy), rows=vars(model.y)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Simulations with Increase/Decrease",
+       title="MSE 0 v. QNM 0 (Base Model)") +
+  theme_bw() + theme(legend.title=element_blank())
+dev.off()
+
+
+png(here('results','QNM_v_MSE_3LowerProductivity_quantitative_scatterplot_2024-02-01.png'), width=3200,height=1500,res=300)
+speciesALL_compare %>%
+  filter(grepl('3',operating_model)) %>%
+  ggplot(aes(x=prob,y=psims, pch=variable_out)) +
+  geom_point() +
+  geom_hline(aes(yintercept=60), col="orange", lty=2) +
+  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
+  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
+  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+  facet_grid(cols=vars(management_strategy), rows=vars(model.y)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Simulations with Increase/Decrease",
+       title="MSE 3 v. QNM 3 (Lower Productivity)") +
+  theme_bw() + theme(legend.title=element_blank())
+dev.off()
+```
+
+
+
