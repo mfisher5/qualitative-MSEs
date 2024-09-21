@@ -12,7 +12,7 @@
 ##' @param perturb a named vector that indicates which nodes were perturbed and the relative magnitude of the perturbation.
 ##' @param monitor a named vector of signs (-1,0,1) or NA that indicates the outcome of the perturbation.
 ##' @export
-impact.ss <- function(sim,perturb=0,monitor=NA,epsilon=1.0E-5) {
+impact.ss <- function(sim,perturb=0,monitor=NA,epsilon=1.0E-5, track_sims=5000) {
   
   
   ## Utility function
@@ -30,14 +30,14 @@ impact.ss <- function(sim,perturb=0,monitor=NA,epsilon=1.0E-5) {
   }
   ##
   
-  
+  s <- Sys.time()
   # Summarise simulation outcomes -------------------------------------------
   As <- sim$A                                         # list of community matrices
   nodes <- node.labels(sim$edges)                     # node names
   
   Wlog <- matrix(nrow=1,ncol=length(sim$edges$From))
   Wlog <- as.data.frame(Wlog)
-  exA <- adjacency.matrix(sim$edges,required.groups = c(0,4))
+  exA <- QPress::adjacency.matrix(sim$edges,required.groups = c(0,4))
   whichW <- which(exA != 0)   # which pairwise matches of nodes have an interaction in the qnm
   if(!(length(whichW)==dim(Wlog)[2])){stop("ERROR: you have uncertain edges in your model. make sure these edges are required when generating the sample community matrix, exA.")}
   tempedgenames <- matrix("",nrow=dim(exA)[1],ncol=dim(exA)[2])
@@ -62,8 +62,9 @@ impact.ss <- function(sim,perturb=0,monitor=NA,epsilon=1.0E-5) {
     ## pull the edge values
     Wlog[i,] <- As[[i]][whichW]
     
-    if(i%%10000==0){message(i, " sims logged.")}
+    if(i%%track_sims==0){message(i, " sims logged.")}
   }
+  message(round(Sys.time()-s))
   
   return(list(allimp,Wlog))
 }
