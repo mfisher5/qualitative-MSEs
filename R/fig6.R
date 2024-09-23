@@ -12,6 +12,8 @@
 
 # Set up ------------------------------------------------------------------
 
+sim.date <- '20240923'
+
 ## Functions
 library(here)
 library(tidyverse)
@@ -23,7 +25,7 @@ library(janitor)
 
 # Data --------------------------------------------------------------------
 
-speciesALL_compare <- readRDS(here('data','results','mse-probs_V_qnm-props_Species12_allHCRallMS_202402.rds'))
+speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv')))
 
 
 
@@ -31,6 +33,7 @@ speciesALL_compare <- readRDS(here('data','results','mse-probs_V_qnm-props_Speci
 
 ## fix variable names for legend
 speciesALL_compare %<>% 
+  filter(code != "2-A") %>%     # QNM 2 HCR A doesn't have a perturbation
   mutate(variable_out=fct_recode(variable_out,"Fishery 1 Catch"="fishery_1_catch",
                                  "Fishery 2 Catch"="fishery_2_catch",
                                  "Total Catch"="total_catch",
@@ -75,7 +78,7 @@ p1 <- ggplot(data=speciesALL_compare, aes(x=prob, y=psims,
                                           pch=fct_relevel(variable_out, 
                                                           c("Total Catch","Fishery 1 Catch","Fishery 2 Catch", "Spawning Biomass")))) +
   geom_point(size=2) +
-  geom_text(data=compare_counts,aes(x=x,y=y,label=n, col=match), 
+  geom_text(data=compare_counts_om,aes(x=x,y=y,label=n, col=match), 
             size=3.5, inherit.aes=FALSE) +
   geom_hline(aes(yintercept=60), col="orange", lty=2) +
   geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
