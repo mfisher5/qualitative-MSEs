@@ -24,8 +24,8 @@ library(ggplot2)
 
 #Load XML first--dependency not included in QPress
 #To install QPress: 
-#   library(remotes)
-#   remotes::install_github("SWotherspoon/QPress")
+  # library(remotes)
+  # remotes::install_github("SWotherspoon/QPress")
 library(QPress)
 library(XML)
 library(tcltk2)
@@ -106,6 +106,23 @@ end.timer(s)
 mlist_all <- list(m0list,m2list,m3list,m4list,m5list)
 names(mlist_all) <- c("OM O","OM 2 Thorson Effort","OM 3", "OM 4 Offshore Inaccessible","OM 5 Faster Growth")
 ```
+```{r eval=FALSE}
+## check for duplicate edges
+for(j in seq(1,length(mlist_all))){
+  tmp_mlist <- mlist_all[[j]]
+  for(i in seq(1,length(tmp_mlist))){
+    tmp <- tmp_mlist[[i]] %>% unite(From,To,col="edge", sep="-") %>%
+      group_by(edge) %>% summarise(n=n()) %>%
+      filter(n>1)
+    if(dim(tmp)[1]>0){   
+      print(names(mlist_all)[[j]])   
+      print(i)
+      print("!! duplicate edges !!")
+      print(tmp)
+    }
+  }
+}
+```
 
 
 Some models require perturbations
@@ -144,8 +161,8 @@ for(i in seq(1,length(mlist_all))){
 
 
 ## specific OMs
-tmp_list <- mlist4
-tmp_name <- "QNM 4 Offshore Inaccessible"
+tmp_list <- mlist0
+tmp_name <- "OM O"
 for(j in seq(1:4)){
   m.mat.out <- adjacency.matrix(tmp_list[[j]],labels=TRUE)
   m.mat.df <- as.data.frame(m.mat.out) %>% rownames_to_column("x")

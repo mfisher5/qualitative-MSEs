@@ -44,7 +44,7 @@ source(here('R/fxns/qnm.sensitivity.R'))
 end.timer <- function(s){round(Sys.time()-s,2)}
 
 ## read in which version of the data from qpress?
-sim.date <- '20240920' ## 9/20/2024 and 9/19/2024 are the same, just run on different computers
+sim.date <- '20240919' ## 9/20/2024 and 9/19/2024 are the same, just run on different computers
 
 ```
 
