@@ -28,7 +28,7 @@ library(kableExtra)
 source(here('R/fxns/compare.models.MSEtable.R'))
 
 ## read in which version of the data from qpress?
-sim.date <- '20240919'
+sim.date <- '20240923'
 
 ```
 
@@ -42,7 +42,7 @@ qnm <- read_csv(here('data','results',paste0('qnm0-5_hcra-e_pSims_',sim.date,'.c
 ```
 
 The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
-```{r}
+```{r eval=TRUE}
 mse_format <- read_csv(here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
 ```
 
@@ -82,7 +82,7 @@ write_csv(mse_format, here('data','results','mse0-5_hcrb-d_species1-2_20240206.c
 
 If this isn't the first time running the script, read in the data frames from the next section. set code chunks to false.
 
-```{r eval=TRUE}
+```{r eval=FALSE}
 
 speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv'))) %>% 
   filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
@@ -95,7 +95,7 @@ compareThorson <- read_csv(here('data','results',paste0('mse2Vqnm2_prob-psim_spe
 ### first run of script
 
 melt tables so that they can be combined
-```{r eval=FALSE}
+```{r eval=TRUE}
 qnm %<>% pivot_longer(cols=c(total_catch, fishery_1,fishery_2,spawning_biomass), names_to="variable_out", values_to="psims") %>%
   mutate(model="QNM") %>%
   mutate(variable_out=ifelse(variable_out=="fishery_1","fishery_1_catch",
@@ -111,7 +111,7 @@ mse2 <- mse_format %>% filter(model=="MSE-Species2") %>%
 ```
 
 match mse species 1 / qnm
-```{r eval=FALSE}
+```{r eval=TRUE}
 species1_compare <- qnm %>% left_join(mse1, by=c("code","variable_out"))
 ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
@@ -127,7 +127,7 @@ ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
 ```
 
 match mse species 2 / qnm
-```{r eval=FALSE}
+```{r eval=TRUE}
 species2_compare <- qnm %>% left_join(mse2, by=c("code","variable_out"))
 ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
@@ -143,7 +143,7 @@ ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
 ```
 
 match multiple MSE versions of 2 Thorson Effort to QNM
-```{r eval=FALSE}
+```{r eval=TRUE}
 compareThorson <- qnm %>% filter(operating_model=="2. Thorson effort") %>% 
   separate(code, into=c("om-code","ms-code"),sep="-",remove=FALSE) %>%
   dplyr::select(-"om-code") %>%
@@ -162,7 +162,7 @@ compareThorson$operating_model <- factor(compareThorson$operating_model, levels=
 
 save 
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 ## all hcrs, oms
 speciesALL_compare <- bind_rows(species1_compare, species2_compare)
 write_csv(speciesALL_compare, here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv')))
@@ -190,6 +190,7 @@ any(abs(speciesALL_compare$psims) == 50)
 ok, we need to account for 50/50 output (which shouldn't be considered positive/negative) in the QNMs.
 ```{r}
 summarise_mismatches <- speciesALL_compare %>%
+  filter(code != "2-A") %>%    # no perturbation in 2-A so can't compare to MSE
   mutate(qnm_direction=ifelse(psims < 0 & abs(psims) != 50, "negative", 
                               ifelse(psims > 0 & abs(psims) != 50, "positive","split")),
          mse_direction=ifelse(prob < 0, "negative","positive")) %>%
@@ -228,10 +229,11 @@ out1 %<>%
       dplyr::select(model.y,variable,mismatch_codes)
   )
 ```
+
 save to file
 ```{r eval=FALSE}
 # as csv
-write_csv(here('data','results','qnmVmse_mismatches_bySpbyVar.csv'))
+write_csv(out1, here('data','results',paste0('qnmVmse_mismatches_bySpbyVar',sim.date,'.csv')))
 
 # as nice table
 out1 %>%
@@ -274,7 +276,7 @@ out2 <- summarise_mismatches %>%
 ```
  
 ```{r eval=FALSE}
-  write_csv(out2, here('data','results','qnmVmse_mismatches_byOMbyHCR.csv'))
+  write_csv(out2, here('data','results',paste0('qnmVmse_mismatches_byOMbyHCR',sim.date,'.csv')))
 ```
 
 plotting. aggregate across HCRs; look at OMs (x facet) by species (y facet)

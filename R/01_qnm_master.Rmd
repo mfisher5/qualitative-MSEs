@@ -161,8 +161,8 @@ for(i in seq(1,length(mlist_all))){
 
 
 ## specific OMs
-tmp_list <- mlist0
-tmp_name <- "OM O"
+tmp_list <- m3list
+tmp_name <- "OM 3"
 for(j in seq(1:4)){
   m.mat.out <- adjacency.matrix(tmp_list[[j]],labels=TRUE)
   m.mat.df <- as.data.frame(m.mat.out) %>% rownames_to_column("x")
@@ -173,7 +173,7 @@ for(j in seq(1:4)){
   
   m.mat.name <- paste0(str_replace_all(tmp_name, " ", "_"),suffix,'.csv')
   
-  write_csv(m.mat.df, file=here('data','CSVs',m.mat.name))
+  write_csv(m.mat.df, file=here('data','qnm_models',m.mat.name))
 }
 ```
 

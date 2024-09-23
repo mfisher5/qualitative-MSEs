@@ -29,7 +29,7 @@ source(here('R/fxns/compare.models.MSEtable.R'))
 
 This script creates tables for the perturbations run on:
 ```{r}
-sim.date <- '20240919'
+sim.date <- '20240923'
 ```
 
 

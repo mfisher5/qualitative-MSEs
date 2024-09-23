@@ -1,7 +1,0 @@
-species,operating_model,match,mismatch - qnm equivocal,mismatch,sum
-MSE-Species1,Target 0.75x Biomass,0.8125,0.0625,0.125,16
-MSE-Species1,Target 1.25x Biomass,0.8125,0.0625,0.125,16
-MSE-Species1,Target 1x Biomass (OG),0.8125,0.0625,0.125,16
-MSE-Species2,Target 0.75x Biomass,0.5625,0.1875,0.25,16
-MSE-Species2,Target 1.25x Biomass,0.6875,0.1875,0.125,16
-MSE-Species2,Target 1x Biomass (OG),0.625,0.1875,0.1875,16

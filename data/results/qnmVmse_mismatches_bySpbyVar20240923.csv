@@ -1,0 +1,9 @@
+model.y,variable,match,mismatch - qnm equivocal,mismatch,mismatch_codes
+MSE-Species1,fishery_1_catch,0.65,0.13,0.22,"0-E, 3-E, 5-A, 5-D, 5-E"
+MSE-Species1,fishery_2_catch,0.83,0.04,0.13,"2-C, 5-A, 5-C"
+MSE-Species1,spawning_biomass,0.87,0.04,0.09,"2-C, 5-A"
+MSE-Species1,total_catch,0.57,0.22,0.22,"0-B, 0-E, 5-A, 5-B, 5-E"
+MSE-Species2,fishery_1_catch,0.43,0.17,0.39,"0-D, 0-E, 3-D, 3-E, 4-D, 5-A, 5-C, 5-D, 5-E"
+MSE-Species2,fishery_2_catch,0.83,0.09,0.09,"2-C, 5-A"
+MSE-Species2,spawning_biomass,0.91,0.04,0.04,5-A
+MSE-Species2,total_catch,0.26,0.17,0.57,"0-B, 0-D, 0-E, 2-C, 2-E, 3-D, 3-E, 4-D, 5-A, 5-B, 5-C, 5-D, 5-E"
