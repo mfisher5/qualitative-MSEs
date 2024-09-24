@@ -44,7 +44,7 @@ source(here('R/fxns/qnm.sensitivity.R'))
 end.timer <- function(s){round(Sys.time()-s,2)}
 
 ## read in which version of the data from qpress?
-sim.date <- '20240919' ## 9/20/2024 and 9/19/2024 are the same, just run on different computers
+sim.date <- '20240923' ## 9/20/2024 and 9/19/2024 are the same, just run on different computers
 
 ```
 
@@ -139,30 +139,7 @@ Pert5.list <- lapply(Pert.list,function(x){c(x,c(`Growth`=1))})
 ## Prep: extract simulation data
 
 Use a custom function to produce two matrices from each QPRESS object: (1) the perturbation response (+1/-1/0) of each variable (column) in each simulation iteration (row); and (2) the randomly simulated weight of each edge (column) in each simulation iteration (row). Bind them together.
-```{r}
-s <- Sys.time()
 
-for(i in seq(1,length(hcrC_out))){
-  tmp_s <- hcrC_out[[i]]
-  tmp_name <- names(hcrC_out)[[i]]
-  if(i==1){tmp_qnm=0}else{tmp_qnm=i}
-  
-  if(grepl("3", tmp_name)){ tmp_p <- Pert3.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]}
-  else if(grepl("4", tmp_name)){ tmp_p <- Pert4.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]}
-  else if(grepl("5", tmp_name)){ tmp_p <- Pert5.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]} else {
-    tmp_p <- Pert.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]
-  }
-  
-  tmp_mat <- impact.ss(sim=tmp_s,perturb=tmp_p,monitor=NA)
-  out <- cbind(tmp_mat[[1]],tmp_mat[[2]])
-  write_csv(out, here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',tmp_qnm,'-HCRc_',sim.date,'.csv')))
-            
-}
-
-
-
-end.timer(s)
-```
 ```{r}
 for(i in c(1,4)){
   # get the QPRESS output for all OMs in this HCR list
@@ -174,7 +151,7 @@ for(i in c(1,4)){
   
   # for each OM's QPRESS output in this list...
   # for(j in seq(2,length(tmp_hcr_out))){
-  for(j in c(2,4,5)){
+  for(j in c(1,3)){
     ## create loop objects
     tmp_qpress <- tmp_hcr_out[[j]]            # QPRESS output object for this OM
     tmp_name <- names(tmp_hcr_out)[[j]]  # name of OM
@@ -210,7 +187,34 @@ sim$edges %>% unite(From,To,col="edge",sep="-") %>%
 m %>% unite(From,To,col="edge",sep="-") %>% 
   group_by(edge) %>% summarise(n=n()) %>% filter(n>1)
 ```
-It appears that my QNM 0, which I use for both HCR A and HCR D, has the edges `offshore biomass large-Total catch` and `offshore biomass small-Total catch` listed 3/2 times instead of just once 
+
+
+
+```{r echo=FALSE, eval=FALSE}
+## run for a single HCR
+s <- Sys.time()
+
+for(i in seq(1,length(hcrC_out))){
+  tmp_s <- hcrC_out[[i]]
+  tmp_name <- names(hcrC_out)[[i]]
+  if(i==1){tmp_qnm=0}else{tmp_qnm=i}
+  
+  if(grepl("3", tmp_name)){ tmp_p <- Pert3.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]}
+  else if(grepl("4", tmp_name)){ tmp_p <- Pert4.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]}
+  else if(grepl("5", tmp_name)){ tmp_p <- Pert5.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]} else {
+    tmp_p <- Pert.list[['C:Rmv inshore sm mesh fleet\nEffort redistribution']]
+  }
+  
+  tmp_mat <- impact.ss(sim=tmp_s,perturb=tmp_p,monitor=NA)
+  out <- cbind(tmp_mat[[1]],tmp_mat[[2]])
+  write_csv(out, here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',tmp_qnm,'-HCRc_',sim.date,'.csv')))
+            
+}
+
+
+
+end.timer(s)
+```
 
 
 ## Linkage influence: Total catch
@@ -265,15 +269,17 @@ fish1.br.list <- list()
 This for loop will 
 ```{r}
 counter = 1
-for(i in c("A","B","C","D","E")){
-  
-  for(j in c(2,4,5)){
+for(i in c("B","c","D","E")){  # HCRs
+
+  for(j in c(0,2,3,4,5)){  # OMs
+    
+    if(j %in% c(0,3) & i %in% c("A","D")){sim.date='20240923'} else{sim.date='20240920'}
     
     # read in gbm input matrix 
     tmp_in <- read_csv(here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.csv')))
     
     # if variable differs in response across sims, fit with gbm step
-    if(length(unique(tmp_in[,"Fishery 1"])) > 1){
+    if(dim(unique(tmp_in[,"Fishery 1"]))[1] > 1){
       ## find the column that starts reporting on edges, instead of vertices
       d1 <- which(str_detect(colnames(tmp_in),"_"))[1]
       d2 <- dim(tmp_in)[2]
@@ -282,6 +288,7 @@ for(i in c("A","B","C","D","E")){
       d <- cbind(tmp_in[,"Fishery 1"],tmp_in[,d1:d2])
       
       ## fitting with gbm step
+      +
       fit.gbm <- gbm.step(data=d,gbm.x=2:dim(d)[2],gbm.y=1,family="gaussian",tree.complexity=5, learning.rate = 0.01,bag.fraction = 0.5)
       ## save fit to list
       fish1.br.list[[counter]] <- fit.gbm
@@ -293,6 +300,15 @@ for(i in c("A","B","C","D","E")){
     
 }
 }
+```
+ran: 
+```{r}
+names(fish1.br.list)
+```
+
+save 
+```{r}
+saveRDS(fish1.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_Fishery1_GaussTr5Lr01_',sim.date,'.rds')))
 ```
 
 

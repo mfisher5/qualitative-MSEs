@@ -145,6 +145,7 @@ ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
 match multiple MSE versions of 2 Thorson Effort to QNM
 ```{r eval=TRUE}
 compareThorson <- qnm %>% filter(operating_model=="2. Thorson effort") %>% 
+  filter(`ms-code` != "A") %>%
   separate(code, into=c("om-code","ms-code"),sep="-",remove=FALSE) %>%
   dplyr::select(-"om-code") %>%
   left_join(mse_format %>% rename(mse_code=code) %>%
