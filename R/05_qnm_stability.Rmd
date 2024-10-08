@@ -28,8 +28,7 @@ library(tidyverse)
 library(magrittr)
 library(ggplot2)
 library(QPress)
-library(janitor)
-library(kableExtra)
+library(PNWColors)
 
 ## let's time things
 end.timer <- function(s){round(Sys.time()-s,2)}
@@ -48,6 +47,7 @@ Read in the output from perturbations
 ```{r load_sims, echo=TRUE}
 s <- Sys.time()
 
+
 hcrA_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrA_10K_',sim.date,'.rds')))
 hcrB_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrB_10K_',sim.date,'.rds')))
 hcrC_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrC_10K_',sim.date,'.rds')))
@@ -57,29 +57,122 @@ hcrE_out <- readRDS(here('data','qnm_out',paste0('mse0-5_hcrE_10K_',sim.date,'.r
 hcr_out_all <- list(hcrA_out,hcrB_out,hcrC_out,hcrD_out,hcrE_out)
 names(hcr_out_all) <- c("A","B","C","D","E")
 
+
 end.timer(s)
 ```
 
+Read in the counts of mismatched qual v quant results.
+```{r echo=TRUE}
+compare_df <- read_csv(here('data','results','qnmVmse_mismatches_byOMbyHCR20240923.csv'))
+```
 
-## % stable matrices
-
-What is the overall distribution of % stable matrices?
-
-
-Where do the results for operating model scenario #5 fall within this distribution?
-
-
-Where do the results for management strategies D & E fall within this distribution?
-
+Read in the qualitative outcomes from the QNMs, so we can count equivocal results.
+```{r}
+qnm_out <- read_csv(here('data','results','qnm0-5_hcra-e_qualitative_20240923.csv'))
+```
 
 
 
-Ranked sum -- does % mismatches trend with % stable matrices?
+## stability & mismatched results
+
+What is the overall distribution of proportion stable matrices?
+```{r}
+for(i in 1:length(hcr_out_all)){
+  
+  tmp.stable <- sapply(hcr_out_all[[1]],function(x){x$stable/x$total})
+  
+  if(i==1){
+    stable.df <- data.frame(ms=rep(names(hcr_out_all)[i],length.out=length(tmp.stable)),
+                            om=names(tmp.stable),
+                            pstable=as.numeric(tmp.stable))
+  } else{ stable.df %<>% bind_rows(data.frame(ms=rep(names(hcr_out_all)[i],length.out=length(tmp.stable)),
+                            om=names(tmp.stable),
+                            pstable=as.numeric(tmp.stable)))}
+}
+
+ggplot(stable.df,aes(x=pstable)) +
+  geom_histogram(bins=50) + theme_bw()
+```
 
 
+Break down by OM/MS: Is the stability of OM 5 (had the most mismatches between the quantitative MSE and the QNMs)
+```{r}
+ggplot(stable.df,aes(x=om,y=pstable)) +
+  geom_jitter(width=0.15,height=0, aes(col=ms)) + 
+  labs(x='operating model', y='proportion matrices stable') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1))
+```
+
+wild! so OM 4 (offshore inaccessible biomass because of climate change) was the least stable, while OM 2 (Thorson effort) was the most stable. 
+
+This is not what I expected!
+
+Does % mismatches trend with % stable matrices?
+```{r}
+compare_df %<>%
+  pivot_longer(cols=c('A','B','C','D','E'), names_to="MS", values_to="n_mismatch") %>%
+  mutate(p_mismatch=n_mismatch/4)
+
+compare_df %>%
+  left_join(stable.df %>%
+              rename(om_name=om) %>%
+              mutate(om=substr(om_name,4,4)) %>%
+              mutate(om=ifelse(om=="O",as.double("0"),as.double(om))),
+            by=c("MS"="ms","OM"="om")) %>%
+  ggplot(aes(x=pstable,y=p_mismatch)) +
+  geom_point(aes(col=om_name)) + 
+  facet_wrap(~model.y) +
+  theme_bw()
+```
 
 
+```{r}
+png(here('doc','supplement','figC1-StabilityVMismatches.png'), res=300, height=1000,width=1850)
+compare_df %>%
+  mutate(model.y=case_when(model.y=='MSE-Species1' ~ 'Species 1',
+                           model.y=='MSE-Species2' ~ 'Species 2')) %>%
+  left_join(stable.df %>%
+              rename(om_name=om) %>%
+              mutate(om=substr(om_name,4,4)) %>%
+              mutate(om=ifelse(om=="O",as.double("0"),as.double(om)),
+                     om_name=ifelse(om_name=="OM O", "OM 0 Status Quo",om_name)),
+            by=c("MS"="ms","OM"="om")) %>%
+  ggplot(aes(x=pstable,y=p_mismatch)) +
+  geom_point(aes(col=om_name), alpha=0.5) + 
+  facet_wrap(~model.y) +
+  labs(x='proportion matrices stable',y='proportion metrics mismatched') +
+  scale_color_discrete(type=pnw_palette(name="Starfish",n=5,type="discrete"), name='Operating Model') +
+  theme_bw()
+dev.off()
+```
 
 
+## stability & equivocal QNM output
 
+The OM with the least stability will probably have the most equivocal outcomes for metrics?...
 
+```{r}
+qnm_out %<>% pivot_longer(cols=4:7, names_to='metric', values_to='qual_out') %>%
+  group_by(`Operating model`,`Management strategy`) %>%
+  mutate(n_tot=n()) %>%
+  ungroup() %>%
+  group_by(`Operating model`,`Management strategy`, n_tot,qual_out) %>%
+  summarise(n=n()) %>%
+  mutate(p_tot=n/n_tot)
+```
+
+```{r}
+qnm_out %>% filter(qual_out=="Equiv") %>%
+  mutate(OM=substr(`Operating model`,1,1),
+         MS=substr(`Management strategy`,1,1)) %>%
+  left_join(stable.df %>%
+              rename(om_name=om) %>%
+              mutate(om=substr(om_name,4,4)) %>%
+              mutate(om=ifelse(om=="O","0",om)),
+            by=c("OM"="om","MS"="ms")) %>%
+  ggplot(aes(x=pstable,y=p_tot)) +
+  geom_jitter(width=0.005,height=0.005,aes(pch=MS,col=OM)) +
+  theme_bw()
+```
+
+hmm. nope.
