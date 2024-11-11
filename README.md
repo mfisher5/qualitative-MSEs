@@ -1,1 +1,1 @@
-# Translating quantitative MSEs into quantitative network models
+# Translating quantitative MSEs into qualitative network models
