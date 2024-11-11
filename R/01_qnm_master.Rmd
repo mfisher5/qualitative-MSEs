@@ -219,16 +219,12 @@ names(Pert.list) <- c("A:Status Quo","B:Rmv sm mesh fleet","C:Rmv inshore sm mes
 
 ## Run each HCR across Operating Models
 
-Compare outcomes from different HCRs for each operating model
-```{r}
-hcr_run_times <- c()
-```
-
-Run things
+Each section runs an HCR across all operating models. Then it saves: (1) an RDS for each HCR, with the perturbation output in a list; (2) a vector with the time it took to run the perturbations, and (3) a table of perturbation results for each variable (optionally saving this into a png, if plot_out=TRUE) 
 ```{r}
 set.seed(555)
 
 plot_out <- FALSE
+hcr_run_times <- c()
 
 # HCR A -------------------------------------------------------------------
 # simulation prep
@@ -237,7 +233,6 @@ mlist_hcr <- sapply(mlist_all,"[",1)  # we only need the first version of the OM
 hcr_out <- list()   # empty list for simulation output
 
 # run simulation
-s <- Sys.time()  # start timer
 for(i in seq(1,length(mlist_hcr))){
   
   # load 'i' operating model
@@ -249,6 +244,9 @@ for(i in seq(1,length(mlist_hcr))){
   if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
   if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
   
+  
+  s <- Sys.time()  # start timer
+  
   # run simulation, save to output list
   hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
                             edges=tmp_om, # the qnm
@@ -259,13 +257,14 @@ for(i in seq(1,length(mlist_hcr))){
                               monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
   names(hcr_out)[i] <- tmp_om_name
   
+  # save time info
+  hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+  names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrA',tmp_om_name,sep="_")
+  
   # reset perturbation
   p_hcr <- PertA
 }
 
-# save time info
-hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
-names(hcr_run_times)[length(hcr_run_times)] <- "HCR A"
 
 # HCR A 
 # 15.79955s
@@ -299,7 +298,6 @@ names(mlist_hcr) <- names(mlist_all)
 hcr_out <- list()   # empty list for simulation output
 
 # run simulation
-s <- Sys.time()  # start timer
 for(i in seq(1,length(mlist_hcr))){
   
   # load 'i' operating model
@@ -311,6 +309,8 @@ for(i in seq(1,length(mlist_hcr))){
   if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
   if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
   
+  s <- Sys.time()  # start timer
+
   # run simulation, save to output list
   hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
                                   edges=tmp_om, # the qnm
@@ -321,13 +321,14 @@ for(i in seq(1,length(mlist_hcr))){
                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
   names(hcr_out)[i] <- tmp_om_name
   
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrB',tmp_om_name,sep="_")
+  
   # reset perturbation
   p_hcr <- PertB
 }
 
-# save time info
-hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
-names(hcr_run_times)[length(hcr_run_times)] <- "HCR B"
 
 # save simulation outputs for future use
 saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
@@ -359,7 +360,6 @@ mlist_hcr <- sapply(mlist_all,"[",3)  # we  need the FIRST version of the OM for
 hcr_out <- list()   # empty list for simulation output
 
 # run simulation
-s <- Sys.time()  # start timer
 for(i in seq(1,length(mlist_hcr))){
   
   # load 'i' operating model
@@ -371,6 +371,8 @@ for(i in seq(1,length(mlist_hcr))){
   if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
   if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
   
+  s <- Sys.time()  # start timer
+  
   # run simulation, save to output list
   hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
                                   edges=tmp_om, # the qnm
@@ -381,13 +383,13 @@ for(i in seq(1,length(mlist_hcr))){
                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
   names(hcr_out)[i] <- tmp_om_name
   
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrC',tmp_om_name,sep="_")
+
   # reset perturbation
   p_hcr <- PertC
 }
-
-# save time info
-hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
-names(hcr_run_times)[length(hcr_run_times)] <- "HCR C"
 
 # save simulation outputs for future use
 saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
@@ -419,7 +421,6 @@ mlist_hcr <- sapply(mlist_all,"[",1)  # we  need the FIRST version of the OM for
 hcr_out <- list()   # empty list for simulation output
 
 # run simulation
-s <- Sys.time()  # start timer
 for(i in seq(1,length(mlist_hcr))){
   
   # load 'i' operating model
@@ -431,6 +432,8 @@ for(i in seq(1,length(mlist_hcr))){
   if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
   if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
   
+s <- Sys.time()  # start timer
+
   # run simulation, save to output list
   hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
                                   edges=tmp_om, # the qnm
@@ -441,13 +444,14 @@ for(i in seq(1,length(mlist_hcr))){
                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
   names(hcr_out)[i] <- tmp_om_name
   
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrD',tmp_om_name,sep="_")
+
   # reset perturbation
   p_hcr <- PertD
 }
 
-# save time info
-hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
-names(hcr_run_times)[length(hcr_run_times)] <- "HCR D"
 
 # save simulation outputs for future use
 saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
@@ -480,7 +484,6 @@ mlist_hcr <- sapply(mlist_all,"[",4)  # we  need the FIRST version of the OM for
 hcr_out <- list()   # empty list for simulation output
 
 # run simulation
-s <- Sys.time()  # start timer
 for(i in seq(1,length(mlist_hcr))){
   
   # load 'i' operating model
@@ -492,6 +495,9 @@ for(i in seq(1,length(mlist_hcr))){
   if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
   if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
   
+  
+s <- Sys.time()  # start timer
+  
   # run simulation, save to output list
   hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
                                   edges=tmp_om, # the qnm
@@ -502,13 +508,14 @@ for(i in seq(1,length(mlist_hcr))){
                                     monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
   names(hcr_out)[i] <- tmp_om_name
   
+# save time info
+hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrE',tmp_om_name,sep="_")
+
   # reset perturbation
   p_hcr <- PertE
 }
 
-# save time info
-hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
-names(hcr_run_times)[length(hcr_run_times)] <- "HCR E"
 
 # save simulation outputs for future use
 saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
@@ -532,13 +539,44 @@ dev.off()}
 
 ```
 
-so, how long did everything take?
+so, how long did everything take, on average?
 ```{r}
-hcr_run_times
+run_times_df <- as.data.frame(hcr_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM O Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=hcr_run_times)
+
+mean(run_times_df$run_time)
+group_by(run_times_df, hcr) %>% summarise(all_oms=sum(run_time))
 ```
 
 |.HCR A.|.HCR B.|.HCR C.|.HCR D.|.HCR E.|
 | 28.97 | 29.93 | 29.73 | 29.14 | 28.20 |
+
+save as df and fig
+```{r}
+write_csv(run_times_df, here('data','qnm_run_times.csv'))
+
+ptime <- run_times_df %>%
+  mutate(om_num=str_split_i(om, ' ', 2)) %>%
+  mutate(om_num=case_when(om_num=='O' ~ '0', .default=om_num)) %>%
+  mutate(om=fct_reorder(om, as.numeric(om_num))) %>%
+ggplot(aes(y=run_time, x=om)) + 
+  geom_boxplot(aes(fill=om), alpha=0.5) +
+  geom_jitter(aes(col=om), pch=21, width=0.05) +
+  labs(y='run time (seconds)',x='QNM') +
+  ylim(c(0,6)) +
+  theme_bw() +
+  theme(legend.position='none', axis.text.x=element_text(angle=40, hjust=1))
+
+ptime
+
+png(here('doc','supplement','FigC1-run-times.png'), res=200, height=800,width=800)
+ptime
+dev.off()
+```
 
 
 ## Run each OM for every HCR
@@ -663,9 +701,9 @@ dev.off()
 
 
 
-### OM 4
+### Revise an OM
 
-
+Written for revising QNM 4 (Inaccessible offshore biomass)
 do you want to load new models?
 ```{r}
 # m1 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-2-movement-to-inaccessible',dia_path=here('data'))[[1]]  # no constraints

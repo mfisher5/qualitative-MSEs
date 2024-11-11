@@ -139,19 +139,19 @@ Pert5.list <- lapply(Pert.list,function(x){c(x,c(`Growth`=1))})
 ## Prep: extract simulation data
 
 Use a custom function to produce two matrices from each QPRESS object: (1) the perturbation response (+1/-1/0) of each variable (column) in each simulation iteration (row); and (2) the randomly simulated weight of each edge (column) in each simulation iteration (row). Bind them together.
-
 ```{r}
-for(i in c(1,4)){
+prep_run_times <- c()
+```
+```{r}
+for(i in c(2,3,5)){
   # get the QPRESS output for all OMs in this HCR list
   tmp_hcr_out <- hcr_out_all[[i]]
   tmp_hcr <- names(hcr_out_all)[[i]]
   print(tmp_hcr)
   
-  s <- Sys.time()
-  
   # for each OM's QPRESS output in this list...
   # for(j in seq(2,length(tmp_hcr_out))){
-  for(j in c(1,3)){
+  for(j in 1:5){
     ## create loop objects
     tmp_qpress <- tmp_hcr_out[[j]]            # QPRESS output object for this OM
     tmp_name <- names(tmp_hcr_out)[[j]]  # name of OM
@@ -164,21 +164,42 @@ for(i in c(1,4)){
       tmp_p <- Pert.list[[i]]
     }
     
+    s <- Sys.time()  # start timer
+    
     ## generate matrix from QPRESS output
     tmp_mat <- impact.ss(sim=tmp_qpress,perturb=tmp_p,monitor=NA)
     out <- cbind(tmp_mat[[1]],tmp_mat[[2]])
-    write_csv(out, here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',tmp_qnm,'-HCR',tmp_hcr,'_',sim.date,'.csv')))
+    
+    prep_run_times[length(prep_run_times)+1] <- end.timer(s)
+    names(prep_run_times)[length(prep_run_times)] <- paste(tmp_hcr, tmp_name, sep="_")
+    
+    ## save matrix
+    saveRDS(out, here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',tmp_qnm,'-HCR',tmp_hcr,'_',sim.date,'.rds')))
     
   }
-  
-  end.timer(s)
   
 }
 ```
 
-Each hcr list is taking ~7-10min.
 
-*If impact.ss returns an ERROR about having uncertain edges, first check to make sure that all "Group" numbers from the model data frame (first object in the list of the QPRESS system.simulate output, tmp_qpress) are listed as 'required.groups' on line 40 of the impact.ss function code. Then, check to see if any of your edges are listed twice in the model data frame. 
+How long did that take, on average? (~1-2min each)
+```{r}
+run_times_df <- as.data.frame(prep_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time_min=prep_run_times)
+# save
+write_csv(run_times_df, here('data','qnm_out','sensitivity','prep_sensitivity_mats_run_times.csv'))
+#
+
+mean(run_times_df$run_time); sd(run_times_df$run_time)
+```
+
+
+
+*If impact.ss returns an ERROR about having uncertain edges,* first check to make sure that all "Group" numbers from the model data frame (first object in the list of the QPRESS system.simulate output, tmp_qpress) are listed as 'required.groups' on line 40 of the impact.ss function code. Then, check to see if any of your edges are listed twice in the model data frame.
 
 ```{r eval=FALSE}
 sim$edges %>% unite(From,To,col="edge",sep="-") %>% 
@@ -214,6 +235,11 @@ for(i in seq(1,length(hcrC_out))){
 
 
 end.timer(s)
+```
+
+```{r echo=FALSE}
+# clean up
+rm(tmp_mat,tmp_qpress,tmp_hcr_out,out)
 ```
 
 
@@ -261,25 +287,26 @@ fit.sq.df <- as.data.frame(summary(fit3), row.names=NULL) %>%
 
 ### Fishery 1 catch
 
-Set up for loop. Create list object to save influence dataframes, specify which HCR / OM combos to work through.
+Set up for loop. Create list object to save influence dataframes, specify which HCR / OM combos to work through, and timer.
 ```{r}
 fish1.br.list <- list()
+fish1_run_times <- c()
 ```
 
-This for loop will 
+This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
 ```{r}
 counter = 1
-for(i in c("B","c","D","E")){  # HCRs
+for(i in c("A","B","c","D","E")){  # HCRs
 
   for(j in c(0,2,3,4,5)){  # OMs
     
-    if(j %in% c(0,3) & i %in% c("A","D")){sim.date='20240923'} else{sim.date='20240920'}
+    # if(j %in% c(0,3) & i %in% c("A","D")){sim.date='20240923'} else{sim.date='20240920'}
     
     # read in gbm input matrix 
-    tmp_in <- read_csv(here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.csv')))
+    tmp_in <- readRDS(here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.rds')))
     
     # if variable differs in response across sims, fit with gbm step
-    if(dim(unique(tmp_in[,"Fishery 1"]))[1] > 1){
+    if(length(unique(tmp_in[,"Fishery 1"])) > 1){
       ## find the column that starts reporting on edges, instead of vertices
       d1 <- which(str_detect(colnames(tmp_in),"_"))[1]
       d2 <- dim(tmp_in)[2]
@@ -288,27 +315,121 @@ for(i in c("B","c","D","E")){  # HCRs
       d <- cbind(tmp_in[,"Fishery 1"],tmp_in[,d1:d2])
       
       ## fitting with gbm step
-      +
+      s <- Sys.time()  # start timer
+      
       fit.gbm <- gbm.step(data=d,gbm.x=2:dim(d)[2],gbm.y=1,family="gaussian",tree.complexity=5, learning.rate = 0.01,bag.fraction = 0.5)
       ## save fit to list
       fish1.br.list[[counter]] <- fit.gbm
       names(fish1.br.list)[[counter]] <- paste0('QNM-',j,'-HCR-',i)
       
+      ## save timer
+    fish1_run_times[length(fish1_run_times)+1] <- end.timer(s)
+    names(fish1_run_times)[length(fish1_run_times)] <- paste(i, j, sep="_")
+      
+    ## add to counter
       counter=counter+1
       
     } else{message('skipping QNM ',j,' HCR ',i,' for this variable. no variation in response to perturbation.')}
     
+  }
 }
-}
+
+## save 
+saveRDS(fish1.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_Fishery1_GaussTr5Lr01_',sim.date,'.rds')))
 ```
+
 ran: 
 ```{r}
 names(fish1.br.list)
 ```
 
-save 
+how long did that take?
 ```{r}
-saveRDS(fish1.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_Fishery1_GaussTr5Lr01_',sim.date,'.rds')))
+fish1_run_times_df <- as.data.frame(fish1_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=hcr_run_times)
+# save
+write_csv(fish1_run_times_df, here('data','sensitivity','fish1_gbm_run_times.csv'))
+#
+
+ggplot(fish1_run_times_df, aes(x=run_time)) + geom_histogram() + theme_bw()
 ```
 
+
+
+### Total catch
+
+Set up for loop. Create list object to save influence dataframes, specify which HCR / OM combos to work through.
+```{r}
+catch.br.list <- list()
+catch_run_times <- c()
+```
+
+This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
+```{r}
+counter = 1
+for(i in c("B","c","D","E")){  # HCRs
+
+  for(j in c(0,2,3,4,5)){  # OMs
+    
+    # if(j %in% c(0,3) & i %in% c("A","D")){sim.date='20240923'} else{sim.date='20240920'}
+    
+    # read in gbm input matrix 
+    tmp_in <- readRDS(here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.rds')))
+    
+    # if variable differs in response across sims, fit with gbm step
+    if(dim(unique(tmp_in[,"Total catch"]))[1] > 1){
+      ## find the column that starts reporting on edges, instead of vertices
+      d1 <- which(str_detect(colnames(tmp_in),"_"))[1]
+      d2 <- dim(tmp_in)[2]
+      
+      ## grab just edge info
+      d <- cbind(tmp_in[,"Total catch"],tmp_in[,d1:d2])
+      
+      ## fitting with gbm step
+      s <- Sys.time()  # start timer
+      
+      fit.gbm <- gbm.step(data=d,gbm.x=2:dim(d)[2],gbm.y=1,family="gaussian",tree.complexity=5, learning.rate = 0.01,bag.fraction = 0.5)
+      ## save fit to list
+      catch.br.list[[counter]] <- fit.gbm
+      names(catch.br.list)[[counter]] <- paste0('QNM-',j,'-HCR-',i)
+      
+      ## save timer
+    catch_run_times[length(catch_run_times)+1] <- end.timer(s)
+    names(catch_run_times)[length(catch_run_times)] <- paste(i, j, sep="_")
+      
+    ## add to counter
+      counter=counter+1
+      
+    } else{message('skipping QNM ',j,' HCR ',i,' for this variable. no variation in response to perturbation.')}
+    
+  }
+}
+
+## save 
+saveRDS(catch.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_TotalCatch_GaussTr5Lr01_',sim.date,'.rds')))
+```
+
+ran: 
+```{r}
+names(catch.br.list)
+```
+
+how long did that take?
+```{r}
+catch_run_times_df <- as.data.frame(catch_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=hcr_run_times)
+# save
+write_csv(run_times_df, here('data','sensitivity','catch_gbm_run_times.csv'))
+#
+
+ggplot(catch_run_times_df, aes(x=run_time)) + geom_histogram() + theme_bw()
+```
 
