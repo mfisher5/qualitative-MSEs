@@ -21,6 +21,9 @@ Total Catch - all. aggregate results separately for QNMs that did / didn't match
 
 Fishery 2 & spawning biomass - Start with 2-C and 5-A, where both were mismatched.
 
+Use boosted regression trees to examine the relative importance of model edges (linkages) in determining the response of a given well-being variable to a HAB simulation in the Status Quo model based on Melbourne-Thomas et al. (2012): https://esapubs.org/archive/mono/M082/019/tree.r
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -243,12 +246,8 @@ rm(tmp_mat,tmp_qpress,tmp_hcr_out,out)
 ```
 
 
-## Linkage influence: Total catch
 
-Use boosted regression trees to examine the relative importance of model edges (linkages) in determining the response of a given well-being variable to a HAB simulation in the Status Quo model based on Melbourne-Thomas et al. (2012): https://esapubs.org/archive/mono/M082/019/tree.r
-
-
-### testing
+## testing
 
 Test these functions on one example -- fishery 1 catch in OM 2 (Thorson effort) for HCR B
 
@@ -285,18 +284,18 @@ fit.sq.df <- as.data.frame(summary(fit3), row.names=NULL) %>%
 ```
 
 
-### Fishery 1 catch
+## Fishery 1 catch
 
-Set up for loop. Create list object to save influence dataframes, specify which HCR / OM combos to work through, and timer.
+Set up for loop. Create list object to save influence dataframes and timer. The 'counter' is used to add list objects in order (because not all HCR/OM combos will have entries in the list)
 ```{r}
 fish1.br.list <- list()
 fish1_run_times <- c()
+counter = 1
 ```
 
 This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
 ```{r}
-counter = 1
-for(i in c("A","B","c","D","E")){  # HCRs
+for(i in c("B","c","D","E")){  # HCRs
 
   for(j in c(0,2,3,4,5)){  # OMs
     
@@ -333,6 +332,7 @@ for(i in c("A","B","c","D","E")){  # HCRs
     
   }
 }
+beepr::beep()
 
 ## save 
 saveRDS(fish1.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_Fishery1_GaussTr5Lr01_',sim.date,'.rds')))
@@ -350,17 +350,57 @@ fish1_run_times_df <- as.data.frame(fish1_run_times) %>%
   separate(col=name, into=c('hcr','om'), sep="_") %>%
    mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
                       om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
-  rename(run_time=hcr_run_times)
+  rename(run_time=fish1_run_times)
 # save
-write_csv(fish1_run_times_df, here('data','sensitivity','fish1_gbm_run_times.csv'))
+write_csv(fish1_run_times_df, here('data','qnm_out','sensitivity','fish1_gbm_run_times.csv'))
 #
 
-ggplot(fish1_run_times_df, aes(x=run_time)) + geom_histogram() + theme_bw()
+ggplot(fish1_run_times_df, aes(x=om, y=run_time)) + 
+  geom_boxplot() + 
+  stat_summary(geom="text", fun=median,
+               aes(label=sprintf("%1.0f", ..y..)),
+               position=position_nudge(x=0.13, y=1), size=3.5) +
+  labs(subtitle=paste0("overall mean: ", mean(fish1_run_times_df$run_time), " min."),
+       x="operating model",y="run time (min)") +
+  theme_bw()
 ```
 
+Convert to a data frame with just the relative influence value per link.
+```{r}
+for(i in 1:length(fish1.br.list)){
+  
+    fit.sq <- fish1.br.list[[i]]
+    tmp_name <- names(fish1.br.list)[i]
+    
+  if(i==1){
+    fit.fish1.df <- as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Fishery 1 catch") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name)
+  } else{
+  fit.fish1.df <- fit.fish1.df %>%
+    bind_rows(as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Fishery 1 catch") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name))
+  }
+}
 
+## save
+write_csv(fit.fish1.df, here('data','qnm_out','sensitivity',paste0('gbmResults_Fishery1_GaussTr5Lr01_',sim.date,'.csv')))
+```
 
-### Total catch
+graph the distribution of relative influence
+```{r}
+ggplot(data=fit.fish1.df, aes(x=rel.inf)) +
+  geom_histogram() +
+  geom_vline(xintercept=median(fit.fish1.df$rel.inf)) +
+  annotate("text", x = median(fit.fish1.df$rel.inf)+5, y = 100, label = paste0("median: ", round(median(fit.fish1.df$rel.inf),3))) +
+  labs(title="Fishery 1 catch", x="relative influence",y="link count") + 
+  theme_bw()
+```
+
+## Total catch
 
 Set up for loop. Create list object to save influence dataframes, specify which HCR / OM combos to work through.
 ```{r}
@@ -371,7 +411,7 @@ catch_run_times <- c()
 This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
 ```{r}
 counter = 1
-for(i in c("B","c","D","E")){  # HCRs
+for(i in c("A","B","c","D","E")){  # HCRs
 
   for(j in c(0,2,3,4,5)){  # OMs
     
@@ -381,7 +421,8 @@ for(i in c("B","c","D","E")){  # HCRs
     tmp_in <- readRDS(here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.rds')))
     
     # if variable differs in response across sims, fit with gbm step
-    if(dim(unique(tmp_in[,"Total catch"]))[1] > 1){
+    if(length(unique(tmp_in[,"Total catch"]))> 1){
+      message(paste('HCR', i, 'OM', j, sep=' '))
       ## find the column that starts reporting on edges, instead of vertices
       d1 <- which(str_detect(colnames(tmp_in),"_"))[1]
       d2 <- dim(tmp_in)[2]
@@ -398,10 +439,10 @@ for(i in c("B","c","D","E")){  # HCRs
       names(catch.br.list)[[counter]] <- paste0('QNM-',j,'-HCR-',i)
       
       ## save timer
-    catch_run_times[length(catch_run_times)+1] <- end.timer(s)
-    names(catch_run_times)[length(catch_run_times)] <- paste(i, j, sep="_")
+      catch_run_times[length(catch_run_times)+1] <- end.timer(s)
+      names(catch_run_times)[length(catch_run_times)] <- paste(i, j, sep="_")
       
-    ## add to counter
+      ## add to counter
       counter=counter+1
       
     } else{message('skipping QNM ',j,' HCR ',i,' for this variable. no variation in response to perturbation.')}
@@ -411,12 +452,28 @@ for(i in c("B","c","D","E")){  # HCRs
 
 ## save 
 saveRDS(catch.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_TotalCatch_GaussTr5Lr01_',sim.date,'.rds')))
+
+
+## how long did that take?
+catch_run_times_df <- as.data.frame(catch_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=catch_run_times)
+# save
+write_csv(catch_run_times_df, here('data','qnm_out','sensitivity','catch_gbm_run_times.csv'))
+#
 ```
 
 ran: 
 ```{r}
 names(catch.br.list)
 ```
+ [1] "QNM-4-HCR-A" "QNM-0-HCR-B" "QNM-2-HCR-B" "QNM-3-HCR-B" "QNM-4-HCR-B" "QNM-5-HCR-B"
+ [7] "QNM-0-HCR-c" "QNM-2-HCR-c" "QNM-3-HCR-c" "QNM-4-HCR-c" "QNM-5-HCR-c" "QNM-0-HCR-D"
+[13] "QNM-2-HCR-D" "QNM-3-HCR-D" "QNM-4-HCR-D" "QNM-5-HCR-D" "QNM-0-HCR-E" "QNM-2-HCR-E"
+[19] "QNM-3-HCR-E" "QNM-4-HCR-E" "QNM-5-HCR-E"
 
 how long did that take?
 ```{r}
@@ -432,4 +489,29 @@ write_csv(run_times_df, here('data','sensitivity','catch_gbm_run_times.csv'))
 
 ggplot(catch_run_times_df, aes(x=run_time)) + geom_histogram() + theme_bw()
 ```
+total: 7.4 hrs
 
+Convert to a data frame with just the relative influence value per link.
+```{r}
+for(i in 1:length(catch.br.list)){
+  
+    fit.sq <- catch.br.list[[i]]
+    tmp_name <- names(catch.br.list)[i]
+    
+  if(i==1){
+    fit.catch.df <- as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Total catch") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name)
+  } else{
+  fit.catch.df <- fit.catch.df %>%
+    bind_rows(as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Total catch") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name))
+  }
+}
+
+## save
+write_csv(fit.catch.df, here('data','qnm_out','sensitivity',paste0('gbmResults_TotalCatch_GaussTr5Lr01_',sim.date,'.csv')))
+```

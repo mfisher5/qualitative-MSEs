@@ -111,7 +111,7 @@ p2 <- ggplot(data=speciesALL_compare, aes(x=prob, y=psims,
   xlim(c(-110, 110)) +
   guides(color='none') +
   labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Simulations with Increase/Decrease",
-       subtitle="by managment strategy") +
+       subtitle="by management strategy") +
   theme_bw() + theme(legend.title=element_blank())
 
 
@@ -130,5 +130,70 @@ dev.off()
 png(here('data','results','Fig6.png'), res=300, height=2500,width=3500)
 plot_grid(p1,p2,nrow=2)
 dev.off()
+
+
+
+
+
+# testing -----------------------------------------------------------------
+
+speciesALL_compare  %>%
+  filter(code != "2-A") %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
+  mutate(variable_out=fct_relevel(variable_out, c("Total Catch", "Fishery 1 Catch", "Fishery 2 Catch", "Spawning Biomass"))) %>%
+  mutate(management_strategy=fct_rev(management_strategy)) %>%
+  ggplot(aes(x=operating_model,y=management_strategy)) +
+  geom_tile(aes(fill=match, alpha=match)) +
+  facet_grid(cols=vars(variable_out), rows=vars(model.y)) +
+  labs(x='Operating model scenario',y='Management strategy') +
+  scale_fill_manual(values=c('white','darkred')) +
+  scale_alpha_manual(values=c(0,1)) +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
+                     legend.title=element_blank())
+
+
+
+png(here('data','results','Fig6c.png'), res=300, height=1100,width=2400)
+speciesALL_compare  %>%
+  filter(code != "2-A") %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
+  mutate(variable_out=fct_relevel(variable_out, c("Total Catch", "Fishery 1 Catch", "Fishery 2 Catch", "Spawning Biomass"))) %>%
+  mutate(management_strategy=fct_rev(management_strategy)) %>%
+  mutate(model.y=case_when(model.y=="MSE-Species1"~'(1) medium long.',.default='(2) short long.')) %>%
+  ggplot(aes(x=operating_model,y=management_strategy)) +
+  geom_tile(aes(fill=match, alpha=match)) +
+  facet_grid(cols=vars(variable_out), rows=vars(model.y)) +
+  labs(x='Operating model scenario',y='Management strategy') +
+  scale_fill_manual(values=c('white','darkred')) +
+  scale_alpha_manual(values=c(0,1)) +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
+                     legend.title=element_blank())
+dev.off()
+
+
+
+
+
+png(here('data','results','Fig6c-present.png'), res=300, height=1100,width=2400)
+speciesALL_compare  %>%
+  filter(code != "2-A") %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
+  mutate(variable_out=fct_relevel(variable_out, c("Total Catch", "Fishery 1 Catch", "Fishery 2 Catch", "Spawning Biomass"))) %>%
+  mutate(management_strategy=fct_rev(management_strategy)) %>%
+  mutate(model.y=case_when(model.y=="MSE-Species1"~'(1) groundfish',.default='(2) forage fish')) %>%
+  ggplot(aes(x=operating_model,y=management_strategy)) +
+  geom_tile(aes(fill=match, alpha=match)) +
+  facet_grid(cols=vars(variable_out), rows=vars(model.y)) +
+  labs(x='Operating model scenario',y='Management strategy') +
+  scale_fill_manual(values=c('white','darkred')) +
+  scale_alpha_manual(values=c(0,1)) +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
+                     legend.title=element_blank())
+dev.off()
+
+
+
+
+
 
 
