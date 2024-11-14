@@ -139,15 +139,20 @@ dev.off()
 
 speciesALL_compare  %>%
   filter(code != "2-A") %>%
+  mutate(equiv=ifelse(abs(psims)<60, 'y','n')) %>%
   mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
+  mutate(match_is_equiv=ifelse(match=='match' & equiv=='y','match, qnm equiv',
+                               ifelse(match=='mismatch'& equiv=='y','mismatch, qnm equiv',match))) %>%
+  mutate(match_is_equiv=fct_relevel(match_is_equiv, c('match','match, qnm equiv','mismatch','mismatch, qnm equiv'))) %>%
   mutate(variable_out=fct_relevel(variable_out, c("Total Catch", "Fishery 1 Catch", "Fishery 2 Catch", "Spawning Biomass"))) %>%
   mutate(management_strategy=fct_rev(management_strategy)) %>%
+  mutate(model.y=case_when(model.y=="MSE-Species1"~'(sp.1) med longevity',.default='(sp.2) short longevity')) %>%
   ggplot(aes(x=operating_model,y=management_strategy)) +
-  geom_tile(aes(fill=match, alpha=match)) +
+  geom_tile(aes(fill=match_is_equiv, alpha=match_is_equiv)) +
   facet_grid(cols=vars(variable_out), rows=vars(model.y)) +
   labs(x='Operating model scenario',y='Management strategy') +
-  scale_fill_manual(values=c('white','darkred')) +
-  scale_alpha_manual(values=c(0,1)) +
+  scale_fill_manual(values=c('white','gray70','darkred', 'darkred')) +
+  scale_alpha_manual(values=c(0,0.5,1,0.5)) +
   theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
                      legend.title=element_blank())
 
@@ -174,26 +179,52 @@ dev.off()
 
 
 
-png(here('data','results','Fig6c-present.png'), res=300, height=1100,width=2400)
+png(here('data','results','Fig6c-equiv.png'), res=300, height=1300,width=2600)
 speciesALL_compare  %>%
   filter(code != "2-A") %>%
+  mutate(equiv=ifelse(abs(psims)<60, 'y','n')) %>%
   mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
+  mutate(match_is_equiv=ifelse(match=='match' & equiv=='y','match, qnm equiv',
+                               ifelse(match=='mismatch'& equiv=='y','mismatch, qnm equiv',match))) %>%
+  mutate(match_is_equiv=fct_relevel(match_is_equiv, c('match','match, qnm equiv','mismatch','mismatch, qnm equiv'))) %>%
   mutate(variable_out=fct_relevel(variable_out, c("Total Catch", "Fishery 1 Catch", "Fishery 2 Catch", "Spawning Biomass"))) %>%
   mutate(management_strategy=fct_rev(management_strategy)) %>%
-  mutate(model.y=case_when(model.y=="MSE-Species1"~'(1) groundfish',.default='(2) forage fish')) %>%
+  mutate(model.y=case_when(model.y=="MSE-Species1"~'(sp.1) med longevity',.default='(sp.2) short longevity')) %>%
   ggplot(aes(x=operating_model,y=management_strategy)) +
-  geom_tile(aes(fill=match, alpha=match)) +
+  geom_tile(aes(fill=match_is_equiv, alpha=match_is_equiv)) +
   facet_grid(cols=vars(variable_out), rows=vars(model.y)) +
   labs(x='Operating model scenario',y='Management strategy') +
-  scale_fill_manual(values=c('white','darkred')) +
-  scale_alpha_manual(values=c(0,1)) +
+  scale_fill_manual(values=c('white','gray70','darkred', 'darkred')) +
+  scale_alpha_manual(values=c(0,0.5,1,0.5)) +
   theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
                      legend.title=element_blank())
 dev.off()
 
 
 
+new_table2_counts <- speciesALL_compare  %>%
+  filter(code != "2-A") %>% dplyr::select(-model.x, -operating_model, -management_strategy) %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
+ group_by(model.y, variable_out) %>% mutate(compare_total=length(unique(code))) %>%
+  ungroup() %>% dplyr::select(-psims, -prob) %>%
+  group_by(model.y, variable_out, match, compare_total) %>% 
+  summarise(n_compare=length(unique(code))) %>%
+  mutate(p_compare=n_compare/compare_total)
 
+
+
+
+new_table2_mismatch_counts <- speciesALL_compare  %>%
+  filter(code != "2-A") %>% dplyr::select(-model.x, -operating_model, -management_strategy) %>%
+  mutate(equiv=ifelse(abs(psims)<60, 'y','n')) %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match",
+                      ifelse(equiv=='y',"mismatch, equiv", "mismatch"))) %>%
+  group_by(model.y,variable_out) %>% mutate(compare_total=length(unique(code))) %>%
+  ungroup() %>% dplyr::select(-equiv, -prob, -psims) %>%
+  group_by(model.y, variable_out, match, compare_total) %>% 
+  summarise(n_compare=length(unique(code))) %>%
+  mutate(p_compare=n_compare/compare_total)
+  
 
 
 
