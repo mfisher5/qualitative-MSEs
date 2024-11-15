@@ -40,6 +40,9 @@ speciesALL_compare %<>%
                                  "Spawning Biomass"="spawning_biomass"))
 
 
+
+# FIGURE: strong/weak -------------------------------------
+
 ## count the number of times there is a mismatch for plot 1, create dataframe for plotting
 compare_counts_om <- speciesALL_compare  %>%
   filter(code != "2-A") %>%
@@ -50,7 +53,7 @@ compare_counts_om <- speciesALL_compare  %>%
   summarise(n=n()) %>%
   filter(!(match %in% c("match","other")))
 compare_counts_om %<>% mutate(y=ifelse(match=="negQNM--posMSE", -40, 40),
-                              x=ifelse(match=="negQNM--posMSE", 95, -95)) %>%
+                              x=ifelse(match=="negQNM--posMSE", 90, -90)) %>%
   filter(n>1) %>%
   mutate(n=paste0("n=",n))
 
@@ -64,14 +67,10 @@ compare_counts_ms <- speciesALL_compare  %>%
   group_by(management_strategy, model.y, match) %>%
   summarise(n=n()) %>%
   filter(!(match %in% c("match","other")))
-compare_counts_ms %<>% mutate(y=ifelse(match=="negQNM--posMSE", -40, 40),
-                              x=ifelse(match=="negQNM--posMSE", 95, -95)) %>%
+compare_counts_ms %<>% mutate(y=ifelse(match=="negQNM--posMSE", -30, 40),
+                              x=ifelse(match=="negQNM--posMSE", 88, -88)) %>%
   filter(n>1) %>%
   mutate(n=paste0("n=",n))
-
-
-
-# FIGURE -------------------------------------
 
 ## by om
 p1 <- ggplot(data=speciesALL_compare, aes(x=prob, y=psims, 
@@ -89,7 +88,7 @@ p1 <- ggplot(data=speciesALL_compare, aes(x=prob, y=psims,
   scale_color_manual(values=c("lightblue3","orange")) +
   xlim(c(-110, 110)) +
   guides(color='none') +
-  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Simulations with Increase/Decrease",
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Matrices with Increase/Decrease",
        subtitle="by operating model scenario") +
   theme_bw() + theme(legend.title=element_blank())
 
@@ -132,6 +131,101 @@ plot_grid(p1,p2,nrow=2)
 dev.off()
 
 
+
+# FIGURE: equivocal only --------------------------------------------------
+
+## count the number of times there is a mismatch for plot 1, create dataframe for plotting
+compare_counts_om <- speciesALL_compare  %>%
+  filter(code != "2-A") %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match",
+                      ifelse(psims < 0 & prob > 0, "negQNM--posMSE",
+                             ifelse(psims > 0 & prob < 0, "posQNM--negMSE", "other")))) %>%
+  group_by(operating_model, model.y, match) %>%
+  summarise(n=n()) %>%
+  filter(!(match %in% c("match","other")))
+compare_counts_om %<>% mutate(y=ifelse(match=="negQNM--posMSE", -30, 40),
+                              x=ifelse(match=="negQNM--posMSE", 90, -90)) %>%
+  filter(n>1) %>%
+  mutate(n=paste0("n=",n))
+
+
+## count the number of times there is a mismatch for plot2, create dataframe for plotting
+compare_counts_ms <- speciesALL_compare  %>%
+  filter(code != "2-A") %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match",
+                      ifelse(psims < 0 & prob > 0, "negQNM--posMSE",
+                             ifelse(psims > 0 & prob < 0, "posQNM--negMSE", "other")))) %>%
+  group_by(management_strategy, model.y, match) %>%
+  summarise(n=n()) %>%
+  filter(!(match %in% c("match","other")))
+compare_counts_ms %<>% mutate(y=ifelse(match=="negQNM--posMSE", -30, 40),
+                              x=ifelse(match=="negQNM--posMSE", 88, -88)) %>%
+  filter(n>1) %>%
+  mutate(n=paste0("n=",n))
+
+compare_counts_ms %<>% mutate(management_strategy=case_when(
+  management_strategy=='C. Fishery 1 in "offshore" only, effort changes'~'C. Fishery 1 in "offshore"\nonly, effort changes',
+  management_strategy=='E. Fishery 1 in "offshore" only'~'E. Fishery 1 in "offshore"\n only',
+  management_strategy=='D. Increase fishery mesh size'~'D. Increase fishery\n mesh size',
+  .default=management_strategy))
+
+
+## by om
+p1 <- speciesALL_compare %>%
+  mutate(variable_out=fct_relevel(variable_out,c("Total Catch","Fishery 1 Catch","Fishery 2 Catch", "Spawning Biomass"))) %>%
+  ggplot(aes(x=prob, y=psims,pch=variable_out)) +
+  geom_rect(aes(xmin=-110,xmax=110,ymin=-60,ymax=60), fill='gray95', col='transparent', alpha=0.5) +
+  geom_point(size=2) +
+  geom_text(data=compare_counts_om,aes(x=x,y=y,label=n, col=match), 
+            size=3.5, inherit.aes=FALSE) +
+  facet_grid(cols=vars(operating_model), rows=vars(model.y)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  scale_color_manual(values=c("darkblue","darkorange")) +
+  scale_x_continuous(limits=c(-110, 110), expand=c(0,0)) +
+  guides(color='none') +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Matrices with Increase/Decrease",
+       subtitle="(a) by operating model scenario") +
+  theme_bw() + theme(legend.title=element_blank())
+p1
+
+# by ms
+p2 <- speciesALL_compare %>%
+  mutate(management_strategy=case_when(
+    management_strategy=='C. Fishery 1 in "offshore" only, effort changes'~'C. Fishery 1 in "offshore"\nonly, effort changes',
+    management_strategy=='E. Fishery 1 in "offshore" only'~'E. Fishery 1 in "offshore"\n only',
+    management_strategy=='D. Increase fishery mesh size'~'D. Increase fishery\n mesh size',
+    .default=management_strategy)) %>%
+  mutate(variable_out=fct_relevel(variable_out,c("Total Catch","Fishery 1 Catch","Fishery 2 Catch", "Spawning Biomass"))) %>%
+  ggplot(aes(x=prob, y=psims, pch=variable_out)) +
+  geom_rect(aes(xmin=-110,xmax=110,ymin=-60,ymax=60), fill='gray95', col='transparent', alpha=0.5) +
+  geom_point(size=2.5) +
+  geom_text(data=compare_counts_ms,aes(x=x,y=y,label=n, col=match), 
+            size=4, inherit.aes=FALSE) +
+  facet_grid(cols=vars(management_strategy), rows=vars(model.y)) +
+  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  scale_color_manual(values=c("darkblue","darkorange")) +
+  scale_x_continuous(limits=c(-110, 110), expand=c(0,0)) +
+  guides(color='none') +
+  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Matrices with Increase/Decrease",
+       subtitle="(b) by management strategy") +
+  theme_bw() + theme(legend.title=element_blank())
+p2
+
+# plot separately
+png(here('data','results','FigC3a.png'), res=300, height=1300,width=2800)
+p1
+dev.off()
+
+
+png(here('data','results','FigC3b.png'), res=300, height=1300,width=3200)
+p2
+dev.off()
+
+
+# plot together
+# png(here('data','results','FigC3.png'), res=300, height=2500,width=3500)
+# plot_grid(p1,p2,nrow=2)
+# dev.off()
 
 
 

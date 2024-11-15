@@ -3,10 +3,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 0-B,0. Baseline,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species1
 0-B,0. Baseline,B. Eliminate fishery 1,fishery_2_catch,100,QNM,100,MSE-Species1
 0-B,0. Baseline,B. Eliminate fishery 1,spawning_biomass,100,QNM,100,MSE-Species1
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",total_catch,55,QNM,100,MSE-Species1
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,54,QNM,100,MSE-Species1
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,55,QNM,-100,MSE-Species1
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",spawning_biomass,64,QNM,100,MSE-Species1
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,55,QNM,100,MSE-Species1
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,54,QNM,100,MSE-Species1
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,55,QNM,-100,MSE-Species1
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,64,QNM,100,MSE-Species1
 0-D,0. Baseline,D. Increase fishery mesh size,total_catch,87,QNM,100,MSE-Species1
 0-D,0. Baseline,D. Increase fishery mesh size,fishery_1_catch,87,QNM,100,MSE-Species1
 0-D,0. Baseline,D. Increase fishery mesh size,fishery_2_catch,100,QNM,100,MSE-Species1
@@ -23,10 +23,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 2-B,2. Thorson effort,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species1
 2-B,2. Thorson effort,B. Eliminate fishery 1,fishery_2_catch,100,QNM,100,MSE-Species1
 2-B,2. Thorson effort,B. Eliminate fishery 1,spawning_biomass,100,QNM,97,MSE-Species1
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,93.5,MSE-Species1
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,100,MSE-Species1
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,-100,MSE-Species1
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,-96,MSE-Species1
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,66,QNM,93.5,MSE-Species1
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,63,QNM,100,MSE-Species1
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,62,QNM,-100,MSE-Species1
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,85,QNM,-96,MSE-Species1
 2-D,2. Thorson effort,D. Increase fishery mesh size,total_catch,57,QNM,99.5,MSE-Species1
 2-D,2. Thorson effort,D. Increase fishery mesh size,fishery_1_catch,55,QNM,87.5,MSE-Species1
 2-D,2. Thorson effort,D. Increase fishery mesh size,fishery_2_catch,58,QNM,100,MSE-Species1
@@ -43,10 +43,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 3-B,3. Lower productivity,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species1
 3-B,3. Lower productivity,B. Eliminate fishery 1,fishery_2_catch,98,QNM,100,MSE-Species1
 3-B,3. Lower productivity,B. Eliminate fishery 1,spawning_biomass,98,QNM,100,MSE-Species1
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",total_catch,-51,QNM,100,MSE-Species1
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,-51,QNM,100,MSE-Species1
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,-51,QNM,-100,MSE-Species1
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",spawning_biomass,57,QNM,100,MSE-Species1
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,-51,QNM,100,MSE-Species1
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,-51,QNM,100,MSE-Species1
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,-51,QNM,-100,MSE-Species1
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,57,QNM,100,MSE-Species1
 3-D,3. Lower productivity,D. Increase fishery mesh size,total_catch,73,QNM,100,MSE-Species1
 3-D,3. Lower productivity,D. Increase fishery mesh size,fishery_1_catch,73,QNM,100,MSE-Species1
 3-D,3. Lower productivity,D. Increase fishery mesh size,fishery_2_catch,88,QNM,100,MSE-Species1
@@ -63,10 +63,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 4-B,"4. Move ""far offshore""",B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species1
 4-B,"4. Move ""far offshore""",B. Eliminate fishery 1,fishery_2_catch,87,QNM,100,MSE-Species1
 4-B,"4. Move ""far offshore""",B. Eliminate fishery 1,spawning_biomass,95,QNM,100,MSE-Species1
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",total_catch,-53,QNM,100,MSE-Species1
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",fishery_1_catch,-53,QNM,100,MSE-Species1
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",fishery_2_catch,-56,QNM,-100,MSE-Species1
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",spawning_biomass,67,QNM,100,MSE-Species1
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",total_catch,-53,QNM,100,MSE-Species1
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,-53,QNM,100,MSE-Species1
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,-56,QNM,-100,MSE-Species1
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,67,QNM,100,MSE-Species1
 4-D,"4. Move ""far offshore""",D. Increase fishery mesh size,total_catch,67,QNM,100,MSE-Species1
 4-D,"4. Move ""far offshore""",D. Increase fishery mesh size,fishery_1_catch,67,QNM,100,MSE-Species1
 4-D,"4. Move ""far offshore""",D. Increase fishery mesh size,fishery_2_catch,69,QNM,100,MSE-Species1
@@ -83,10 +83,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 5-B,5. Lower growth rate,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species1
 5-B,5. Lower growth rate,B. Eliminate fishery 1,fishery_2_catch,100,QNM,100,MSE-Species1
 5-B,5. Lower growth rate,B. Eliminate fishery 1,spawning_biomass,100,QNM,100,MSE-Species1
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",total_catch,73,QNM,100,MSE-Species1
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,74,QNM,100,MSE-Species1
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,70,QNM,-100,MSE-Species1
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",spawning_biomass,76,QNM,100,MSE-Species1
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,73,QNM,100,MSE-Species1
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,74,QNM,100,MSE-Species1
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,70,QNM,-100,MSE-Species1
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,76,QNM,100,MSE-Species1
 5-D,5. Lower growth rate,D. Increase fishery mesh size,total_catch,95,QNM,100,MSE-Species1
 5-D,5. Lower growth rate,D. Increase fishery mesh size,fishery_1_catch,95,QNM,-86.5,MSE-Species1
 5-D,5. Lower growth rate,D. Increase fishery mesh size,fishery_2_catch,100,QNM,100,MSE-Species1
@@ -99,10 +99,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 0-B,0. Baseline,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species2
 0-B,0. Baseline,B. Eliminate fishery 1,fishery_2_catch,100,QNM,100,MSE-Species2
 0-B,0. Baseline,B. Eliminate fishery 1,spawning_biomass,100,QNM,100,MSE-Species2
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",total_catch,55,QNM,-100,MSE-Species2
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,54,QNM,-100,MSE-Species2
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,55,QNM,100,MSE-Species2
-0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",spawning_biomass,64,QNM,100,MSE-Species2
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,55,QNM,-100,MSE-Species2
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,54,QNM,-100,MSE-Species2
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,55,QNM,100,MSE-Species2
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,64,QNM,100,MSE-Species2
 0-D,0. Baseline,D. Increase fishery mesh size,total_catch,87,QNM,-100,MSE-Species2
 0-D,0. Baseline,D. Increase fishery mesh size,fishery_1_catch,87,QNM,-100,MSE-Species2
 0-D,0. Baseline,D. Increase fishery mesh size,fishery_2_catch,100,QNM,100,MSE-Species2
@@ -119,10 +119,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 2-B,2. Thorson effort,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species2
 2-B,2. Thorson effort,B. Eliminate fishery 1,fishery_2_catch,100,QNM,100,MSE-Species2
 2-B,2. Thorson effort,B. Eliminate fishery 1,spawning_biomass,100,QNM,99,MSE-Species2
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,-75,MSE-Species2
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,52.5,MSE-Species2
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,-100,MSE-Species2
-2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,93.5,MSE-Species2
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,66,QNM,-75,MSE-Species2
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,63,QNM,52.5,MSE-Species2
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,62,QNM,-100,MSE-Species2
+2-C,2. Thorson effort,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,85,QNM,93.5,MSE-Species2
 2-D,2. Thorson effort,D. Increase fishery mesh size,total_catch,57,QNM,-94,MSE-Species2
 2-D,2. Thorson effort,D. Increase fishery mesh size,fishery_1_catch,55,QNM,-96.5,MSE-Species2
 2-D,2. Thorson effort,D. Increase fishery mesh size,fishery_2_catch,58,QNM,99.5,MSE-Species2
@@ -139,10 +139,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 3-B,3. Lower productivity,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species2
 3-B,3. Lower productivity,B. Eliminate fishery 1,fishery_2_catch,98,QNM,100,MSE-Species2
 3-B,3. Lower productivity,B. Eliminate fishery 1,spawning_biomass,98,QNM,100,MSE-Species2
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",total_catch,-51,QNM,-100,MSE-Species2
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,-51,QNM,-100,MSE-Species2
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,-51,QNM,100,MSE-Species2
-3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only",spawning_biomass,57,QNM,100,MSE-Species2
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,-51,QNM,-100,MSE-Species2
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,-51,QNM,-100,MSE-Species2
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,-51,QNM,100,MSE-Species2
+3-C,3. Lower productivity,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,57,QNM,100,MSE-Species2
 3-D,3. Lower productivity,D. Increase fishery mesh size,total_catch,73,QNM,-97.5,MSE-Species2
 3-D,3. Lower productivity,D. Increase fishery mesh size,fishery_1_catch,73,QNM,-100,MSE-Species2
 3-D,3. Lower productivity,D. Increase fishery mesh size,fishery_2_catch,88,QNM,100,MSE-Species2
@@ -159,10 +159,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 4-B,"4. Move ""far offshore""",B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species2
 4-B,"4. Move ""far offshore""",B. Eliminate fishery 1,fishery_2_catch,87,QNM,100,MSE-Species2
 4-B,"4. Move ""far offshore""",B. Eliminate fishery 1,spawning_biomass,95,QNM,100,MSE-Species2
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",total_catch,-53,QNM,-100,MSE-Species2
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",fishery_1_catch,-53,QNM,-100,MSE-Species2
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",fishery_2_catch,-56,QNM,100,MSE-Species2
-4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",spawning_biomass,67,QNM,100,MSE-Species2
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",total_catch,-53,QNM,-100,MSE-Species2
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,-53,QNM,-100,MSE-Species2
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,-56,QNM,100,MSE-Species2
+4-C,"4. Move ""far offshore""","C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,67,QNM,100,MSE-Species2
 4-D,"4. Move ""far offshore""",D. Increase fishery mesh size,total_catch,67,QNM,-100,MSE-Species2
 4-D,"4. Move ""far offshore""",D. Increase fishery mesh size,fishery_1_catch,67,QNM,-100,MSE-Species2
 4-D,"4. Move ""far offshore""",D. Increase fishery mesh size,fishery_2_catch,69,QNM,100,MSE-Species2
@@ -179,10 +179,10 @@ code,operating_model,management_strategy,variable_out,psims,model.x,prob,model.y
 5-B,5. Lower growth rate,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,-100,MSE-Species2
 5-B,5. Lower growth rate,B. Eliminate fishery 1,fishery_2_catch,100,QNM,100,MSE-Species2
 5-B,5. Lower growth rate,B. Eliminate fishery 1,spawning_biomass,100,QNM,100,MSE-Species2
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",total_catch,73,QNM,-100,MSE-Species2
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,74,QNM,-100,MSE-Species2
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,70,QNM,100,MSE-Species2
-5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only",spawning_biomass,76,QNM,100,MSE-Species2
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",total_catch,73,QNM,-100,MSE-Species2
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_1_catch,74,QNM,-100,MSE-Species2
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",fishery_2_catch,70,QNM,100,MSE-Species2
+5-C,5. Lower growth rate,"C. Fishery 1 in ""offshore"" only, effort changes",spawning_biomass,76,QNM,100,MSE-Species2
 5-D,5. Lower growth rate,D. Increase fishery mesh size,total_catch,95,QNM,-100,MSE-Species2
 5-D,5. Lower growth rate,D. Increase fishery mesh size,fishery_1_catch,95,QNM,-100,MSE-Species2
 5-D,5. Lower growth rate,D. Increase fishery mesh size,fishery_2_catch,100,QNM,100,MSE-Species2
