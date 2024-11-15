@@ -226,5 +226,17 @@ new_table2_mismatch_counts <- speciesALL_compare  %>%
   mutate(p_compare=n_compare/compare_total)
   
 
+new_table2_match_counts <- speciesALL_compare  %>%
+  filter(code != "2-A") %>% dplyr::select(-model.x, -operating_model, -management_strategy) %>%
+  mutate(equiv=ifelse(abs(psims)<60, 'y','n')) %>%
+  mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
+  mutate(match_equiv=ifelse(equiv=='y' & match=="match","match, equiv",
+                            ifelse(equiv=='n' & match=="match", "match, not equiv", "mismatch"))) %>%
+  group_by(model.y,variable_out) %>% mutate(compare_total=length(unique(code))) %>%
+  ungroup() %>% dplyr::select(-equiv, -prob, -psims, -match) %>%
+  group_by(model.y, variable_out, match_equiv, compare_total) %>% 
+  summarise(n_compare=length(unique(code))) %>%
+  mutate(p_compare=n_compare/compare_total) %>% pivot_wider(id_cols=c(model.y, variable_out), names_from=match_equiv,values_from=p_compare)
+
 
 
