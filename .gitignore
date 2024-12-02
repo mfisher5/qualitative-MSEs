@@ -8,6 +8,5 @@ data/**/*.xlsx
 data/qnm_out/sensitivity/*.csv
 data/qnm_out/retired/**
 data/results/old_runs/**
-doc/Abs 492 2024-10.docx
-doc/Tables Figs Abs 492 2024-10.docx
 data/qnm_out/sensitivity.zip
+doc/*.docx

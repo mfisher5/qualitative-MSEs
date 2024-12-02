@@ -61,13 +61,22 @@ triage_df %>% filter(triage_noEquiv=='false positive') %>%
   group_by(management_strategy, variable_out,species) %>% summarise(n=n()) %>%
   pivot_wider(names_from=variable_out,values_from=n) %>%
   arrange(species,management_strategy)
-
-triage_df %>% filter(triage=='false positive') %>%
-  group_by(management_strategy, variable_out,species) %>% summarise(n=n()) %>%
-  pivot_wider(names_from=variable_out,values_from=n) %>%
-  arrange(species,management_strategy)
 ##
 
+## make table of false positive frequencies
+table_c4 <- triage_df %>% 
+  group_by(management_strategy,species) %>%
+  mutate(total_n=length(unique(operating_model))) %>%
+  ungroup() %>%
+  filter(triage=="false positive" | triage_noEquiv == "false positive") %>%
+  pivot_longer(cols=c(triage,triage_noEquiv), names_to='triage_type',values_to='decision') %>%
+  group_by(management_strategy, variable_out,species, total_n, triage_type, decision) %>% summarise(n=n()) %>%
+  mutate(p=n/total_n) %>% dplyr::select(-n) %>%
+  pivot_wider(names_from=variable_out,values_from=p) %>%
+  arrange(species,management_strategy)
+
+View(filter(table_c4, grepl('1', species)))
+View(filter(table_c4, grepl('2', species)))
 
 
 
@@ -90,6 +99,98 @@ triage_df %>%
                      legend.title=element_blank())
 dev.off()
 
+
+
+# summary scatter change equiv cutoff -------------------------------------
+
+## calculate false positives / negatives when cutoff is 0.51, 0.55, 0.6, 0.65, 0.70, 0.75, 0.80
+
+make_triage_df <- function(x, cutoff){
+  out <- x  %>%
+    mutate(qnm_equiv=ifelse(abs(qnm_psims) < cutoff, 1, 0)) %>%
+    mutate(triage0=ifelse(qnm_psims < 0 & mse_prob < 0, 'true negative',
+                         ifelse(qnm_psims > 0 & mse_prob > 0, 'true positive',
+                                ifelse(qnm_psims > 0 & mse_prob < 0, 'false positive',
+                                       ifelse(qnm_psims < 0 & mse_prob > 0, 'false negative', NA))))) %>%
+    mutate(triage=ifelse(qnm_equiv==1 & mse_prob < 0, 'false positive', 
+                                 ifelse(qnm_equiv==1 & mse_prob > 0, 'true positive',
+                                        ifelse(qnm_equiv==0, triage0, NA)))) %>%
+    dplyr::select(-triage0, -qnm_equiv)
+  return(out)
+}
+
+
+speciesALL_compare_format <- speciesALL_compare %>%
+  dplyr::select(-model.x) %>%
+  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
+  mutate(species=case_when(
+    species=="MSE-Species1" ~ "(sp.1) med longevity", 
+    species=="MSE-Species2" ~ "(sp.2) short longevity"))
+
+t_Step <- make_triage_df(x=speciesALL_compare_format,cutoff=51) %>%
+  rename(p51=triage) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=55) %>%
+      rename(p55=triage)
+  ) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=60) %>%
+      rename(p60=triage)
+  ) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=65) %>%
+      rename(p65=triage)
+  ) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=70) %>%
+      rename(p70=triage)
+  ) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=75) %>%
+      rename(p75=triage)
+  ) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=80) %>%
+      rename(p80=triage)
+  ) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=85) %>%
+      rename(p85=triage)
+  ) %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=90) %>%
+      rename(p90=triage)
+  )  %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=95) %>%
+      rename(p95=triage)
+  )  %>%
+  left_join(
+    make_triage_df(x=speciesALL_compare_format,cutoff=99) %>%
+      rename(p99=triage)
+  )
+
+total_comparisons <- length(unique(t_Step$code))
+colnames(t_Step)
+
+png(here('data','results','Fig8.png'), res=300, height=1100,width=1900)
+t_Step %>%
+  pivot_longer(cols=8:18, names_to="cutoff", values_to="triage") %>%
+  mutate(cutoff=substr(cutoff,2,3)) %>% 
+  mutate(total_n=length(unique(t_Step$code))) %>%
+  group_by(species,triage,cutoff, total_n) %>% summarize(n=length(unique(code))) %>%
+  ## make zeros to fill empty false negative entries
+  pivot_wider(names_from=triage, values_from=n, values_fill=0) %>% 
+  pivot_longer(cols=c(`true positive`, `true negative`, `false positive`, `false negative`), names_to='triage', values_to='n') %>%
+  mutate(p=n/total_n) %>%
+  filter(triage %in% c('false negative','false positive')) %>%
+  ggplot(aes(x=cutoff,y=p, col=species, pch=species, group=species)) +
+  geom_point() + 
+  geom_path() +
+  facet_wrap(~triage) + 
+  labs(x='Minimum sign consistency (%)',y='Prop. OM scenarios x Management strategies') +
+  theme_bw()
+dev.off()
 
 # summary heat map --------------------------------------------------------
 
