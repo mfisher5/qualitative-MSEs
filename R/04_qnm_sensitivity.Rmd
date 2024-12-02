@@ -34,6 +34,7 @@ library(ggplot2)
 library(QPress)
 library(janitor)
 library(kableExtra)
+library(cowplot)
 
 library(gbm)
 library(dismo)
@@ -515,3 +516,321 @@ for(i in 1:length(catch.br.list)){
 ## save
 write_csv(fit.catch.df, here('data','qnm_out','sensitivity',paste0('gbmResults_TotalCatch_GaussTr5Lr01_',sim.date,'.csv')))
 ```
+
+
+## Spawning Biomass
+
+Set up for loop. Create list object to save influence dataframes, specify which HCR / OM combos to work through.
+```{r}
+biomass.br.list <- list()
+biomass_run_times <- c()
+```
+
+This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
+```{r}
+counter = 1
+for(i in c("A","B","c","D","E")){  # HCRs
+
+  for(j in c(0,2,3,4,5)){  # OMs
+    
+    # if(j %in% c(0,3) & i %in% c("A","D")){sim.date='20240923'} else{sim.date='20240920'}
+    
+    # read in gbm input matrix 
+    tmp_in <- readRDS(here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.rds')))
+    
+    # if variable differs in response across sims, fit with gbm step
+    if(length(unique(tmp_in[,"spawning biomass"]))> 1){
+      message(paste('HCR', i, 'OM', j, sep=' '))
+      ## find the column that starts reporting on edges, instead of vertices
+      d1 <- which(str_detect(colnames(tmp_in),"_"))[1]
+      d2 <- dim(tmp_in)[2]
+      
+      ## grab just edge info
+      d <- cbind(tmp_in[,"spawning biomass"],tmp_in[,d1:d2])
+      
+      ## fitting with gbm step
+      s <- Sys.time()  # start timer
+      
+      fit.gbm <- gbm.step(data=d,gbm.x=2:dim(d)[2],gbm.y=1,family="gaussian",tree.complexity=5, learning.rate = 0.01,bag.fraction = 0.5)
+      ## save fit to list
+      biomass.br.list[[counter]] <- fit.gbm
+      names(biomass.br.list)[[counter]] <- paste0('QNM-',j,'-HCR-',i)
+      
+      ## save timer
+      biomass_run_times[length(biomass_run_times)+1] <- end.timer(s)
+      names(biomass_run_times)[length(biomass_run_times)] <- paste(i, j, sep="_")
+      
+      ## add to counter
+      counter=counter+1
+      
+    } else{message('skipping QNM ',j,' HCR ',i,' for this variable. no variation in response to perturbation.')}
+    
+  }
+}
+
+## save 
+saveRDS(biomass.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_SpawningBiomass_GaussTr5Lr01_',sim.date,'.rds')))
+
+
+## how long did that take?
+biomass_run_times_df <- as.data.frame(biomass_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=biomass_run_times)
+# save
+write_csv(biomass_run_times_df, here('data','qnm_out','sensitivity','biomass_gbm_run_times.csv'))
+#
+```
+
+ran: 
+```{r}
+names(biomass.br.list)
+```
+ [1] "QNM-4-HCR-A" "QNM-0-HCR-B" "QNM-2-HCR-B" "QNM-3-HCR-B" "QNM-4-HCR-B" "QNM-5-HCR-B"
+ [7] "QNM-0-HCR-c" "QNM-2-HCR-c" "QNM-3-HCR-c" "QNM-4-HCR-c" "QNM-5-HCR-c" "QNM-0-HCR-D"
+[13] "QNM-2-HCR-D" "QNM-3-HCR-D" "QNM-4-HCR-D" "QNM-5-HCR-D" "QNM-0-HCR-E" "QNM-2-HCR-E"
+[19] "QNM-3-HCR-E" "QNM-4-HCR-E" "QNM-5-HCR-E"
+
+how long did that take?
+```{r}
+biomass_run_times_df <- as.data.frame(biomass_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=hcr_run_times)
+# save
+write_csv(run_times_df, here('data','sensitivity','biomass_gbm_run_times.csv'))
+#
+
+ggplot(biomass_run_times_df, aes(x=run_time)) + geom_histogram() + theme_bw()
+```
+total: 7.4 hrs
+
+Convert to a data frame with just the relative influence value per link.
+```{r}
+biomass.br.list <- readRDS(here('data','qnm_out','sensitivity',paste0('gbmOut_SpawningBiomass_GaussTr5Lr01_',sim.date,'.rds')))
+
+for(i in 1:length(biomass.br.list)){
+  
+    fit.sq <- biomass.br.list[[i]]
+    tmp_name <- names(biomass.br.list)[i]
+    
+  if(i==1){
+    fit.biomass.df <- as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Spawning biomass") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name)
+  } else{
+  fit.biomass.df <- fit.biomass.df %>%
+    bind_rows(as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Spawning biomass") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name))
+  }
+}
+
+## save
+write_csv(fit.biomass.df, here('data','qnm_out','sensitivity',paste0('gbmResults_SpawningBiomass_GaussTr5Lr01_',sim.date,'.csv')))
+```
+
+
+
+## Fishery 2 catch
+
+Set up for loop. Create list object to save influence dataframes and timer. The 'counter' is used to add list objects in order (because not all HCR/OM combos will have entries in the list)
+```{r}
+fish2.br.list <- list()
+fish2_run_times <- c()
+counter = 1
+```
+
+This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
+```{r}
+for(i in c("B","c","D","E")){  # HCRs
+
+  for(j in c(0,2,3,4,5)){  # OMs
+    
+    # if(j %in% c(0,3) & i %in% c("A","D")){sim.date='20240923'} else{sim.date='20240920'}
+    
+    # read in gbm input matrix 
+    tmp_in <- readRDS(here('data','qnm_out','sensitivity',paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.rds')))
+    
+    # if variable differs in response across sims, fit with gbm step
+    if(length(unique(tmp_in[,"Fishery 2"])) > 1){
+      ## find the column that starts reporting on edges, instead of vertices
+      d1 <- which(str_detect(colnames(tmp_in),"_"))[1]
+      d2 <- dim(tmp_in)[2]
+      
+      ## grab just edge info
+      d <- cbind(tmp_in[,"Fishery 2"],tmp_in[,d1:d2])
+      
+      ## fitting with gbm step
+      s <- Sys.time()  # start timer
+      
+      fit.gbm <- gbm.step(data=d,gbm.x=2:dim(d)[2],gbm.y=1,family="gaussian",tree.complexity=5, learning.rate = 0.01,bag.fraction = 0.5)
+      ## save fit to list
+      fish2.br.list[[counter]] <- fit.gbm
+      names(fish2.br.list)[[counter]] <- paste0('QNM-',j,'-HCR-',i)
+      
+      ## save timer
+    fish2_run_times[length(fish2_run_times)+1] <- end.timer(s)
+    names(fish2_run_times)[length(fish2_run_times)] <- paste(i, j, sep="_")
+      
+    ## add to counter
+      counter=counter+1
+      
+    } else{message('skipping QNM ',j,' HCR ',i,' for this variable. no variation in response to perturbation.')}
+    
+  }
+}
+beepr::beep()
+
+## save 
+saveRDS(fish2.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_Fishery2_GaussTr5Lr01_',sim.date,'.rds')))
+```
+
+ran: 
+```{r}
+names(fish2.br.list)
+```
+
+how long did that take?
+```{r}
+fish2_run_times_df <- as.data.frame(fish2_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=fish2_run_times)
+# save
+write_csv(fish2_run_times_df, here('data','qnm_out','sensitivity','fish2_gbm_run_times.csv'))
+#
+
+ggplot(fish2_run_times_df, aes(x=om, y=run_time)) + 
+  geom_boxplot() + 
+  stat_summary(geom="text", fun=median,
+               aes(label=sprintf("%1.0f", ..y..)),
+               position=position_nudge(x=0.13, y=1), size=3.5) +
+  labs(subtitle=paste0("overall mean: ", mean(fish2_run_times_df$run_time), " min."),
+       x="operating model",y="run time (min)") +
+  theme_bw()
+```
+
+Convert to a data frame with just the relative influence value per link.
+```{r}
+for(i in 1:length(fish2.br.list)){
+  
+    fit.sq <- fish2.br.list[[i]]
+    tmp_name <- names(fish2.br.list)[i]
+    
+  if(i==1){
+    fit.fish2.df <- as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Fishery 2 catch") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name)
+  } else{
+  fit.fish2.df <- fit.fish2.df %>%
+    bind_rows(as.data.frame(summary(fit.sq), row.names=NULL) %>%
+      rename("Link"=var) %>% mutate(Variable="Fishery 2 catch") %>%
+      rownames_to_column("Link2") %>% dplyr::select(-Link2) %>%
+      mutate(name=tmp_name))
+  }
+}
+
+## save
+write_csv(fit.fish2.df, here('data','qnm_out','sensitivity',paste0('gbmResults_Fishery2_GaussTr5Lr01_',sim.date,'.csv')))
+```
+
+graph the distribution of relative influence
+```{r}
+ggplot(data=fit.fish2.df, aes(x=rel.inf)) +
+  geom_histogram() +
+  geom_vline(xintercept=median(fit.fish2.df$rel.inf)) +
+  annotate("text", x = median(fit.fish2.df$rel.inf)+5, y = 100, label = paste0("median: ", round(median(fit.fish2.df$rel.inf),3))) +
+  labs(title="Fishery 2 catch", x="relative influence",y="link count") + 
+  theme_bw()
+```
+
+
+## Compare
+
+**Reminder:** Total catch and Fishery 1 catch have the least agreement between the quantitative and qualitative models. 
+
+Read in each data frame and combine into one.
+```{r}
+# fit.fish2.df <- read_csv(here('data','qnm_out','sensitivity',paste0('gbmResults_Fishery2_GaussTr5Lr01_',sim.date,'.csv'))
+fit.catch.df <- read_csv(here('data','qnm_out','sensitivity',paste0('gbmResults_TotalCatch_GaussTr5Lr01_',sim.date,'.csv')))
+fit.fish1.df <- read_csv(here('data','qnm_out','sensitivity',paste0('gbmResults_Fishery1_GaussTr5Lr01_',sim.date,'.csv')))
+fit.biomass.df <- read_csv(here('data','qnm_out','sensitivity',paste0('gbmResults_SpawningBiomass_GaussTr5Lr01_',sim.date,'.csv')))
+
+fit.df <- bind_rows(fit.fish2.df, fit.fish1.df, fit.catch.df, fit.biomass.df)
+fit.df %<>% rename(rel_inf=rel.inf)
+```
+
+How do the distributions of relative influence compare between the variables? 
+```{r}
+plot.all <- fit.df %>%
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
+ggplot(aes(x=rel_inf)) +
+  geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
+  facet_wrap(~Variable,ncol=4) +
+  theme_bw()
+dat.top10 <- fit.df %>% group_by(Variable) %>%
+  slice_max(order_by=rel_inf, prop=0.10)
+
+fit.df %>%
+  mutate(comparison='All Links') %>%
+  bind_rows(dat.top10 %>% mutate(comparison='Top 10% Links')) %>%
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>% 
+  ggplot(aes(x=rel_inf)) +
+  geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
+  facet_grid(cols=vars(Variable), rows=vars(comparison), scales="free_y") +
+  labs(x='relative influence') +
+  theme_bw()
+```
+
+make that look nice to save it.
+```{r}
+png(here('data','qnm_out','sensitivity','gbmOut_relinf_distribution_allvars_top10.png'),res=300,height=1600,width=2200)
+fit.df %>%
+  mutate(comparison='All Links') %>%
+  bind_rows(dat.top10 %>% mutate(comparison='Top 10% Links')) %>%
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>% 
+  ggplot(aes(x=rel_inf)) +
+  geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
+  facet_grid(cols=vars(Variable), rows=vars(comparison), scales="free_y") +
+  labs(x='relative influence') +
+  theme_bw()
+dev.off()
+```
+
+what are the means / medians of each?
+```{r}
+fit.df %>% 
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>% 
+  group_by(Variable) %>%
+  summarise(mean_influence=mean(rel_inf), sd_influence=sd(rel_inf), med_influence=median(rel_inf))
+  # ggplot(aes(x=Variable, y=rel_inf)) + 
+  # geom_boxplot() + 
+  # stat_summary(geom="text", fun=mean,
+  #              aes(label=sprintf("%1.00f", ..y..)),
+  #              position=position_nudge(x=0.13, y=1), size=3.5) +
+  # theme_bw()
+```
+
+
+I'd like some kind of quantitative comparison... fit a model to each distribution of relative influence values?
+```{r}
+fit.nested <- fit.df %>%
+  group_by(Variable) %>%
+  nest() %>%
+  mutate(lm_x = map(data, ~glm(rel_inf ~ ., family='...', data=.x)))
+```
+
+
+
+
+
