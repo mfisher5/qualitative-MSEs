@@ -822,15 +822,72 @@ fit.df %>%
 ```
 
 
-I'd like some kind of quantitative comparison... fit a model to each distribution of relative influence values?
+I'd like some kind of quantitative comparison... 
 ```{r}
+summary(glm(rel_inf ~ Variable, family=Gamma,data=fit.df))
+```
+<!-- Call: -->
+<!-- glm(formula = rel_inf ~ Variable, family = Gamma, data = fit.df) -->
+
+<!-- Coefficients: -->
+<!--                           Estimate Std. Error t value Pr(>|t|)     -->
+<!-- (Intercept)               0.653750   0.062275  10.498   <2e-16 *** -->
+<!-- VariableFishery 2 catch  -0.006058   0.092775  -0.065    0.948     -->
+<!-- VariableSpawning biomass  0.003750   0.108070   0.035    0.972     -->
+<!-- VariableTotal catch      -0.012321   0.082324  -0.150    0.881     -->
+<!-- --- -->
+<!-- Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 -->
+
+<!-- (Dispersion parameter for Gamma family taken to be 9.491792) -->
+
+<!--     Null deviance: 8890.6  on 3760  degrees of freedom -->
+<!-- Residual deviance: 8890.3  on 3757  degrees of freedom -->
+<!-- AIC: 9621 -->
+
+<!-- Number of Fisher Scoring iterations: 9 -->
+
+fit a model to each distribution of relative influence values?
+```{r}
+library(fitdistrplus)
 fit.nested <- fit.df %>%
+  dplyr::select(Variable,rel_inf) %>%
   group_by(Variable) %>%
   nest() %>%
-  mutate(lm_x = map(data, ~glm(rel_inf ~ ., family='...', data=.x)))
+  mutate(my_gamma = map(data, function(x) (fitdist(data=x$rel_inf, distr='gamma', method = "mle")))) %>%
+  mutate(k=map(data, function(x) (x[[1]][1])),
+         theta=map(data, function(x) (x[[1]][2])))
+
+fits.gamma <- fit.nested %>% dplyr::select(Variable, k, theta) %>% unnest(cols=c(k, theta)) %>%
+   mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
+  arrange(Variable)
+fits.gamma
 ```
 
 
 
+```{r}
+fit.df %>%
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
+  left_join(fits.gamma) %>%
+ggplot(aes(x=rel_inf)) +
+  geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
+  geom_text(aes(x = 30, y = 0.3, label = paste0('k: ',round(k,3)))) +
+  geom_text(aes(x = 35, y = 0.28, label = paste0('theta: ',round(theta,3)))) +
+  facet_wrap(~Variable,ncol=4) +
+  theme_bw()
+```
 
-
+```{r}
+png(here('data','qnm_out','sensitivity','gbmOut_relinf_distribution_allvarsGamma.png'),res=300,height=1200,width=2200)
+fit.df %>%
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
+  left_join(fits.gamma) %>%
+ggplot(aes(x=rel_inf)) +
+  geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
+  geom_text(aes(x = 30, y = 0.3, label = paste0('k: ',round(k,3)))) +
+  geom_text(aes(x = 35, y = 0.28, label = paste0('theta: ',round(theta,3)))) +
+  facet_wrap(~Variable,ncol=4) +
+  labs(x='relative influence') +
+  theme_bw()
+dev.off()
+```
