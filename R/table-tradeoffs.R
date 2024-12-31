@@ -38,6 +38,15 @@ speciesALL_compare %<>%
                                  "Total Catch"="total_catch",
                                  "Spawning Biomass"="spawning_biomass"))
 
+## prep df to describe trade-offs
+tos <- speciesALL_compare  %>%
+  dplyr::select(-model.x) %>%
+  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
+  mutate(species=case_when(
+    species=="MSE-Species1" ~ "(sp.1) med longevity", 
+    species=="MSE-Species2" ~ "(sp.2) short longevity")) %>%
+  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0))
+
 ## create full pairwise df 
 tradeoffs_vec <- c("catch increases,\nbiomass increases","catch increases,\nbiomass decreases","catch decreases,\nbiomass increases", "catch decreases,\nbiomass decreases")
 pairwise_df <- data.frame(MSE= c(rep("catch decreases,\nbiomass increases",4), 
@@ -78,13 +87,6 @@ tos %>%
 
 
 # Total catch -------------------------------------------------------------
-tos <- speciesALL_compare  %>%
-  dplyr::select(-model.x) %>%
-  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
-  mutate(species=case_when(
-    species=="MSE-Species1" ~ "(sp.1) med longevity", 
-    species=="MSE-Species2" ~ "(sp.2) short longevity")) %>%
-  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0))
 
 tos_total <- tos %>%
   filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
@@ -277,4 +279,180 @@ plot_grid(plotlist=list(
   plot.fish1 + ggtitle("(B) Fishery 1 catch"),
   plot.fish2 + ggtitle("(C) Fishery 2 catch")
 ), ncol=1, nrow=3)
+dev.off()
+
+
+
+# Expanded table ----------------------------------------------------------
+
+## tabulate "+" and "-" by OM / MS
+tos_total2 <- tos_total %>%
+  separate(QNM, into=c("QNM_catch","QNM_biomass"), remove=TRUE, sep=",") %>%
+  separate(MSE, into=c("MSE_catch","MSE_biomass"), remove=TRUE, sep=",") %>%
+  mutate(QNM_catch=str_replace(QNM_catch,"catch ","")) %>%
+  mutate(QNM_biomass=str_replace(QNM_biomass,"biomass ","")) %>%
+  mutate(MSE_catch=str_replace(MSE_catch,"catch ","")) %>%
+  mutate(MSE_biomass=str_replace(MSE_biomass,"biomass ",""))
+tos_total2 %<>% 
+  pivot_longer(cols=c(QNM_catch, QNM_biomass, MSE_catch, MSE_biomass), names_to="var", values_to="change") %>%
+  separate(var, into=c("model","var"), sep="_") %>%
+  pivot_wider(names_from="model",values_from="change")
+tos_total2 %<>%
+  mutate(QNM=ifelse(grepl("increases",QNM), "+",
+                    ifelse(grepl("decreases",QNM),"-",NA)))
+tos_total2 %<>%
+  mutate(MSE=ifelse(grepl("increases",MSE), "+",
+                    ifelse(grepl("decreases",MSE),"-",NA)))
+any(is.na(tos_total2$MSE))
+any(is.na(tos_total2$QNM))
+
+tos_total2 %<>% 
+  mutate(qnm_compare=ifelse(QNM==MSE, "same", 
+                            ifelse(QNM=="+" & MSE=="-", "optimistic",
+                                   ifelse(QNM=="-" & MSE=="+", "pessimistic",NA))))
+any(is.na(tos_total2$qnm_compare))
+
+p2_total <- tos_total2 %>%
+  pivot_longer(cols=c(QNM, MSE), names_to="model", values_to="change") %>%
+  filter(grepl("1", species))  %>%
+  mutate(management_strategy=ifelse(
+    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
+    "C. Fishery 1 in \"offshore\" only,\n effort changes",
+    management_strategy
+  )) %>%
+  ggplot(aes(y=model,x=var, fill=qnm_compare)) +
+  geom_tile() +
+  geom_text(aes(label=change)) +
+  facet_grid(cols=vars(operating_model), rows=vars(management_strategy),
+             switch='y') +
+  geom_hline(aes(yintercept=1.5)) +
+  labs(y="",x="") +
+  scale_x_discrete(position='bottom') +
+  scale_y_discrete(position='right')+
+  scale_fill_manual(values=c("goldenrod","#8da0cb","white"), na.value="white",name='QNM is...') +
+  theme_bw() +
+  theme(strip.background=element_rect(fill='white'),
+        strip.placement = "outside",
+        strip.text.x.top=element_text(angle=90),
+        strip.text.y.left=element_text(angle=0,hjust=1),
+        axis.text.x=element_text(angle=90, vjust=0.5),
+        panel.spacing.x=unit(0, "lines") , panel.spacing.y=unit(0,"lines"))
+  
+
+png(here('data','results','fig8-tradeoffs-expanded_totalCatch.png'), res=300,height=1400,width=1900)
+p2_total
+dev.off()
+
+
+## tabulate "+" and "-" by OM / MS
+tos2_fish1 <- tos_fish1 %>%
+  separate(QNM, into=c("QNM_catch","QNM_biomass"), remove=TRUE, sep=",") %>%
+  separate(MSE, into=c("MSE_catch","MSE_biomass"), remove=TRUE, sep=",") %>%
+  mutate(QNM_catch=str_replace(QNM_catch,"catch ","")) %>%
+  mutate(QNM_biomass=str_replace(QNM_biomass,"biomass ","")) %>%
+  mutate(MSE_catch=str_replace(MSE_catch,"catch ","")) %>%
+  mutate(MSE_biomass=str_replace(MSE_biomass,"biomass ","")) %>%
+  pivot_longer(cols=c(QNM_catch, QNM_biomass, MSE_catch, MSE_biomass), names_to="var", values_to="change") %>%
+  separate(var, into=c("model","var"), sep="_") %>%
+  pivot_wider(names_from="model",values_from="change") %>%
+  mutate(QNM=ifelse(grepl("increases",QNM), "+",
+                    ifelse(grepl("decreases",QNM),"-",NA))) %>%
+  mutate(MSE=ifelse(grepl("increases",MSE), "+",
+                    ifelse(grepl("decreases",MSE),"-",NA)))
+any(is.na(tos2_fish1$MSE))
+any(is.na(tos2_fish1$QNM))
+
+tos2_fish1 %<>% 
+  mutate(qnm_compare=ifelse(QNM==MSE, "same", 
+                            ifelse(QNM=="+" & MSE=="-", "optimistic",
+                                   ifelse(QNM=="-" & MSE=="+", "pessimistic",NA))))
+any(is.na(tos2_fish1$qnm_compare))
+
+p2_fish1 <- tos2_fish1 %>%
+  pivot_longer(cols=c(QNM, MSE), names_to="model", values_to="change") %>%
+  filter(grepl("1", species))  %>%
+  mutate(management_strategy=ifelse(
+    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
+    "C. Fishery 1 in \"offshore\" only,\n effort changes",
+    management_strategy
+  )) %>%
+  ggplot(aes(y=model,x=var, fill=qnm_compare)) +
+  geom_tile() +
+  geom_text(aes(label=change)) +
+  facet_grid(cols=vars(operating_model), rows=vars(management_strategy),
+             switch='y') +
+  geom_hline(aes(yintercept=1.5)) +
+  labs(y="",x="") +
+  scale_x_discrete(position='bottom') +
+  scale_y_discrete(position='right')+
+  scale_fill_manual(values=c("goldenrod","#8da0cb","white"), na.value="white",name='QNM is...') +
+  theme_bw() +
+  theme(strip.background=element_rect(fill='white'),
+        strip.placement = "outside",
+        strip.text.x.top=element_text(angle=90),
+        strip.text.y.left=element_text(angle=0,hjust=1),
+        axis.text.x=element_text(angle=90, vjust=0.5),
+        panel.spacing.x=unit(0, "lines") , panel.spacing.y=unit(0,"lines"))
+
+
+## tabulate "+" and "-" by OM / MS
+tos2_fish2 <- tos_fish2 %>%
+  separate(QNM, into=c("QNM_catch","QNM_biomass"), remove=TRUE, sep=",") %>%
+  separate(MSE, into=c("MSE_catch","MSE_biomass"), remove=TRUE, sep=",") %>%
+  mutate(QNM_catch=str_replace(QNM_catch,"catch ","")) %>%
+  mutate(QNM_biomass=str_replace(QNM_biomass,"biomass ","")) %>%
+  mutate(MSE_catch=str_replace(MSE_catch,"catch ","")) %>%
+  mutate(MSE_biomass=str_replace(MSE_biomass,"biomass ","")) %>%
+  pivot_longer(cols=c(QNM_catch, QNM_biomass, MSE_catch, MSE_biomass), names_to="var", values_to="change") %>%
+  separate(var, into=c("model","var"), sep="_") %>%
+  pivot_wider(names_from="model",values_from="change") %>%
+  mutate(QNM=ifelse(grepl("increases",QNM), "+",
+                    ifelse(grepl("decreases",QNM),"-",NA))) %>%
+  mutate(MSE=ifelse(grepl("increases",MSE), "+",
+                    ifelse(grepl("decreases",MSE),"-",NA)))
+
+any(is.na(tos2_fish2$MSE))
+any(is.na(tos2_fish2$QNM))
+
+tos2_fish2 %<>% 
+  mutate(qnm_compare=ifelse(QNM==MSE, "same", 
+                            ifelse(QNM=="+" & MSE=="-", "optimistic",
+                                   ifelse(QNM=="-" & MSE=="+", "pessimistic",NA))))
+any(is.na(tos2_fish2$qnm_compare))
+
+p2_fish2 <- tos2_fish2 %>%
+  pivot_longer(cols=c(QNM, MSE), names_to="model", values_to="change") %>%
+  filter(grepl("1", species))  %>%
+  mutate(management_strategy=ifelse(
+    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
+    "C. Fishery 1 in \"offshore\" only,\n effort changes",
+    management_strategy
+  )) %>%
+  ggplot(aes(y=model,x=var, fill=qnm_compare)) +
+  geom_tile() +
+  geom_text(aes(label=change)) +
+  facet_grid(cols=vars(operating_model), rows=vars(management_strategy),
+             switch='y') +
+  geom_hline(aes(yintercept=1.5)) +
+  labs(y="",x="") +
+  scale_x_discrete(position='bottom') +
+  scale_y_discrete(position='right')+
+  scale_fill_manual(values=c("goldenrod","white"), na.value="white",name='QNM is...') +
+  theme_bw() +
+  theme(strip.background=element_rect(fill='white'),
+        strip.placement = "outside",
+        strip.text.x.top=element_text(angle=90),
+        strip.text.y.left=element_text(angle=0,hjust=1),
+        axis.text.x=element_text(angle=90, vjust=0.5),
+        panel.spacing.x=unit(0, "lines") , panel.spacing.y=unit(0,"lines"))
+p2_fish2
+
+
+
+png(here('data','results','fig8-tradeoffs-no-equiv-expanded.png'), res=300,height=1800,width=4400)
+plot_grid(plotlist=list(
+  p2_total + ggtitle("(A) Total catch") + theme(legend.position='left'),
+  p2_fish1 + ggtitle("(B) Fishery 1 catch") + theme(legend.position='none'),
+  p2_fish2 + ggtitle("(C) Fishery 2 catch") + theme(legend.position='none')
+), ncol=3, nrow=1, rel_widths=c(1,0.76,0.76))
 dev.off()
