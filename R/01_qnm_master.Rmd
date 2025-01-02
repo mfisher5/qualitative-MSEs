@@ -559,6 +559,8 @@ save as df and fig
 ```{r}
 write_csv(run_times_df, here('data','qnm_run_times.csv'))
 
+run_times_df <- read_csv(here('data','qnm_run_times.csv'))
+
 ptime <- run_times_df %>%
   mutate(om_num=str_split_i(om, ' ', 2)) %>%
   mutate(om_num=case_when(om_num=='O' ~ '0', .default=om_num)) %>%
@@ -573,7 +575,7 @@ ggplot(aes(y=run_time, x=om)) +
 
 ptime
 
-png(here('doc','supplement','FigC1-run-times.png'), res=200, height=800,width=800)
+png(here('doc','supplement','FigC1-run-times-qpress.png'), res=300, height=1200,width=1200)
 ptime
 dev.off()
 ```

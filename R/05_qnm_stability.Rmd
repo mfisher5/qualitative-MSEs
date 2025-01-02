@@ -111,7 +111,7 @@ Does % mismatches trend with % stable matrices?
 ```{r}
 compare_df %<>%
   pivot_longer(cols=c('A','B','C','D','E'), names_to="MS", values_to="n_mismatch") %>%
-  mutate(p_mismatch=n_mismatch/4)
+  mutate(p_match=1-(n_mismatch/4))
 
 compare_df %>%
   left_join(stable.df %>%
@@ -119,29 +119,28 @@ compare_df %>%
               mutate(om=substr(om_name,4,4)) %>%
               mutate(om=ifelse(om=="O",as.double("0"),as.double(om))),
             by=c("MS"="ms","OM"="om")) %>%
-  ggplot(aes(x=pstable,y=p_mismatch)) +
-  geom_point(aes(col=om_name)) + 
-  facet_wrap(~model.y) +
+  ggplot(aes(x=pstable,y=p_match)) +
+  geom_point(aes(col=om_name, pch=model.y)) + 
   theme_bw()
 ```
 
 
 ```{r}
-png(here('doc','supplement','figC1-StabilityVMismatches.png'), res=300, height=1000,width=1850)
+png(here('doc','supplement','figC1-StabilityVMatches.png'), res=300, height=1000,width=1400)
 compare_df %>%
   mutate(model.y=case_when(model.y=='MSE-Species1' ~ 'Species 1',
                            model.y=='MSE-Species2' ~ 'Species 2')) %>%
+  rename(`MSE Species`=model.y) %>%
   left_join(stable.df %>%
               rename(om_name=om) %>%
               mutate(om=substr(om_name,4,4)) %>%
               mutate(om=ifelse(om=="O",as.double("0"),as.double(om)),
                      om_name=ifelse(om_name=="OM O", "OM 0 Status Quo",om_name)),
             by=c("MS"="ms","OM"="om")) %>%
-  ggplot(aes(x=pstable,y=p_mismatch)) +
-  geom_point(aes(col=om_name), alpha=0.5) + 
-  facet_wrap(~model.y) +
-  labs(x='proportion matrices stable',y='proportion metrics mismatched') +
-  scale_color_discrete(type=pnw_palette(name="Starfish",n=5,type="discrete"), name='Operating Model') +
+  ggplot(aes(x=pstable,y=p_match)) +
+  geom_point(aes(col=om_name, pch=`MSE Species`), alpha=0.5) + 
+  labs(x='proportion matrices stable',y='proportion metrics matched') +
+  scale_color_discrete(type=pnw_palette(name="Starfish",n=5,type="discrete"), name='Operating Model Scenario') +
   theme_bw()
 dev.off()
 ```

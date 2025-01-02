@@ -10,7 +10,7 @@ output:
 
 **Date written: 2024-09-19**
 
-# Description
+## Description
 
 Certain output variables don't have similar results between the QNMs and the MSEs. Run sensitivity analyses for the following variables in the specific QNMs:
 
@@ -253,7 +253,7 @@ rm(tmp_mat,tmp_qpress,tmp_hcr_out,out)
 
 
 
-## testing
+### testing
 
 Test these functions on one example -- fishery 1 catch in OM 2 (Thorson effort) for HCR B
 
@@ -760,7 +760,51 @@ ggplot(data=fit.fish2.df, aes(x=rel.inf)) +
 ```
 
 
-## Compare
+## Run times
+
+Plot run times of BRMs for supplement.
+
+Read in run times
+```{r}
+runtime_df <- lapply(X=list('fish1','catch','biomass','fish2'), FUN= function(x){
+  tmp <- read_csv(here('data', 'qnm_out', 'sensitivity',  paste0(x,'_gbm_run_times.csv'))) %>%
+    mutate(variable=paste0(x))
+})
+
+runtime_df <- bind_rows(runtime_df)
+```
+
+Add OM names
+```{r}
+om_names <- data.frame(om=c(0,2,3,4,5),
+                       om_name=c('OM 0 Status Quo',
+                                 'OM 2 Thorson Effort',
+                                 'OM 3 Reduced Productivity',
+                                 'OM 4 Offshore Inaccessible',
+                                 'OM 5 Faster Growth')) 
+```
+
+plot and save
+```{r}
+runtime_df %>%
+  left_join(om_names,by='om') %>%
+  ggplot(aes(x=om_name, y=run_time)) +
+  geom_boxplot(aes(fill=om_name), alpha=0.8) +
+  geom_jitter(aes(fill=om_name), pch=21, alpha=0.5, width=0.01, height=0.01) +
+  labs(x='QNM', y='run time (minutes)') +
+  theme_bw() + theme(legend.position='none',
+                     axis.text.x=element_text(angle=45, hjust=1)) -> p
+
+p
+
+
+png(here('doc','supplement','FigC1-run-times-brts.png'), res=300,height=1200,width=1200)
+p
+dev.off()
+```
+
+
+## Explore sensitivity results
 
 **Reminder:** Total catch and Fishery 1 catch have the least agreement between the quantitative and qualitative models. 
 
