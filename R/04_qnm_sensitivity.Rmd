@@ -1015,8 +1015,8 @@ dev.off()
 
 Dive into Total catch, Fishery 1 catch more
 ```{r}
-p <- 0.075
-v <- "Total Catch"
+p <- 0.10
+v <- "Fishery 1 catch"
 fit_by_VOM <- fit.df %>%
   filter(Variable==v) %>%
   group_by(Variable,Link, OM) %>%
