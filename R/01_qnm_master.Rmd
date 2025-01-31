@@ -100,8 +100,9 @@ m5list <- list(
 
 end.timer(s)
 ```
-*Time difference of 2.24 secs*
 
+
+Add all into a single list
 ```{r}
 mlist_all <- list(m0list,m2list,m3list,m4list,m5list)
 names(mlist_all) <- c("OM O","OM 2 Thorson Effort","OM 3", "OM 4 Offshore Inaccessible","OM 5 Faster Growth")
@@ -178,6 +179,44 @@ for(j in seq(1:4)){
 ```
 
 
+Save some network complexity info for each QNM. How many variables in each QNM / HCR combo? What is the link density?
+```{r}
+nvar_df <- as.data.frame(lapply(
+  lapply(mlist_all, FUN=function(x){
+  out <- lapply(x, FUN=function(y){
+    return(length(unique(c(y[,1], y[,2]))))
+  })
+}), unlist
+))
+
+ed_df <- as.data.frame(lapply(
+  lapply(mlist_all, FUN=function(x){
+  out <- lapply(x, FUN=function(y){
+    g <- igraph::graph_from_data_frame(y)
+    return(edge_density(g))
+  })
+}), unlist
+))
+```
+
+Save a data frame of complexity metrics.
+```{r}
+complexity_df <- nvar_df %>% 
+  mutate(MS=c('A','B','C','E')) %>%
+  pivot_longer(all_of(colnames(nvar_df))) %>%
+  rename(n_variables=value) %>%
+  left_join(ed_df %>% 
+              mutate(MS=c('A','B','C','E')) %>%
+              pivot_longer(all_of(colnames(ed_df))) %>%
+              rename(edge_density=value),
+            by=c("MS","name")) %>%
+  rename(QNM=name) %>%
+  mutate(QNM=str_replace(QNM,'QNM.','')) %>%
+  mutate(QNM=ifelse(QNM=="O","0.Baseline",QNM))
+
+write_csv(complexity_df, here('data','qnm_models','qnm_complexity_stats.csv'))
+
+```
 
 
 ## HCR Overview

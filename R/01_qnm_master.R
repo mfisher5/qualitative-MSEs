@@ -14,6 +14,8 @@ library(here)
 library(tidyverse)
 library(magrittr)
 library(ggplot2)
+library(gridExtra)
+library(cowplot)
 
 #Load XML first--dependency not included in QPress
 #To install QPress: 
@@ -22,18 +24,17 @@ library(ggplot2)
 library(QPress)
 library(XML)
 library(tcltk2)
-library(gridExtra)
-library(cowplot)
+library(igraph)
 
 
 ## custom functions
-source(here('../R/parse.constraints.SWotherspoon.R'))
-source(here('../R/prepare.dia.R'))
-source(here('../R/impact.table.R'))
-source(here('../R/compare.baseline.impact.table.R'))
-source(here('../R/compare.models.impact.table.R'))
-source(here('../R/compare.models.impact.dataframe.R'))
-source(here('../R/alternating.list.R'))
+source(here('R/fxns/parse.constraints.SWotherspoon.R'))
+source(here('R/fxns/prepare.dia.R'))
+# source(here('R/fxns/impact.table.R'))
+source(here('R/fxns/compare.baseline.impact.table.R'))
+source(here('R/fxns/compare.models.impact.table.R'))
+# source(here('R/fxns/compare.models.impact.dataframe.R'))
+source(here('R/fxns/alternating.list.R'))
 
 
 ## 
@@ -46,24 +47,24 @@ set.seed(555)
 
 ## create a list of lists, so that each operating model scenario (0-5) 
 ##        is run with the five management strategies (A-E)
-##        management strategies A-B,D-E use the same underlying QNM structure
+##        management strategies A,D use the same underlying QNM structure
 ##        but strategy C requires a separate dia object.
 
 
 ##### 0. A baseline scenario #####
 mlist0 <- list(
-  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00-constantF',dia_path=here('data'))[[1]],  # no constraints
-  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00B-rm-small-mesh',dia_path=here('data'))[[1]],  # no const
-  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]],  # no constraints
-  m.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh',dia_path=here('data'))[[1]]
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00-constantF',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],  # no const
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]
 )
 
 #### 2. Effort scales according to the Thorson effort model (Thorson et al., 2013) ####
 mlist2 <- list(
-  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data'))[[1]],  # no constraints
-  m2.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data'))[[1]],   # no constraints
-  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]],  # no constraints
-  m2.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh',dia_path=here('data'))[[1]]  # no constraints
+  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m2.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],   # no constraints
+  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m2.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]  # no constraints
 )
 
 #### 3. Climate reduces productivity ####
@@ -71,18 +72,18 @@ mlist3 <- mlist0
 
 #### 4. Animals move into the “far offshore” area ####
 mlist4 <- list(
-  m4 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-movement-to-inaccessible',dia_path=here('data'))[[1]],  # no constraints
-  m4.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004B-rm-small-mesh',dia_path=here('data'))[[1]],
-  m4.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]],  # no constraints
-  m4.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh',dia_path=here('data'))[[1]]
+  m4 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-movement-to-inaccessible',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m4.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],
+  m4.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m4.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]
    )
 
 #### 5. Climate increases growth rate ####
 mlist5 <- list(
-  m5 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005-growth-perturb',dia_path=here('data'))[[1]],  # no constraints
-  m5.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005B-rm-small-mesh',dia_path=here('data'))[[1]],
-  m5.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small',dia_path=here('data'))[[1]],  # no constraints
-  m5.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh',dia_path=here('data'))[[1]]
+  m5 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005-growth-perturb',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m5.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],
+  m5.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m5.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]
   )
 
 
@@ -92,13 +93,12 @@ names(mlist_all) <- c("QNM O","QNM 2 Thorson Effort","QNM 3 Fewer Recruits", "QN
 
 #### Model variable key ####
 # I use this to order the variables in the output tables.
-vkey <- read_csv(here('data','om_variable_key.csv'))
+vkey <- read_csv(here('data','qnm_models','om_variable_key.csv'))
 vkey %<>% bind_rows(
   data.frame(variable=c("offshore biomass inaccessible large","offshore biomass inaccessible small"),
              group=rep("ecosystem",2),
              group_order=rep(1,2),specific_order=rep(6,2))
   )
-
 
 # Write QNM matrices ------------------------------------------------------
 
@@ -179,6 +179,40 @@ PertOM5 <- c(`Growth`=1)
 
 
 
+# Summarize QNM complexity ------------------------------------------------
+# how many variables in each QNM / HCR combo?
+nvar_df <- as.data.frame(lapply(
+  lapply(mlist_all, FUN=function(x){
+  out <- lapply(x, FUN=function(y){
+    return(length(unique(c(y[,1], y[,2]))))
+  })
+}), unlist
+))
+
+# link density?
+ed_df <- as.data.frame(lapply(
+  lapply(mlist_all, FUN=function(x){
+  out <- lapply(x, FUN=function(y){
+    g <- igraph::graph_from_data_frame(y)
+    return(edge_density(g))
+  })
+}), unlist
+))
+
+complexity_df <- nvar_df %>% 
+  mutate(MS=c('A','B','C','E')) %>%
+  pivot_longer(all_of(colnames(nvar_df))) %>%
+  rename(n_variables=value) %>%
+  left_join(ed_df %>% 
+              mutate(MS=c('A','B','C','E')) %>%
+              pivot_longer(all_of(colnames(ed_df))) %>%
+              rename(edge_density=value),
+            by=c("MS","name")) %>%
+  rename(QNM=name) %>%
+  mutate(QNM=str_replace(QNM,'QNM.','')) %>%
+  mutate(QNM=ifelse(QNM=="O","0.Baseline",QNM))
+
+write_csv(complexity_df, here('data','qnm_models','qnm_complexity_stats.csv'))
 
 
 # HCRs by Operating Model -------------------------------------------------

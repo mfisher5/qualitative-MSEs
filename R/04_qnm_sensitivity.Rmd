@@ -818,19 +818,112 @@ fit.biomass.df <- read_csv(here('data','qnm_out','sensitivity',paste0('gbmResult
 fit.df <- bind_rows(fit.fish2.df, fit.fish1.df, fit.catch.df, fit.biomass.df)
 fit.df %<>% rename(rel_inf=rel.inf)
 ```
+
+separate om / hcr column. clean up om so all are capitalized
+```{r}
+fit.df %<>% separate(col=name, into=c("tmp1","OM","tmp2","HCR"), sep="-", remove=FALSE) %>% dplyr::select(-tmp1,-tmp2) %>%
+  mutate(HCR=ifelse(HCR=="c","C",HCR))
+```
+
+add in edge densities of each OMxHCR model.
+```{r}
+complexity_df <- read_csv(here('data','qnm_models','qnm_complexity_stats.csv'))
+complexity_df %>%
+  bind_rows(complexity_df %>% filter(MS=="A") %>%
+              mutate(MS='D')) %>%
+  rename(HCR=MS) %>%
+  mutate(OM=substr(QNM,1,1)) %>%
+  dplyr::select(-QNM) %>%
+  right_join(fit.df, by=c("OM","HCR")) -> fit.df
+```
+
 grab just the top 10% influential links for each variable.
 ```{r}
 dat.top10 <- fit.df %>% group_by(Variable) %>%
   slice_max(order_by=rel_inf, prop=0.10)
 ```
 
-separate om / hcr column.
-```{r}
-fit.df %<>% separate(col=name, into=c("tmp1","OM","tmp2","HCR"), sep="-", remove=FALSE) %>% dplyr::select(-tmp1,-tmp2)
-dat.top10 %<>% separate(col=name, into=c("tmp1","OM","tmp2","HCR"), sep="-", remove=FALSE) %>% dplyr::select(-tmp1,-tmp2)
-```
 
 ### Visualize
+
+#### edge densities
+
+How different are the edge densities by variable? (different models may have gone into the sensitivity analysis since the variable result must vary across stable matrices to run the BRTs)
+```{r}
+fit.df %>% dplyr::select(Variable,edge_density) %>% 
+  distinct() %>%
+  mutate(Variable=factor(Variable, levels=rev(c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass")))) %>%
+  ggplot(aes(x=Variable, y=edge_density)) + 
+  geom_boxplot() + 
+  ylim(c(0.12,0.18)) +
+  labs(x="Variable",y="Edge Density of QNM") + theme_bw()
+```
+
+Great, not so different. which QNMs were represented for which variables?
+```{r}
+fit.df %>% dplyr::select(Variable,OM,HCR) %>% 
+  distinct() %>%
+  unite(col=code, OM,HCR, sep="-") %>%
+  mutate(present='yes') %>%
+  pivot_wider(names_from=code, values_from=present, values_fill='no') %>%
+  pivot_longer(cols=2:21, names_to='OM_HCR',values_to='present') %>%
+  mutate(Variable=factor(Variable, levels=rev(c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass")))) %>%
+  ggplot() +
+  geom_tile(aes(x=Variable, y=OM_HCR, fill=as.factor(present))) +
+  geom_vline(aes(xintercept=1.5), col='black') +
+  geom_vline(aes(xintercept=2.5), col='black') +
+  geom_vline(aes(xintercept=3.5), col='black') +
+  geom_vline(aes(xintercept=4.5), col='black') +
+  scale_x_discrete(position='top', name='') + 
+  scale_fill_manual(values=c("darkred","gray65"), name='in BRTs') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
+```
+
+
+Save this for supplement
+```{r}
+pbox <- fit.df %>% dplyr::select(Variable,edge_density) %>% 
+  distinct() %>%
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
+  ggplot(aes(x=edge_density, y=Variable)) + 
+  geom_boxplot() + 
+  geom_hline(aes(yintercept=0.5), col='black') +
+  geom_hline(aes(yintercept=1.5), col='black') +
+  geom_hline(aes(yintercept=2.5), col='black') +
+  geom_hline(aes(yintercept=3.5), col='black') +
+  geom_hline(aes(yintercept=4.5), col='black') +
+  xlim(c(0.12,0.18)) +
+  scale_y_discrete(position='left', name='Variable') + 
+  labs(y="Variable",x="Edge Densities of QNMs") + 
+  theme_bw() + theme(plot.margin=margin(t=5,r=0.25,b=15,l=5))
+
+
+p2 <- fit.df %>% dplyr::select(Variable,OM,HCR) %>% 
+  distinct() %>%
+  unite(col=code, OM,HCR, sep="-") %>%
+  mutate(present='yes') %>%
+  pivot_wider(names_from=code, values_from=present, values_fill='no') %>%
+  pivot_longer(cols=2:21, names_to='QNM',values_to='present') %>%
+  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
+  ggplot() +
+  geom_tile(aes(y=Variable, x=QNM, fill=as.factor(present))) +
+  geom_hline(aes(yintercept=0.5), col='black') +
+  geom_hline(aes(yintercept=1.5), col='black') +
+  geom_hline(aes(yintercept=2.5), col='black') +
+  geom_hline(aes(yintercept=3.5), col='black') +
+  geom_hline(aes(yintercept=4.5), col='black') +
+  scale_fill_manual(values=c("darkred","gray65"), name='in BRTs') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1),
+                     axis.text.y=element_blank(), axis.title.y=element_blank())
+
+png(here('data','qnm_out','sensitivity','gbmOut_qnms_x_ed.png'),res=300,height=900,width=2300)
+plot_grid(pbox,p2,ncol=2)
+dev.off()
+```
+
+
+
+#### by Variable
 
 How do the distributions of relative influence compare between the variables? 
 
@@ -847,13 +940,6 @@ fit.df %>%
 
 
 ```{r}
-plot.all <- fit.df %>%
-  mutate(Variable=factor(Variable, levels=c("Spawning biomass","Fishery 2 catch","Fishery 1 catch","Total catch"))) %>%
-ggplot(aes(x=rel_inf)) +
-  geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
-  facet_wrap(~Variable,ncol=4) +
-  theme_bw()
-
 fit.df %>%
   mutate(comparison='All Links') %>%
   bind_rows(dat.top10 %>% mutate(comparison='Top 10% Links')) %>%
@@ -867,7 +953,7 @@ fit.df %>%
 
 make that look nice to save it.
 ```{r}
-png(here('data','qnm_out','sensitivity','gbmOut_relinf_distribution_allvars_top10.png'),res=300,height=1600,width=2200)
+png(here('data','qnm_out','sensitivity','gbmOut_relinf_distribution_allvars_top10.png'),res=300,height=1200,width=2200)
 fit.df %>%
   mutate(comparison='All Links') %>%
   bind_rows(dat.top10 %>% mutate(comparison='Top 10% Links')) %>%
@@ -876,12 +962,12 @@ fit.df %>%
   geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
   facet_grid(cols=vars(Variable), rows=vars(comparison), scales="free_y") +
   labs(x='relative influence') +
-  theme_bw()
+  theme_bw() + theme(legend.position='none')
 dev.off()
 ```
 
 ```{r}
-png(here('data','qnm_out','sensitivity','gbmOut_relinf_mean_5pLinks_byVarbyOM.png'),res=300,height=1200,width=2800)
+png(here('data','qnm_out','sensitivity','gbmOut_relinf_mean_10pLinks_byVarbyOM.png'),res=300,height=1200,width=2800)
 fit.df %>%
   group_by(Variable,OM,Link) %>%
   summarise(mean_ri=mean(rel_inf), sd_ri=sd(rel_inf)) %>%
@@ -896,6 +982,8 @@ fit.df %>%
   theme_bw()
 dev.off()
 ```
+
+#### By variable, specific links
 
 ```{r}
 p <- 0.075
@@ -923,6 +1011,29 @@ my_heatmap +
   scale_x_discrete(position = "top") +
   theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
 dev.off()
+```
+
+Dive into Total catch, Fishery 1 catch more
+```{r}
+p <- 0.075
+v <- "Total Catch"
+fit_by_VOM <- fit.df %>%
+  filter(Variable==v) %>%
+  group_by(Variable,Link, OM) %>%
+  summarise(mean_ri=mean(rel_inf), sd_ri=sd(rel_inf)) %>%
+  group_by(Variable, OM) %>%
+  slice_max(order_by=mean_ri, prop=p) %>%
+  unite(Variable, OM, col="Variable_OM", sep="_")
+
+my_heatmap <- fit_by_VOM %>%
+  mutate(Link=factor(Link,levels=rev(unique(arrange(fit_by_VOM,Variable_OM)$Link)))) %>%
+  ggplot(aes(y=Link,x=Variable_OM, fill=mean_ri)) +
+  geom_tile() +
+  scale_fill_distiller(palette = "YlOrBr", direction=1) +
+  scale_x_discrete(position = "top") +
+  theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
+
+my_heatmap
 ```
 
 
@@ -960,8 +1071,12 @@ m.null <- glm(rel_inf ~ 1, family=Gamma(link='log'),data=fit.df)
   
 m.var <- glm(rel_inf ~ Variable, family=Gamma(link='log'),data=fit.df)
 
+m.var2 <- glm(rel_inf ~ Variable+edge_density, family=Gamma(link='log'),data=fit.df)
+
+m.var3 <- glm(rel_inf ~ Variable*edge_density, family=Gamma(link='log'),data=fit.df)
+
 summary(m.var)
-anova(m.null, m.var, test = "LRT")
+anova(m.null, m.var, m.var2, m.var3, test = "LRT")
 ```
 <!-- Call: -->
 <!-- glm(formula = rel_inf ~ Variable, family = Gamma, data = fit.df) -->
@@ -1056,7 +1171,7 @@ dev.off()
 
 
 
-**By Variable, OM, HCR**
+#### By Variable, OM, HCR
 ```{r}
 fit.nested2 <- fit.df %>%
   dplyr::select(Variable,OM, HCR, rel_inf) %>%
@@ -1084,6 +1199,7 @@ p.out <- fits.gamma2 %>%
   theme_bw()
 p.out
 ```
+
 save it!
 ```{r}
 png(here('data','qnm_out','sensitivity','gbmOut_relinfGamma_mean_byVarbyOM.png'),res=300,height=1200,width=2000)
@@ -1102,85 +1218,6 @@ fits.gamma2 %>%
   labs(x='QNM',subtitle='gamma distribution parameters') +
   theme_bw()
 ```
-
-
-### Distributions: Beta
-
-I'd like some kind of quantitative comparison...  I'm going to fit a model to each distribution of relative influence values.
-```{r}
-library(fitdistrplus)
-library(betareg)
-library(lmtest)
-```
-
-But first, I need to relativize the influence values by OM/HCR, so that the link with the maximum influence in a given QNM has an influence value of 1.0. 
-```{r}
-rel.df <- fit.df %>% group_by(Variable,name,OM,HCR) %>%
-  mutate(max_rel_inf=max(rel_inf)) %>%
-  ungroup() %>%
-  mutate(rel2_inf=rel_inf/max_rel_inf)
-```
-
-So now what are the means / medians / max of each?
-```{r}
-rel.df %>% 
-  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>% 
-  group_by(Variable) %>%
-  summarise(mean_influence=mean(rel2_inf), sd_influence=sd(rel2_inf), med_influence=median(rel2_inf), 
-            max_influence=max(rel2_inf))
-```
-
-
-```{r}
-rel.df %>%
-  mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
-ggplot(aes(x=rel2_inf)) +
-  geom_histogram(aes(y = ..density.., group=1, fill=Variable)) +
-  facet_wrap(~Variable,ncol=4) +
-  theme_bw()
-```
-
-
-#### By Variable
-
-are the distributions of relative influence values significantly different depending on the variable?
-```{r}
-m.null <- betareg(rel.df$rel2_inf ~ 1, link="logit") 
-  
-m.var <- betareg(rel.df$rel2_inf ~ rel.df$Variable,  link="logit")
-
-lrtest(m.null, m.var)
-```
-
-Test fit to full data set
-```{r}
-x <- rel.df %>%
-  mutate(rel2_inf = ifelse(rel2_inf==1, 0.9999999999, rel2_inf)) %>%
-  pull(rel2_inf)
-fitdist(x, distr='beta', method = "mle",
-        start = list(shape1 = 1, shape2 = 1))
-```
-
-
-```{r}
-set.seed(55)
-
-beta.nested <- rel.df %>%
-  mutate(rel2_inf = ifelse(rel2_inf==1, 0.9999999999, rel2_inf)) %>%
-  dplyr::select(Variable,rel2_inf) %>%
-  group_by(Variable) %>%
-  nest() %>%
-  mutate(my_gamma = map(data, function(x) (fitdist(data=x$rel2_inf, distr='beta', method = "mle",
-                                                   start = list(shape1 = 1, shape2 = 1))))) %>%
-  mutate(shape=map(data, function(x) (x[[1]][1])),
-         theta=map(data, function(x) (x[[1]][2])))
-
-fits.beta <- beta.nested %>% dplyr::select(Variable, k, theta) %>% unnest(cols=c(k, theta)) %>%
-   mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
-  arrange(Variable)
-fits.beta
-```
-
 
 
 ## Compare to mismatches
