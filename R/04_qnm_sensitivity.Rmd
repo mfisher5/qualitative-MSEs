@@ -1246,6 +1246,7 @@ speciesALL_compare %<>%
 head(speciesALL_compare)
 ```
 
+### gamma distr
 merge data sets.
 ```{r}
 fits_v_match <- fits.gamma2 %>%
@@ -1340,11 +1341,99 @@ fits_v_match %>%
 
 
 
+### specific links
+
+#### all : mismatches
+Dive into the most influential links for comparisons where both Species 1 and 2 were off.
+
+First, grab mismatches in both species.
+```{r}
+compare_mismatch <- speciesALL_compare %>%
+  dplyr::select(-match) %>%
+  mutate(model.y=ifelse(grepl('sp.1', model.y),'species_1_med_longevity','species_2_short_longevity')) %>% 
+  pivot_wider(names_from=model.y, values_from=match_is_equiv) %>%
+  filter((species_1_med_longevity %in% c('mismatch','mismatch, qnm equiv')) & 
+           (species_2_short_longevity %in% c('mismatch','mismatch, qnm equiv')))
+
+compare_mismatch %<>% left_join(fit.df, by=c("OM", "HCR", "variable_out"="Variable"))
+```
+
+
+Then check out the top 10% of links for those variables x OMs x HCRs
+```{r}
+p <- 0.10
+fit_by_VOM_mismatches <- compare_mismatch %>%
+  group_by(variable_out, Link, OM) %>%
+  summarise(mean_ri=mean(rel_inf), sd_ri=sd(rel_inf)) %>%
+  group_by(variable_out, OM) %>%
+  slice_max(order_by=mean_ri, prop=p) %>%
+  unite(variable_out, OM, col="Variable_OM", sep="_") %>%
+  mutate(type)
+
+fit_by_VOM_mismatches %>%
+  mutate(Link=factor(Link,levels=rev(unique(arrange(fit_by_VOM,Variable_OM)$Link)))) %>%
+  ggplot(aes(y=Link,x=Variable_OM, fill=mean_ri)) +
+  geom_tile() +
+  scale_fill_distiller(palette = "YlOrBr", direction=1) +
+  scale_x_discrete(position = "top") +
+  theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
+```
+#### matches : mismatches
+
+Dive into the most influential links for comparisons where both Species 1 and 2 were mismatched VERSUS where either Species 1 or 2 matched. (only one OMxHCR for Total catch had both species 1 and 2 match)
+
+First, grab matches in both species. (we have mismatches from above)
+```{r}
+compare_match <- speciesALL_compare %>%
+  dplyr::select(-match) %>%
+  mutate(model.y=ifelse(grepl('sp.1', model.y),'species_1_med_longevity','species_2_short_longevity')) %>% 
+  pivot_wider(names_from=model.y, values_from=match_is_equiv) %>%
+  filter((species_1_med_longevity %in% c('match','match, qnm equiv')) | 
+           (species_2_short_longevity %in% c('match','match, qnm equiv')))
+
+compare_match %<>% left_join(fit.df, by=c("OM", "HCR", "variable_out"="Variable"))
+```
+
+How do the most influential links for this subset compare to the influential links for mismatched variablesxOMxHCRs?
+```{r}
+v <- 'Fishery 1'
+p <- 0.10
+# re create the fit_by_VOM but make sure p is the same for both. 
+tmp_matches <- compare_match %>%
+  group_by(variable_out, Link, OM) %>%
+  summarise(mean_ri=mean(rel_inf), sd_ri=sd(rel_inf)) %>%
+  group_by(variable_out, OM) %>%
+  slice_max(order_by=mean_ri, prop=p) %>%
+  unite(variable_out, OM, col="Variable_OM", sep="_") %>%
+  mutate(type="matches")
+tmp_mismatches <- compare_mismatch %>%
+  group_by(variable_out, Link, OM) %>%
+  summarise(mean_ri=mean(rel_inf), sd_ri=sd(rel_inf)) %>%
+  group_by(variable_out, OM) %>%
+  slice_max(order_by=mean_ri, prop=p) %>%
+  unite(variable_out, OM, col="Variable_OM", sep="_") %>%
+  mutate(type="mismatches")
+
+# plot
+tmp_mismatches %>%
+  filter(grepl(v, Variable_OM)) %>%
+  bind_rows(tmp_matches %>% filter(grepl(v, Variable_OM))) %>%
+  mutate(Link=factor(Link,levels=rev(unique(c(arrange(tmp_matches,Variable_OM)$Link,arrange(tmp_mismatches,Variable_OM)$Link))))) %>%
+  ggplot(aes(y=Link,x=Variable_OM, fill=mean_ri)) +
+  geom_tile() +
+  facet_wrap(~type) +
+  scale_fill_distiller(palette = "YlOrBr", direction=1) +
+  scale_x_discrete(position = "top") +
+  theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
+```
 
 
 
 
 
+Focus on Total Catch. Plot HCR x OM, instead of combining. 
+```{r}
+```
 
 
 
