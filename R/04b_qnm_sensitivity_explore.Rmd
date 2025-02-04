@@ -187,6 +187,8 @@ plot_grid(pbox,p2,ncol=2)
 dev.off()
 ```
 
+
+
 ### Stats of rel infl
 
 what are the means / medians / max of each?
@@ -587,6 +589,28 @@ my_heatmap
 ```
 
 
+Compare operating model 5 to the others (OM 5 had the least agreement between qual / quant models)
+```{r}
+p <- 0.075
+v <- "Total catch"
+tmp_fit <- fit.df %>%
+  filter(grepl(v,Variable)) %>%
+  group_by(HCR,OM, name) %>%
+  slice_max(order_by=rel_inf, prop=p)
+
+tmp_fit %>%
+  mutate(Link=factor(Link,levels=rev(unique(arrange(tmp_fit,HCR)$Link)))) %>%
+  ggplot(aes(y=Link,x=OM, fill=rel_inf)) +
+  geom_tile() +
+  geom_rect(aes(xmin=4.5,xmax=5.5, ymin=0,ymax=17), fill=NA,color='black') +
+  facet_wrap(~HCR) +
+  labs(y='') +
+  scale_fill_distiller(palette = "YlOrBr", direction=1) +
+  scale_x_discrete(position = "top") +
+  theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0), strip.placement='outside')
+
+```
+
 
 
 ### Compare to mismatches
@@ -616,17 +640,16 @@ fit_by_VOM_mismatches <- compare_mismatch %>%
   group_by(variable_out, OM) %>%
   slice_max(order_by=mean_ri, prop=p) %>%
   unite(variable_out, OM, col="Variable_OM", sep="_") %>%
-  mutate(type)
+  mutate(type="mismatches")
 
 fit_by_VOM_mismatches %>%
-  mutate(Link=factor(Link,levels=rev(unique(arrange(fit_by_VOM,Variable_OM)$Link)))) %>%
+  mutate(Link=factor(Link,levels=rev(unique(arrange(fit_by_VOM_mismatches,Variable_OM)$Link)))) %>%
   ggplot(aes(y=Link,x=Variable_OM, fill=mean_ri)) +
   geom_tile() +
   scale_fill_distiller(palette = "YlOrBr", direction=1) +
   scale_x_discrete(position = "top") +
   theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
 ```
-
 
 
 #### matches : mismatches
