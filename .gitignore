@@ -10,3 +10,4 @@ data/qnm_out/retired/**
 data/results/old_runs/**
 data/qnm_out/sensitivity.zip
 doc/*.docx
+*.zip
