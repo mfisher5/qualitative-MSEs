@@ -105,7 +105,7 @@ end.timer(s)
 Add all into a single list
 ```{r}
 mlist_all <- list(m0list,m2list,m3list,m4list,m5list)
-names(mlist_all) <- c("OM O","OM 2 Thorson Effort","OM 3", "OM 4 Offshore Inaccessible","OM 5 Faster Growth")
+names(mlist_all) <- c("OM 0","OM 2 Thorson Effort","OM 3 Fewer Recruits", "OM 4 Offshore Inaccessible","OM 5 Faster Growth")
 ```
 ```{r eval=FALSE}
 ## check for duplicate edges
@@ -155,7 +155,7 @@ for(i in seq(1,length(mlist_all))){
       
       m.mat.name <- paste0(str_replace_all(tmp_name, " ", "_"),suffix,'.csv')
       
-      write_csv(m.mat.df, file=here('data','CSVs',m.mat.name))
+      write_csv(m.mat.df, file=here('data','qnm_models',m.mat.name))
   }
   print(i)
 }

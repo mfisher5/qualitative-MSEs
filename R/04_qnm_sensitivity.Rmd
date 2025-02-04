@@ -42,7 +42,7 @@ library(dismo)
 ## custom functions
 source(here('R/fxns/prepare.dia.R'))
 source(here('R/fxns/impact.ss.R'))
-source(here('R/fxns/qnm.sensitivity.R'))
+# source(here('R/fxns/qnm.sensitivity.R'))
 
 gg_color_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
