@@ -592,7 +592,7 @@ my_heatmap
 Compare operating model 5 to the others (OM 5 had the least agreement between qual / quant models)
 ```{r}
 p <- 0.075
-v <- "Total catch"
+v <- "Fishery 1 catch"
 tmp_fit <- fit.df %>%
   filter(grepl(v,Variable)) %>%
   group_by(HCR,OM, name) %>%

@@ -158,7 +158,7 @@ tos_total %>%
   facet_wrap(~species,strip.position='bottom') +
   labs(x="MSE outcome",y="QNM outcome") +
   scale_x_discrete(position='top') +
-  scale_fill_gradientn(colours = rev(pal), na.value='white') +
+  scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,23)) +
   theme_bw() +
   theme(legend.title=element_blank()) -> plot.total
 
@@ -214,6 +214,7 @@ tos2_total %>%
   mutate(n=ifelse(is.na(n), 0, n)) %>%
   ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
   geom_tile() + 
+  geom_text(aes(label=n, fontface='bold'), color='white', ) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -226,7 +227,7 @@ tos2_total %>%
   facet_wrap(~species,strip.position='bottom') +
   labs(x="Quant MSE",y="QNM") +
   scale_x_discrete(position='top') +
-  scale_fill_gradientn(colours = rev(pal), na.value='white') +
+  scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
   theme(legend.title=element_blank()) -> plot.total.equiv
 
@@ -341,6 +342,7 @@ tos2_fish1 %>%
   mutate(n=ifelse(is.na(n), 0, n)) %>%
   ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
   geom_tile() + 
+  geom_text(aes(label=n, fontface='bold'), color='white', ) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -353,7 +355,7 @@ tos2_fish1 %>%
   facet_wrap(~species,strip.position='bottom') +
   labs(x="Quant MSE",y="QNM") +
   scale_x_discrete(position='top') +
-  scale_fill_gradientn(colours = rev(pal), na.value='white') +
+  scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
   theme(legend.title=element_blank()) -> plot.fish1.equiv
 
@@ -468,6 +470,7 @@ tos2_fish2 %>%
   mutate(n=ifelse(is.na(n), 0, n)) %>%
   ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2_qnm)), fill=n)) +
   geom_tile() + 
+  geom_text(aes(label=n, fontface='bold'), col='white') +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -480,7 +483,7 @@ tos2_fish2 %>%
   facet_wrap(~species, strip.position='bottom') +
   labs(x="Quant MSE",y="QNM") +
   scale_x_discrete(position='top') +
-  scale_fill_gradientn(colours = rev(pal)) +
+  scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
   theme(legend.title=element_blank()) -> plot.fish2.equiv
 

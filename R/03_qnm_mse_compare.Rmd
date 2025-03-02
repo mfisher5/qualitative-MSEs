@@ -30,6 +30,8 @@ source(here('R/fxns/compare.models.MSEtable.R'))
 ## read in which version of the data from qpress?
 sim.date <- '20240923'
 
+## save output to files?
+write_out <- FALSE
 ```
 
 
@@ -69,7 +71,9 @@ mse_format <- mse %>% pivot_longer(cols=2:(dim(mse)[2]),names_to="variable",valu
   unite(v1,v2, col="variable",sep="_") %>%
   left_join(mse_column_key,by=c("variable"="mse_column")) %>%
   dplyr::select(-col_num, -variable) %>% rename(variable_out=new_name)
+```
 
+```{r eval=write_out}
 ## save
 write_csv(mse_format, here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
 ```
@@ -232,7 +236,7 @@ out1 %<>%
 ```
 
 save to file
-```{r eval=FALSE}
+```{r eval=write_out}
 # as csv
 write_csv(out1, here('data','results',paste0('qnmVmse_mismatches_bySpbyVar',sim.date,'.csv')))
 
@@ -406,9 +410,20 @@ QNM 2 x HCR C seems to perform better when target set to 1.25x biomass in the qu
 
 when the QNM was qualitatively *equivocal* ( <60% stable matrices had same response direction), did the direction generally agree with the quant MSE?
 
+We can look at this with 50/50 results: 
+```{r}
+speciesALL_equiv_split <- speciesALL_compare %>%
+  filter((psims < 60 & psims > 0) | (psims > -60 & psims < 0))
+
+speciesALL_equiv_split %<>% mutate(match_direction=ifelse(psims==50 | psims==-50,"split",
+                                                    ifelse(psims < 0 & prob > 0, "negQNM-->posMSE",
+                                                    ifelse(psims > 0 & prob < 0, "posQNM-->negMSE","match"))))
+```
+
+Or without 50/50 results:
 ```{r}
 speciesALL_equiv <- speciesALL_compare %>%
-  filter((psims < 60 & psims > 0) | (psims > -60 & psims < 0))
+  filter((psims < 60 & psims > 50) | (psims > -60 & psims < -50))
 
 speciesALL_equiv %<>% mutate(match_direction=ifelse(psims==50 | psims==-50,"split",
                                                     ifelse(psims < 0 & prob > 0, "negQNM-->posMSE",
@@ -424,6 +439,22 @@ speciesALL_equiv %<>% mutate(match_direction=ifelse(psims==50 | psims==-50,"spli
 
 "QNM-->MSE" = the QNM direction was different than the MSE direction. Directional difference in heading.
 ```{r echo=FALSE}
+with(filter(speciesALL_equiv_split,grepl("Species1",model.y)), table(match_direction)/dim(filter(speciesALL_equiv_split,grepl("Species1",model.y)))[1])
+
+speciesALL_equiv_split %>% filter(grepl("Species1",model.y)) %>%
+  group_by(variable_out) %>%
+  mutate(var_n=n()) %>%
+  ungroup() %>%
+  group_by(variable_out,var_n,match_direction) %>%
+  summarise(ndiff=n()) %>%
+  mutate(pdiff=round(ndiff/var_n,3)) %>%
+  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
+  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
+  kbl() %>% kable_paper(full_width=T)
+```
+
+**remove splits**
+```{r echo=FALSE}
 with(filter(speciesALL_equiv,grepl("Species1",model.y)), table(match_direction)/dim(filter(speciesALL_equiv,grepl("Species1",model.y)))[1])
 
 speciesALL_equiv %>% filter(grepl("Species1",model.y)) %>%
@@ -432,12 +463,11 @@ speciesALL_equiv %>% filter(grepl("Species1",model.y)) %>%
   ungroup() %>%
   group_by(variable_out,var_n,match_direction) %>%
   summarise(ndiff=n()) %>%
-  mutate(pdiff=round(ndiff/var_n,2)) %>%
+  mutate(pdiff=round(ndiff/var_n,3)) %>%
   dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
   pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
   kbl() %>% kable_paper(full_width=T)
 ```
-
  
 
 #### Species 2
@@ -449,9 +479,9 @@ speciesALL_equiv %>% filter(grepl("Species1",model.y)) %>%
 "QNM-->MSE" = the QNM direction was different than the MSE direction. Directional difference in heading.
 
 ```{r echo=FALSE}
-with(filter(speciesALL_equiv,grepl("Species2",model.y)), table(match_direction)/dim(filter(speciesALL_equiv,grepl("Species2",model.y)))[1])
+with(filter(speciesALL_equiv_split,grepl("Species2",model.y)), table(match_direction)/dim(filter(speciesALL_equiv_split,grepl("Species2",model.y)))[1])
 
-speciesALL_equiv %>% filter(grepl("Species2",model.y)) %>%
+speciesALL_equiv_split %>% filter(grepl("Species2",model.y)) %>%
   group_by(variable_out) %>%
   mutate(var_n=n()) %>%
   ungroup() %>%
@@ -467,11 +497,29 @@ match_direction
      0.40909091      0.09090909      0.40909091      0.09090909 
      
 
+**remove split**
+
+```{r echo=FALSE}
+with(filter(speciesALL_equiv,grepl("Species2",model.y)), table(match_direction)/dim(filter(speciesALL_equiv,grepl("Species2",model.y)))[1])
+
+speciesALL_equiv %>% filter(grepl("Species2",model.y)) %>%
+  group_by(variable_out) %>%
+  mutate(var_n=n()) %>%
+  ungroup() %>%
+  group_by(variable_out,var_n,match_direction) %>%
+  summarise(ndiff=n()) %>%
+  mutate(pdiff=round(ndiff/var_n,2)) %>%
+  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
+  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
+  kbl() %>% kable_paper(full_width=T)
+```
+
+
 
 ## Explore Results: each operating model
 
 for specific operating models, break out comparisons by management strategies and species
-```{r eval=FALSE}
+```{r eval=write_out}
 png(here('results','QNM_v_MSE_0BaseModel_quantitative_scatterplot_2024-02-01.png'), width=3200,height=1500,res=300)
 speciesALL_compare %>%
   filter(grepl('0',operating_model)) %>%
