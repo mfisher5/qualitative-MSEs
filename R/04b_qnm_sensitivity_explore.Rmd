@@ -613,9 +613,9 @@ tmp_fit %>%
 
 
 
-### Compare to mismatches
+### Mismatches v Mismatches
 
-#### all : mismatches
+#### mismatches only
 Dive into the most influential links for comparisons where both Species 1 and 2 were off.
 
 First, grab mismatches in both species.
@@ -652,9 +652,12 @@ fit_by_VOM_mismatches %>%
 ```
 
 
+
 #### matches : mismatches
 
 Dive into the most influential links for comparisons where both Species 1 and 2 were mismatched VERSUS where either Species 1 or 2 matched. (only one OMxHCR for Total catch had both species 1 and 2 match)
+
+*The issue with this method is that the HCR will also affect which links were most influential, so we're really looking at the combined effect of model structure + HCR in our 'rel_inf' metric*
 
 First, grab matches in both species. (we have mismatches from above)
 ```{r}
@@ -701,12 +704,67 @@ tmp_mismatches %>%
   theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
 ```
 
-
-
-
-
-Focus on Total Catch. Plot HCR x OM, instead of combining. 
 ```{r}
+v <- 'Total catch'
+p <- 0.10
+# re create the fit_by_VOM but make sure p is the same for both. 
+tmp_matches <- compare_match %>%
+  group_by(variable_out, Link, OM) %>%
+  summarise(mean_ri=mean(rel_inf), sd_ri=sd(rel_inf)) %>%
+  group_by(variable_out, OM) %>%
+  slice_max(order_by=mean_ri, prop=p) %>%
+  unite(variable_out, OM, col="Variable_OM", sep="_") %>%
+  mutate(type="matches")
+tmp_mismatches <- compare_mismatch %>%
+  group_by(variable_out, Link, OM) %>%
+  summarise(mean_ri=mean(rel_inf), sd_ri=sd(rel_inf)) %>%
+  group_by(variable_out, OM) %>%
+  slice_max(order_by=mean_ri, prop=p) %>%
+  unite(variable_out, OM, col="Variable_OM", sep="_") %>%
+  mutate(type="mismatches")
+
+# plot
+tmp_mismatches %>%
+  filter(grepl(v, Variable_OM)) %>%
+  bind_rows(tmp_matches %>% filter(grepl(v, Variable_OM))) %>%
+  mutate(Link=factor(Link,levels=rev(unique(c(arrange(tmp_matches,Variable_OM)$Link,arrange(tmp_mismatches,Variable_OM)$Link))))) %>%
+  ggplot(aes(y=Link,x=Variable_OM, fill=mean_ri)) +
+  geom_tile() +
+  facet_wrap(~type) +
+  scale_fill_distiller(palette = "YlOrBr", direction=1) +
+  scale_x_discrete(position = "top") +
+  theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
+```
+
+
+
+Focus on Total Catch. Plot HCR x OM, instead of combining. Focus on where both species 1 / 2 match, but species 1 mismatches
+```{r}
+v <- 'Total catch'
+p <- 0.10
+# same as above but don't collapse HCRs into a mean rel inf.
+tmp_matches <- compare_match %>%
+  group_by(variable_out, OM, HCR) %>%
+  slice_max(order_by=rel_inf, prop=p) %>%
+  unite(variable_out, species_1_med_longevity, col="Variable_Match", sep="_") %>%
+  mutate(type="matches")
+tmp_mismatches <- compare_mismatch %>% 
+  mutate(type="mismatches") %>%
+  group_by(variable_out, HCR, OM) %>%
+  slice_max(order_by=rel_inf, prop=p) %>%
+  unite(variable_out, type, col="Variable_Match", sep="_")
+
+
+# plot
+tmp_mismatches %>%
+  filter(grepl(v, Variable_Match)) %>%
+  bind_rows(tmp_matches %>% filter(grepl(v, Variable_Match))) %>%
+  ggplot(aes(y=Link,x=Variable_Match, fill=rel_inf)) +
+  geom_tile() +
+  facet_wrap(~OM*HCR) +
+  scale_fill_distiller(palette = "YlOrBr", direction=1) +
+  scale_x_discrete(position = "top") +
+  theme_bw() + theme(axis.text.x=element_text(angle=45, hjust=0))
 ```
 
 
