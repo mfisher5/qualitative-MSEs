@@ -11,3 +11,4 @@ data/results/old_runs/**
 data/qnm_out/sensitivity.zip
 doc/*.docx
 *.zip
+qualitative-MSEs.Rproj

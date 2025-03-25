@@ -81,8 +81,16 @@ View(filter(table_c4, grepl('2', species)))
 
 
 # expanded heat map -------------------------------------------------------------------
-png(here('data','results','Fig7-equiv.png'), res=300, height=1300,width=2600)
+png(here('data','results','Fig7-equiv.png'), res=300, height=1300,width=2900)
 triage_df %>%
+  ## rename oms!
+  mutate(operating_model=case_when(
+    operating_model=="2. Thorson effort" ~ "1. Thorson effort",
+    operating_model=="3. Lower productivity" ~ "2. Lower productivity",
+    operating_model=="4. Move \"far offshore\"" ~ "3. Move \"far offshore\"",
+    operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
+    .default=operating_model
+  )) %>%
   mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative, equiv',
                                                   'false positive', 'false positive, equiv'))) %>%
