@@ -1,0 +1,1023 @@
+---
+title: "Split Catch by Size: Run HCRs & Compare"
+date: "Last Run `r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+**Date written: Sept 14 2023**
+
+## Description
+
+Master Rmd for running the qualitative MSEs. In these QNMs, the **Total Catch** and **Fishery 1 Catch** performance metrics are split by fish size (small / large fish). 
+
+The last part of the script compares the outputs for each performance metric (1) when all fish size classes are together, and (2) when fish are split by small / large ("Total Catch" v. "Total Catch Large", "Total Catch Small")
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+## Functions
+library(here)
+library(tidyverse)
+library(magrittr)
+library(ggplot2)
+library(janitor)
+
+#Load XML first--dependency not included in QPress
+#To install QPress: 
+  # library(remotes)
+  # remotes::install_github("SWotherspoon/QPress")
+library(QPress)
+library(XML)
+library(tcltk2)
+library(gridExtra)
+library(cowplot)
+
+
+## custom functions
+source(here('R/fxns/parse.constraints.SWotherspoon.R'))
+source(here('R/fxns/prepare.dia.R'))
+source(here('R/fxns/compare.baseline.impact.table.R'))
+source(here('R/fxns/compare.models.impact.table.R'))
+source(here('R/fxns/alternating.list.R'))
+source(here('R/fxns/compare.models.MSEtable.R'))
+
+## let's time things
+end.timer <- function(s){round(Sys.time()-s,2)}
+write <- TRUE
+plot_out <- FALSE
+
+
+## model variable key: I use this to order the variables in the output tables.
+vkey <- read_csv(here('data','qnm_models','om_variable_key.csv'))
+vkey %<>% bind_rows(
+  data.frame(variable=c("offshore biomass inaccessible large","offshore biomass inaccessible small"),
+             group=rep("ecosystem",2),
+             group_order=rep(1,2),specific_order=rep(6,2))
+  )
+```
+
+## QNM overview
+
+create a list of lists, so that each operating model scenario (0-5) has its own QNM list.
+management strategies A/D use the same underlying QNM structure
+but strategies B,C,E require their own unique QNM.
+```{r load_models}
+s <- Sys.time()
+
+
+##### 0. A baseline scenario #####
+m0list <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00-constantF',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m.e <- prepare.dia(dia_name='MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]]  # no constraints
+)
+
+#### 2. Effort scales according to the Thorson effort model (Thorson et al., 2013) ####
+m2list <- list(
+  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m2.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]] , # no constraints
+  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]] , # no constraints
+  m2.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]] # no constraints
+)
+
+#### 3. Climate reduces productivity ####
+m3list <- m0list
+
+#### 4. Animals move into the “far offshore” area ####
+m4list <- list(
+  m4 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-movement-to-inaccessible',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m4.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m4.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]],
+  m4.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]]
+)
+
+#### 5. Climate increases growth rate ####
+m5list <- list(
+  m <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005-growth-perturb',dia_path=here('data','qnm_models'))[[1]],  # no constraints
+  m.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005B-rm-small-mesh',dia_path=here('data','qnm_models'))[[1]],
+  m.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models'))[[1]],
+  m.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh',dia_path=here('data','qnm_models'))[[1]]  # no constraints
+)
+
+
+end.timer(s)
+```
+
+
+Add all into a single list
+```{r}
+mlist_all <- list(m0list,m2list,m3list,m4list)
+names(mlist_all) <- c("OM 0","OM 2 Thorson Effort","OM 3 Fewer Recruits", "OM 4 Offshore Inaccessible")
+```
+```{r eval=FALSE}
+## check for duplicate edges
+for(j in seq(1,length(mlist_all))){
+  tmp_mlist <- mlist_all[[j]]
+  for(i in seq(1,length(tmp_mlist))){
+    tmp <- tmp_mlist[[i]] %>% unite(From,To,col="edge", sep="-") %>%
+      group_by(edge) %>% summarise(n=n()) %>%
+      filter(n>1)
+    if(dim(tmp)[1]>0){   
+      print(names(mlist_all)[[j]])   
+      print(i)
+      print("!! duplicate edges !!")
+      print(tmp)
+    }
+  }
+}
+```
+
+
+Some models require perturbations
+```{r}
+# OM 3:  There is a negative perturbation on “inshore recruits”
+PertOM3 <- c(`inshore recruits`=-1)
+
+# OM 4:  There a positive perturbation on “climate pressure"
+PertOM4 <- c(`Climate pressure`=1)
+
+# OM 5: There is a positive perturbation on "growth"
+PertOM5 <- c(`Growth`=1)
+```
+
+
+Optional: write out models as matrices (for use in other programs, building FCMs)
+```{r eval=FALSE, echo=FALSE}
+## all
+for(i in seq(1,length(mlist_all))){
+  tmp_name <- names(mlist_all)[i]
+  tmp_list <- mlist_all[[i]]
+  for(j in seq(1:4)){
+      m.mat.out <- adjacency.matrix(tmp_list[[j]],labels=TRUE)
+      m.mat.df <- as.data.frame(m.mat.out) %>% rownames_to_column("x")
+      
+      if(j==2){suffix <- "_hcrB"} else if(j==3){
+        suffix <- "_hcrC"}else if(j==4){
+        suffix <- "_hcrE"}else{suffix <- ""}
+      
+      m.mat.name <- paste0(str_replace_all(tmp_name, " ", "_"),suffix,'.csv')
+      
+      write_csv(m.mat.df, file=here('data','qnm_models',m.mat.name))
+  }
+  print(i)
+}
+
+
+## specific OMs
+tmp_list <- m3list
+tmp_name <- "OM 3"
+for(j in seq(1:4)){
+  m.mat.out <- adjacency.matrix(tmp_list[[j]],labels=TRUE)
+  m.mat.df <- as.data.frame(m.mat.out) %>% rownames_to_column("x")
+  
+  if(j==2){suffix <- "_hcrB"} else if(j==3){
+    suffix <- "_hcrC"}else if(j==4){
+      suffix <- "_hcrE"}else{suffix <- ""}
+  
+  m.mat.name <- paste0(str_replace_all(tmp_name, " ", "_"),suffix,'.csv')
+  
+  write_csv(m.mat.df, file=here('data','qnm_models',m.mat.name))
+}
+```
+
+
+Save some network complexity info for each QNM. How many variables in each QNM / HCR combo? What is the link density?
+```{r}
+nvar_df <- as.data.frame(lapply(
+  lapply(mlist_all, FUN=function(x){
+  out <- lapply(x, FUN=function(y){
+    return(length(unique(c(y[,1], y[,2]))))
+  })
+}), unlist
+))
+
+ed_df <- as.data.frame(lapply(
+  lapply(mlist_all, FUN=function(x){
+  out <- lapply(x, FUN=function(y){
+    g <- igraph::graph_from_data_frame(y)
+    return(igraph::edge_density(g))
+  })
+}), unlist
+))
+```
+
+Save a data frame of complexity metrics.
+```{r}
+complexity_df <- nvar_df %>% 
+  mutate(MS=c('A','B','C','E')) %>%
+  pivot_longer(all_of(colnames(nvar_df))) %>%
+  rename(n_variables=value) %>%
+  left_join(ed_df %>% 
+              mutate(MS=c('A','B','C','E')) %>%
+              pivot_longer(all_of(colnames(ed_df))) %>%
+              rename(edge_density=value),
+            by=c("MS","name")) %>%
+  rename(QNM=name) %>%
+  mutate(QNM=str_replace(QNM,'QNM.','')) %>%
+  mutate(QNM=ifelse(QNM=="O","0.Baseline",QNM))
+
+write_csv(complexity_df, here('data','qnm_models','qnm_complexity_stats_split_tc.csv'))
+
+```
+
+
+## HCR Overview
+
+These are the HCRs and the associated perturbations to the QNMs:
+
+HCR A: Status Quo (empty perturbation)
+```{r echo=TRUE}
+PertA <-  c(`inshore small mesh effort`=0)
+```
+
+HCR B: Remove small mesh fleet, (fishery #1)
+```{r echo=TRUE}
+PertB <- c(`inshore small mesh effort`=-1,`offshore small mesh effort`=-1)
+```
+
+HCR C: Remove *inshore* small mesh fleet, allow effort redistribution to offshore small mesh fishery
+```{r echo=TRUE}
+PertC <- c(`inshore small mesh effort`=-1)
+```
+
+HCR D: Increase the mesh size for the small mesh fleet (fishery #1)
+```{r echo=TRUE}
+PertD <- c(`inshore mesh size`=1,`offshore mesh size`=1)
+```
+
+HCR E: remove the small mesh fleet from the inshore area
+```{r echo=TRUE}
+PertE <- c(`inshore small mesh effort`=-1)
+```
+
+Save into a list
+```{r}
+Pert.list <- list(PertA,PertB,PertC,PertD,PertE)
+names(Pert.list) <- c("A:Status Quo","B:Rmv sm mesh fleet","C:Rmv inshore sm mesh fleet\nEffort redistribution",
+                "D:Increase mesh size","E:Rmv inshore sm mesh fleet")
+```
+
+
+## Run each HCR across Operating Models
+
+Each section runs an HCR across all operating models. Then it saves: (1) an RDS for each HCR, with the perturbation output in a list; (2) a vector with the time it took to run the perturbations, and (3) a table of perturbation results for each variable (optionally saving this into a png, if plot_out=TRUE) 
+```{r}
+set.seed(555)
+
+plot_out <- FALSE
+hcr_run_times <- c()
+
+# HCR A -------------------------------------------------------------------
+# simulation prep
+p_hcr <- PertA   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",1)  # we only need the first version of the OM for HCR A
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  # if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  
+  s <- Sys.time()  # start timer
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                            edges=tmp_om, # the qnm
+                            sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                            validators=list(press.validate(
+                              tmp_om, # the qnm
+                              perturb = p_hcr, # the perturbation
+                              monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # save time info
+  hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+  names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrA',tmp_om_name,sep="_")
+  
+  # reset perturbation
+  p_hcr <- PertA
+}
+
+
+# HCR A 
+# 15.79955s
+
+if(write){
+  # save simulation outputs for future use
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+   saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+}
+if(plot_out){
+  # save simulation output as an image
+  # pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4))
+  compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                             perturb.list=pert_list,
+                                             monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                             strong_lower=0.8, weak_lower=0.6,
+                                             epsilon=1.0E-5,
+                                             plot=TRUE, main.axis="Y",
+                                             variable.key=vkey,variable.order="specific_order")
+  ## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+  plot.out <- compare.table[[3]] + ggtitle("HCR A: Status Quo")
+  plot.out
+  
+  png(here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+    plot.out
+    dev.off()}
+
+# HCR B -------------------------------------------------------------------
+# simulation prep
+p_hcr <- PertB   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",2)  # we only need the first version of the OM for HCR B for **all but QNM 2 thorson effort**
+names(mlist_hcr) <- names(mlist_all)
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  # if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  s <- Sys.time()  # start timer
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # save time info
+  hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+  names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrB',tmp_om_name,sep="_")
+  
+  # reset perturbation
+  p_hcr <- PertB
+}
+
+if(write){
+  # save simulation outputs for future use
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+}
+  if(plot_out){
+  # save simulation output as an image
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                             perturb.list=pert_list,
+                                             monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                             strong_lower=0.8, weak_lower=0.6,
+                                             epsilon=1.0E-5,
+                                             plot=TRUE, main.axis="Y",
+                                             variable.key=vkey,variable.order="specific_order")
+  ## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+  plot.out <- compare.table[[3]] +
+    ggtitle("HCR B: Remove Fishery 1 (Small Mesh)")
+  plot.out
+  
+png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+    plot.out
+    dev.off()}
+
+# HCR C -------------------------------------------------------------------
+
+# simulation prep
+p_hcr <- PertC   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",3)  # we  need the FIRST version of the OM for HCR C
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  # if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  s <- Sys.time()  # start timer
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # save time info
+  hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+  names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrC',tmp_om_name,sep="_")
+  
+  # reset perturbation
+  p_hcr <- PertC
+}
+if(write){
+  # save simulation outputs for future use
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+}
+  if(plot_out){
+  # save simulation output as an image
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                             perturb.list=pert_list,
+                                             monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                             strong_lower=0.8, weak_lower=0.6,
+                                             epsilon=1.0E-5,
+                                             plot=TRUE, main.axis="Y",
+                                             variable.key=vkey,variable.order="specific_order")
+  ## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+  plot.out <- compare.table[[3]] +
+    ggtitle("HCR C: Remove inshore small mesh, allow effort redistribution")
+  plot.out
+  
+  png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+    plot.out
+    dev.off()}
+
+  
+  
+# HCR D -------------------------------------------------------------------
+
+# simulation prep
+p_hcr <- PertD   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",1)  # we  need the FIRST version of the OM for HCR D
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  # if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  s <- Sys.time()  # start timer
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # save time info
+  hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+  names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrD',tmp_om_name,sep="_")
+  
+  # reset perturbation
+  p_hcr <- PertD
+}
+
+if(write){
+  # save simulation outputs for future use
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+}
+
+  if(plot_out){
+  # save simulation output as an image
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                             perturb.list=pert_list,
+                                             monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                             strong_lower=0.8, weak_lower=0.6,
+                                             epsilon=1.0E-5,
+                                             plot=TRUE, main.axis="Y",
+                                             variable.key=vkey,variable.order="specific_order")
+  ## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+  plot.out <- compare.table[[3]] +
+    ggtitle("HCR D: Increase Mesh Size")
+  plot.out
+  
+ png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+    plot.out
+    dev.off()}
+
+
+# HCR E -------------------------------------------------------------------
+
+# simulation prep
+p_hcr <- PertE   # perturbation
+mlist_hcr <- sapply(mlist_all,"[",4)  # we  need the FIRST version of the OM for HCR D
+hcr_out <- list()   # empty list for simulation output
+
+# run simulation
+for(i in seq(1,length(mlist_hcr))){
+  
+  # load 'i' operating model
+  tmp_om <- mlist_hcr[[i]]
+  tmp_om_name <- names(mlist_hcr)[i]
+  
+  # adjust perturbation if needed
+  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
+  # if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  
+  
+  s <- Sys.time()  # start timer
+  
+  # run simulation, save to output list
+  hcr_out[[i]] <- system.simulate(n.sims=10000, # number of randomly generated matrices to keep
+                                  edges=tmp_om, # the qnm
+                                  sampler=community.sampler(tmp_om, required.groups = c(0)), # thefx to generate the matrices without constraints
+                                  validators=list(press.validate(
+                                    tmp_om, # the qnm
+                                    perturb = p_hcr, # the perturbation
+                                    monitor = NA))) # a list of expected outcomes that should happen in the simulation (I don't usually use this)
+  names(hcr_out)[i] <- tmp_om_name
+  
+  # save time info
+  hcr_run_times[length(hcr_run_times)+1] <- end.timer(s)
+  names(hcr_run_times)[length(hcr_run_times)] <- paste('hcrE',tmp_om_name,sep="_")
+  
+  # reset perturbation
+  p_hcr <- PertE
+}
+
+if(write){
+  # save simulation outputs for future use
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+} 
+
+  if(plot_out){
+  # save simulation output as an image
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
+                                             perturb.list=pert_list,
+                                             monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                             strong_lower=0.8, weak_lower=0.6,
+                                             epsilon=1.0E-5,
+                                             plot=TRUE, main.axis="Y",
+                                             variable.key=vkey,variable.order="specific_order")
+  ## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+  plot.out <- compare.table[[3]] + ggtitle("HCR E: Remove Inshore Small Mesh Fishery 1")
+  plot.out
+  
+  png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+    plot.out
+    dev.off()}
+
+```
+
+so, how long did everything take, on average?
+```{r}
+run_times_df <- as.data.frame(hcr_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM O Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=hcr_run_times)
+
+mean(run_times_df$run_time)
+group_by(run_times_df, hcr) %>% summarise(all_oms=sum(run_time))
+```
+
+|.HCR A.|.HCR B.|.HCR C.|.HCR D.|.HCR E.|
+| 28.97 | 29.93 | 29.73 | 29.14 | 28.20 |
+
+save as df and fig
+```{r eval=FALSE}
+write_csv(run_times_df, here('data','qnm_split_tc_run_times.csv'))
+
+run_times_df <- read_csv(here('data','qnm_split_tc_run_times.csv'))
+
+ptime <- run_times_df %>%
+  mutate(om_num=str_split_i(om, ' ', 2)) %>%
+  mutate(om_num=case_when(om_num=='O' ~ '0', .default=om_num)) %>%
+  mutate(om=fct_reorder(om, as.numeric(om_num))) %>%
+ggplot(aes(y=run_time, x=om)) + 
+  geom_boxplot(aes(fill=om), alpha=0.5) +
+  geom_jitter(aes(col=om), pch=21, width=0.05) +
+  labs(y='run time (seconds)',x='QNM') +
+  ylim(c(0,6)) +
+  theme_bw() +
+  theme(legend.position='none', axis.text.x=element_text(angle=40, hjust=1))
+
+ptime
+
+png(here('doc','supplement','FigC1-split-tc-run-times-qpress.png'), res=300, height=1200,width=1200)
+ptime
+dev.off()
+```
+
+
+## Results Tables: by Operating Model 
+
+### perturbation results
+
+`system.simulate` output should have been saved as lists from qnm_mse_master.R
+```{r}
+# sim.date <- format(Sys.Date(),"%Y%m%d")
+sim.date <- '20250421'
+hcrA_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',sim.date,'.rds')))
+hcrB_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrB_10K_',sim.date,'.rds')))
+hcrC_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrC_10K_',sim.date,'.rds')))
+hcrD_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrD_10K_',sim.date,'.rds')))
+hcrE_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrE_10K_',sim.date,'.rds')))
+
+hcr_out <- list(hcrA_out,hcrB_out,hcrC_out,hcrD_out,hcrE_out)
+names(hcr_out) <- c("A","B","C","D","E")
+```
+
+### set up
+
+Create a data frame to order the variables in the output tables (only including variables that are output for MSE)
+```{r}
+vkey <- data.frame(variable=c("Total catch Lg","Total catch Sm", "Fishery 1 Lg", "Fishery 1 Sm", "Fishery 2", "spawning biomass"),
+                   specific.order=c(1,2,3,4,5,6))
+```
+
+These match QNM / HCR codes to text descriptors, for table columns
+```{r}
+table.key <- read_csv(here('data','mse_table_key.csv'))
+```
+
+
+### QNM 0 Status Quo
+```{r}
+pert.0 <- list(PertB,PertC,PertD,PertE)
+sims.0 <- sapply(hcr_out,"[",1)    # first simulation in every list
+sims.0 <- sims.0[2:5]                # remove first sim (HCR A)
+names(sims.0) <- c("B","C","D","E")
+
+table.0 <- compare.models.MSEtable(sim.list = sims.0, perturb.list = pert.0,
+                        monitor.list = list(NA,NA,NA,NA), no.response=0) %>%
+  mutate(QNM=0) %>% rename("HCR"="model") %>%
+  left_join(table.key)
+
+table.0 %<>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
+  mutate(p_sim=round(p_sim,0))
+
+# write_csv(table.0, here('results',paste0('qnm0_hcrB-D_MSEtable_',sim.date,'.csv')))
+```
+
+
+### QNM 2 Thorson Effort 
+```{r}
+pert.2 <- list(PertA,PertB,PertC,PertD,PertE)
+sims.2 <- sapply(hcr_out,"[",2)    # second simulation in every list
+names(sims.2) <- c("A","B","C","D","E")
+
+table.2 <- compare.models.MSEtable(sim.list = sims.2, perturb.list = pert.2,
+                                   monitor.list = list(NA,NA,NA,NA,NA), no.response=0) %>%
+  mutate(QNM=2) %>% rename("HCR"="model") %>%
+  left_join(table.key)
+
+table.2 %<>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
+  mutate(p_sim=round(p_sim,0))
+
+# write_csv(table.2, here('results',paste0('qnm2_hcrB-D_MSEtable_',sim.date,'.csv')))
+```
+
+
+### QNM 3 Less recruitment
+```{r}
+pert.3 <- lapply(pert.2, FUN=function(x){return(c(x,PertOM3))})     
+
+sims.3 <- sapply(hcr_out,"[",3)    # second simulation in every list
+names(sims.3) <- c("A","B","C","D","E")
+
+table.3 <- compare.models.MSEtable(sim.list = sims.3, perturb.list = pert.3,
+                                   monitor.list = list(NA,NA,NA,NA,NA), no.response=0) %>%
+  mutate(QNM=3) %>% rename("HCR"="model") %>%
+  left_join(table.key)
+
+table.3 %<>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
+  mutate(p_sim=round(p_sim,0))
+
+# write_csv(table.3, here('results',paste0('qnm3_hcrB-D_MSEtable_',sim.date,'.csv')))
+```
+
+
+### QNM 4 Offshore biomass inaccessible 
+```{r}
+pert.4 <- lapply(pert.2, FUN=function(x){return(c(x,PertOM4))})     
+
+sims.4 <- sapply(hcr_out,"[",4)    # second simulation in every list
+names(sims.4) <- c("A","B","C","D","E")
+
+table.4 <- compare.models.MSEtable(sim.list = sims.4, perturb.list = pert.4,
+                                   monitor.list = list(NA,NA,NA,NA,NA), no.response=0) %>%
+  mutate(QNM=4) %>% rename("HCR"="model") %>%
+  left_join(table.key)
+
+table.4 %<>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
+  mutate(p_sim=round(p_sim,0))
+
+# write_csv(table.4, here('results',paste0('qnm4_hcrB-D_MSEtable_',sim.date,'.csv')))
+```
+
+### save summary tables
+
+First, just for the variables tracked in the MSE
+```{r}
+bind_rows(table.0,table.2,table.3,table.4) %>%
+  filter(variable %in% vkey$variable) %>%
+  ## make each variable in the variable key its own column
+  dplyr::select(Code,`Operating model`,`Management strategy`,variable,response) %>%
+  pivot_wider(names_from="variable",values_from="response") %>%
+  ## reorder to match vkey specific order
+  dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey$variable)) %>%
+  write_csv(here('data','results','split_tc',paste0('qnm0-4_perfmet_splitTC_hcra-e_qualitative_',sim.date,'.csv')))
+
+bind_rows(table.0,table.2,table.3,table.4) %>% 
+  filter(variable %in% vkey$variable) %>%
+  ## make each variable in the variable key its own column
+  mutate(p_sim=ifelse(change=="neg",p_sim*-1,p_sim)) %>%
+  dplyr::select(Code,`Operating model`,`Management strategy`,variable,p_sim) %>%
+  pivot_wider(names_from="variable",values_from="p_sim") %>%
+  ## reorder to match vkey specific order
+  dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey$variable)) %>%
+  write_csv(here('data','results','split_tc',paste0('qnm0-4_perfmet_splitTC_hcra-e_pSims_',sim.date,'.csv')))
+```
+
+
+Then, for every variable in the QNMs
+```{r}
+bind_rows(table.0,table.2,table.3,table.4) %>%
+  dplyr::select(Code,`Operating model`,`Management strategy`,variable,response) %>%
+  write_csv(here('data','qnm_out',paste0('qnm0-4_splitTC_hcra-e_qualitative_',sim.date,'.csv')))
+
+bind_rows(table.0,table.2,table.3,table.4) %>% 
+  mutate(p_sim=ifelse(change=="neg",p_sim*-1,p_sim)) %>%
+  dplyr::select(Code,`Operating model`,`Management strategy`,variable,p_sim) %>%
+  write_csv(here('data','qnm_out',paste0('qnm0-4_splitTC_hcra-e_pSims_',sim.date,'.csv')))
+```
+
+
+## Compare: To QNM
+
+melt tables from previous section so that they can be combined
+```{r eval=TRUE}
+qnm <- bind_rows(table.0,table.2,table.3,table.4) %>% 
+  mutate(p_sim=ifelse(change=="neg",p_sim*-1,p_sim)) %>%
+  dplyr::select(Code,`Operating model`,`Management strategy`,variable,p_sim)
+
+qnm %<>% mutate(variable=str_to_lower(str_replace_all(variable, ' ', '_')))
+                
+qnm %<>% filter(variable %in% c("fishery_1_lg","fishery_1_sm","total_catch_lg","total_catch_sm"))
+qnm %<>% clean_names()
+qnm %<>% mutate(management_strategy=ifelse(management_strategy=="C. Fishery 1 in \"offshore\" only","C. Fishery 1 in \"offshore\" only, effort changes",management_strategy))
+```
+
+unsplit output
+```{r}
+qnm0 <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_20240923.csv')))
+
+qnm0 %<>% filter(variable_out %in% c("fishery_1_catch","total_catch"))
+```
+
+
+match
+```{r}
+qvq <- qnm %>%
+  bind_rows(select(qnm0 %>% rename(variable=variable_out, p_sim=psims), all_of(colnames(qnm))))
+```
+
+
+```{r eval=TRUE}
+msorder <- c("A. Status-quo","B. Eliminate fishery 1","C. Fishery 1 in \"offshore\" only, effort changes",
+             "D. Increase fishery mesh size", "E. Fishery 1 in \"offshore\" only")
+qvq %>% mutate(group=ifelse(grepl('1',variable),'Fishery 1','Total catch')) %>%
+  filter(!grepl('5',code)) %>%
+  mutate(management_strategy=fct_relevel(management_strategy,rev(msorder))) %>%
+ggplot(aes(y=management_strategy,x=variable)) +
+  geom_point(aes(size=p_sim, col=p_sim)) +
+  facet_wrap(~operating_model*group, ncol=4, scales='free_x') +
+  scale_color_gradient(low='darkorange',high='deepskyblue') +
+  theme_bw() + theme(axis.text.x=element_text(angle=30,hjust=1))
+```
+
+list when things look different:
+```{r}
+to_keep <- data.frame(code=c('0-B','2-D','2-B','2-D','3-C','3-B','3-C','4-E','4-B','4-E'),
+                      group='total_catch','fishery_1','total_catch','total_catch','fishery_1','total_catch','total_catch','fishery_1','total_catch','total_catch')
+```
+
+do we get fewer equivocal answers when splitting into large/small?
+```{r}
+qvq %>% mutate(equiv=ifelse(abs(p_sim) < 60, 1, 0)) %>%
+  group_by(variable,equiv) %>%
+  summarise(n=length(unique(code))) %>%
+  pivot_wider(names_from='equiv',values_from='n')
+```
+
+
+## Compare: To MSE
+
+The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
+```{r eval=TRUE}
+mse_format <- read_csv(here('data','results','split_tc','mse0-7_splitTC_hcrb-d_species1-2_202504246.csv'))
+```
+
+### first run: formatting
+```{r eval=FALSE}
+mse <- read_csv(here('data','results','split_tc','mse_Table4_Species12_20250424.csv')) %>% clean_names(allow_dupes=TRUE)
+
+## rename 'j' for juvenile as 'sm', and 'a' for adult as 'lg'
+mse_column_key <- data.frame(mse_column=c("total_j_c_9","cat_j_fl1_10","cat_j_fl2_11","total_a_c_12","cat_a_fl1_13","cat_s_fl2_14","total_j_c_22","cat_j_fl1_23","cat_j_fl2_24","total_a_c_25","cat_a_fl1_26","cat_s_fl2_27"), new_name=rep(c("total_catch_sm", "fishery_1_sm", "fishery_2_sm",
+                                        "total_catch_lg","fishery_1_lg","fishery_2_lg"),2))
+
+# clean up MSE output table
+mse %<>% mutate(label=str_replace(label,'Results//Resu',''))
+mse %<>% mutate(label=str_replace(label,'.out',''))
+mse %<>% separate(col='label',into=c('tmp1','tmp2','tmp3','tmp4'), sep='') %>%
+  unite(tmp2,tmp4,col='code',sep="-") %>% dplyr::select(-tmp1,-tmp3)
+
+mse_format <- mse %>% pivot_longer(cols=2:(dim(mse)[2]),names_to="variable",values_to="prob") %>%
+  mutate(variable=ifelse(grepl("ssb",variable), paste0("ssb_",variable),variable)) %>%
+  left_join(mse_column_key, by=c('variable'='mse_column')) %>%
+  filter(!is.na(new_name)) %>%
+  separate(variable,into=c("V1","V2","V3","col_num"),sep="_", remove=FALSE) %>%
+  mutate(model=ifelse(as.numeric(col_num) < 16, "MSE-Species1","MSE-Species2"))
+#View(mse_format)
+mse_format %<>%
+  dplyr::select(-col_num, -V1, -V2, -V3, -variable) %>% rename(variable_out=new_name)
+
+## save
+write_csv(mse_format, here('data','results','split_tc','mse0-7_splitTC_hcrb-d_species1-2_202504246.csv'))
+```
+
+
+
+
+### compare: Small catch
+
+```{r}
+qvm_sm <- qnm %>% filter(grepl('sm',variable)) %>%
+  left_join(mse_format,by=c('code','variable'='variable_out'))
+```
+
+```{r}
+# Identify false/true positives/negatives ---------------------------------------------------------
+
+## count the number of times there is a mismatch for plot 1, create dataframe for plotting
+triage_sm <- qvm_sm %>%
+  filter(p_sim != 0) %>%
+  rename(qnm_psims=p_sim, mse_prob=prob, species=model) %>%
+  mutate(species=case_when(
+    species=="MSE-Species1" ~ "(sp.1) med longevity", 
+    species=="MSE-Species2" ~ "(sp.2) short longevity")) %>%
+  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0)) %>%
+  mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 0, 'true negative',
+                       ifelse(qnm_psims > 0 & mse_prob > 0, 'true positive',
+                              ifelse(qnm_psims > 0 & mse_prob < 0, 'false positive',
+                                     ifelse(qnm_psims < 0 & mse_prob > 0, 'false negative', NA))))) %>%
+  mutate(triage_noEquiv=ifelse(qnm_equiv==1 & mse_prob < 0, 'false positive', 
+                               ifelse(qnm_equiv==1 & mse_prob > 0, 'true positive',
+                                      ifelse(qnm_equiv==0, triage, NA))))
+## check against excel table
+to_plot <- triage_sm %>%
+  ## rename oms!
+  mutate(operating_model=case_when(
+    operating_model=="2. Thorson effort" ~ "1. Thorson effort",
+    operating_model=="3. Lower productivity" ~ "2. Lower productivity",
+    operating_model=="4. Move \"far offshore\"" ~ "3. Move \"far offshore\"",
+    operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
+    .default=operating_model
+  )) %>%
+  mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
+  mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
+  mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
+                                                  'false positive', 'false positive, equiv'))) %>%
+  mutate(management_strategy=fct_rev(management_strategy)) %>%
+  mutate(variable=case_when(variable=='fishery_1_sm' ~ 'Fishery 1',
+                                               variable=='total_catch_sm' ~ 'Total catch')) %>%
+  mutate(variable=factor(variable,levels=c('Total catch','Fishery 1')))
+  
+  ggplot(to_plot, aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
+  geom_tile() +
+  facet_grid(rows=vars(species), cols=vars(variable)) +
+  # scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
+  # scale_alpha_manual(values=c(1,0.5,1,0.5)) +
+  scale_fill_manual(values=c('dodgerblue4','dodgerblue4','darkorange'), na.value='white') + theme_bw() +
+  scale_alpha_manual(values=c(1,0.5,1), na.value=0) +
+  labs(x='Operating model scenario',y='Management strategy') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
+                     legend.title=element_blank())
+##
+```
+
+save it!
+```{r}
+png(here('data','results','split_tc','Fig-6-mismatch-small-fish-only.png'), res=300, height=1300,width=1900)
+ ggplot(to_plot, aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
+  geom_tile() +
+  facet_grid(rows=vars(species), cols=vars(variable)) +
+  # scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
+  # scale_alpha_manual(values=c(1,0.5,1,0.5)) +
+  scale_fill_manual(values=c('dodgerblue4','dodgerblue4','darkorange'), na.value='white') + theme_bw() +
+  scale_alpha_manual(values=c(1,0.5,1), na.value=0) +
+  labs(x='Operating model scenario',y='Management strategy', title='small / juveniles') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
+dev.off()
+```
+
+
+
+### Large catch
+
+```{r}
+qvm_lg <-  qnm %>% filter(grepl('lg',variable))  %>%
+  left_join(mse_format,by=c('code','variable'='variable_out')) %>% mutate(variable=case_when(variable=='fishery_1_lg' ~ 'fishery_1_catch',
+                                               variable=='total_catch_lg' ~ 'total_catch'))
+```
+
+```{r}
+# Identify false/true positives/negatives ---------------------------------------------------------
+
+## count the number of times there is a mismatch for plot 1, create dataframe for plotting
+triage_lg <- qvm_lg %>%
+  filter(p_sim != 0) %>%
+  rename(qnm_psims=p_sim, mse_prob=prob, species=model) %>%
+  mutate(species=case_when(
+    species=="MSE-Species1" ~ "(sp.1) med longevity", 
+    species=="MSE-Species2" ~ "(sp.2) short longevity")) %>%
+  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0)) %>%
+  mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 0, 'true negative',
+                       ifelse(qnm_psims > 0 & mse_prob > 0, 'true positive',
+                              ifelse(qnm_psims > 0 & mse_prob < 0, 'false positive',
+                                     ifelse(qnm_psims < 0 & mse_prob > 0, 'false negative', NA))))) %>%
+  mutate(triage_noEquiv=ifelse(qnm_equiv==1 & mse_prob < 0, 'false positive', 
+                               ifelse(qnm_equiv==1 & mse_prob > 0, 'true positive',
+                                      ifelse(qnm_equiv==0, triage, NA))))
+## check against excel table
+to_plot <- triage_lg %>%
+  ## rename oms!
+   mutate(operating_model=case_when(
+    operating_model=="2. Thorson effort" ~ "1. Thorson effort",
+    operating_model=="3. Lower productivity" ~ "2. Lower productivity",
+    operating_model=="4. Move \"far offshore\"" ~ "3. Move \"far offshore\"",
+    operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
+    .default=operating_model
+  )) %>%
+  mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
+  mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
+  mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
+                                                  'false positive', 'false positive, equiv'))) %>%
+  mutate(management_strategy=fct_rev(management_strategy)) %>%
+  mutate(variable=case_when(variable=='fishery_1_catch' ~ 'Fishery 1',
+                                               variable=='total_catch' ~ 'Total catch')) %>%
+  mutate(variable=factor(variable,levels=c('Total catch','Fishery 1')))
+
+  ggplot(to_plot, aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
+  geom_tile() +
+  facet_grid(rows=vars(species), cols=vars(variable)) +
+  scale_fill_manual(values=c('darkorange','dodgerblue4','dodgerblue4'), na.value='white') + theme_bw() +
+  scale_alpha_manual(values=c(0.5,1,0.5), na.value=0) +
+  labs(x='Operating model scenario',y='Management strategy') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
+                     legend.title=element_blank())
+##
+```
+
+save it!
+```{r}
+png(here('data','results','split_tc','Fig-6-mismatch-large-fish-only.png'), res=300, height=1300,width=1900)
+  ggplot(to_plot, aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
+  geom_tile() +
+  facet_grid(rows=vars(species), cols=vars(variable)) +
+  scale_fill_manual(values=c('darkorange','dodgerblue4','dodgerblue4'), na.value='white') + theme_bw() +
+  scale_alpha_manual(values=c(0.5,1,0.5), na.value=0) +
+  labs(x='Operating model scenario',y='Management strategy', title='large / adults') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
+dev.off()
+```
+

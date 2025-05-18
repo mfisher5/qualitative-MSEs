@@ -1,0 +1,39 @@
+---
+title: "Species-specific QNMs"
+output: html_document
+date: "2025-03-25"
+---
+
+## Description
+
+**Comment from Chris:**
+There's a sentence up above that says "The two fisheries differ in that the selectivity for fishery 1 tends to capture younger animals than fishery 2 as the age-at-50%-selectivity is lower for species 2 than for species 1 (Fig. 1c, d)." I'm struggling to figure out if that means that the Fishery 1 treats the two species differently, which could argue for subtle differences in the QNMs for the two species (e.g., a non-link between Fishery 1 and small fish of one species, and a negative link between Fishery 1 and small fish of the other species). 
+
+What happens if for species 2, we impose an edge constraint that the 
+
+Species 1: impose an edge constraint such that inshore large fish biomass --> offshore large fish biomass > inshore small fish biomass --> offshore small fish biomass?
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
