@@ -1,21 +1,26 @@
 hcr,om,run_time
-hcrA,OM 0,2.65
-hcrA,OM 2 Thorson Effort,2.75
-hcrA,OM 3 Fewer Recruits,2.99
-hcrA,OM 4 Offshore Inaccessible,5.25
-hcrB,OM 0,3.53
-hcrB,OM 2 Thorson Effort,2.23
-hcrB,OM 3 Fewer Recruits,2.55
-hcrB,OM 4 Offshore Inaccessible,5.41
-hcrC,OM 0,2.79
-hcrC,OM 2 Thorson Effort,2.44
-hcrC,OM 3 Fewer Recruits,2.92
-hcrC,OM 4 Offshore Inaccessible,5.84
-hcrD,OM 0,3.14
-hcrD,OM 2 Thorson Effort,3.11
-hcrD,OM 3 Fewer Recruits,2.79
-hcrD,OM 4 Offshore Inaccessible,5.64
-hcrE,OM 0,3
-hcrE,OM 2 Thorson Effort,2.6
-hcrE,OM 3 Fewer Recruits,2.67
-hcrE,OM 4 Offshore Inaccessible,5.5
+hcrA,OM 0,2.5
+hcrA,OM 2 Thorson Effort,3.01
+hcrA,OM 3 Fewer Recruits,2.45
+hcrA,OM 4 Offshore Inaccessible,5.91
+hcrA,OM 5 Faster Growth,2.88
+hcrB,OM 0,2.84
+hcrB,OM 2 Thorson Effort,2.4
+hcrB,OM 3 Fewer Recruits,2.86
+hcrB,OM 4 Offshore Inaccessible,6.11
+hcrB,OM 5 Faster Growth,2.52
+hcrC,OM 0,3.02
+hcrC,OM 2 Thorson Effort,2.76
+hcrC,OM 3 Fewer Recruits,3.04
+hcrC,OM 4 Offshore Inaccessible,6.42
+hcrC,OM 5 Faster Growth,2.88
+hcrD,OM 0,2.98
+hcrD,OM 2 Thorson Effort,3.32
+hcrD,OM 3 Fewer Recruits,2.9
+hcrD,OM 4 Offshore Inaccessible,6.09
+hcrD,OM 5 Faster Growth,2.83
+hcrE,OM 0,3.1
+hcrE,OM 2 Thorson Effort,2.41
+hcrE,OM 3 Fewer Recruits,2.81
+hcrE,OM 4 Offshore Inaccessible,5.33
+hcrE,OM 5 Faster Growth,3.07
