@@ -44,7 +44,7 @@ tos <- speciesALL_compare  %>%
   rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
   mutate(species=case_when(
     species=="MSE-Species1" ~ "(sp.1) med longevity", 
-    species=="MSE-Species2" ~ "(sp.2) short longevity")) %>%
+    species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
   mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0))
 
 ## create full pairwise df 
@@ -54,7 +54,7 @@ pairwise_df <- data.frame(MSE= rep(tradeoffs_vec,each=4),
 pairwise_df %<>% 
   mutate(species="(sp.1) med longevity") %>%
   bind_rows(
-    pairwise_df %>% mutate(species="(sp.2) short longevity")
+    pairwise_df %>% mutate(species="(sp.2) short lived")
   )
 
 ## create full pairwise df for ARROWS
@@ -67,7 +67,7 @@ pairwise_arrows <- data.frame(MSE= rep(tradeoffs_vec2,each=4),
 pairwise_arrows %<>% 
   mutate(species="(sp.1) med longevity") %>%
   bind_rows(
-    pairwise_arrows %>% mutate(species="(sp.2) short longevity")
+    pairwise_arrows %>% mutate(species="(sp.2) short lived")
   )
 
 ## add in equivocal QNM output
@@ -211,10 +211,10 @@ tos2_total %>%
   group_by(species, QNM, MSE) %>%
   summarise(n=length(unique(code))) %>%
   full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  mutate(n=ifelse(is.na(n), 0, n)) %>%
+  mutate(n=ifelse(is.na(n), 0, n),n_lab=ifelse(n==0,NA,n),n_col=ifelse(n>12,'gray90','gray40')) %>%
   ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
   geom_tile() + 
-  geom_text(aes(label=n, fontface='bold'), color='white', ) +
+  geom_text(aes(label=n_lab, fontface='italic'), col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -339,10 +339,10 @@ tos2_fish1 %>%
   group_by(species, QNM, MSE) %>%
   summarise(n=length(unique(code))) %>%
   full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  mutate(n=ifelse(is.na(n), 0, n)) %>%
+  mutate(n=ifelse(is.na(n), 0, n), n_lab=ifelse(n==0,NA,n)) %>%
   ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
   geom_tile() + 
-  geom_text(aes(label=n, fontface='bold'), color='white', ) +
+  geom_text(aes(label=n_lab, fontface='italic'), color='gray40', ) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -467,10 +467,10 @@ tos2_fish2 %>%
   group_by(QNM, MSE, species) %>%
   summarise(n=length(unique(code))) %>%
   full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  mutate(n=ifelse(is.na(n), 0, n)) %>%
+  mutate(n=ifelse(is.na(n), 0, n),n_lab=ifelse(n==0,NA,n)) %>%
   ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2_qnm)), fill=n)) +
   geom_tile() + 
-  geom_text(aes(label=n, fontface='bold'), col='white') +
+  geom_text(aes(label=n_lab, fontface='italic'), col=c(rep('gray40',2),'gray99','gray99',rep('gray40',32))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -489,6 +489,8 @@ tos2_fish2 %>%
 
 plot.fish2.equiv
 
+
+  
 
 # bring together ----------------------------------------------------------
 
@@ -509,13 +511,15 @@ plot_grid(plotlist=list(
 ), ncol=1, nrow=3)
 dev.off()
 
-png(here('data','results','fig8-tradeoffs-separate-equiv.png'), res=300,height=3100,width=2100)
+png(here('data','results','fig7-tradeoffs-separate-equiv.png'), res=300,height=3100,width=2100)
 plot_grid(plotlist=list(
   plot.total.equiv+theme(plot.margin = unit(c(1, 0, 2, 0), "lines")),
   plot.fish1.equiv+theme(plot.margin = unit(c(0, 0, 2, 0), "lines")),
   plot.fish2.equiv+theme(plot.margin = unit(c(0, 0, 2, 0), "lines"))
-), labels=c("(A) Total catch", "(B) Fishery 1 catch", "(C) Fishery 2 catch"), 
-label_x=c(-0.08, -0.1, -0.1),label_y=c(1.01,1.05,1.05), ncol=1, nrow=3)
+), labels=c("(a) Total catch (sp.1)                         (d) Total catch (sp.2)", 
+            "(b) Fishery 1 catch (sp.1)                  (e) Fishery 1 catch (sp.2)", 
+            "(c) Fishery 2 catch (sp.1)                  (f) Fishery 2 catch (sp.2)"), 
+label_x=c(-0.08, -0.1, -0.1),label_y=c(1.01,1.05,1.05), hjust=c(-0.25,-0.25,-0.25), vjust=c(1.2,0.75,0.75), ncol=1, nrow=3)
 dev.off()
 
 

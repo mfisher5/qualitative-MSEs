@@ -12,3 +12,4 @@ data/qnm_out/sensitivity.zip
 doc/*.docx
 *.zip
 qualitative-MSEs.Rproj
+R/.RDataTmp
