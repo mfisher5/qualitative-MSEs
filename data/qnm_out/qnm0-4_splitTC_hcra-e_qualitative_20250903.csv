@@ -1,0 +1,549 @@
+Code,Operating model,Management strategy,variable,response
+0-B,0. Baseline,B. Eliminate fishery 1,Fishery 1 Lg,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,Fishery 1 Sm,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,Fishery 2,S pos
+0-B,0. Baseline,B. Eliminate fishery 1,Total catch Lg,W pos
+0-B,0. Baseline,B. Eliminate fishery 1,Total catch Sm,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,inshore biomass large,S pos
+0-B,0. Baseline,B. Eliminate fishery 1,inshore biomass small,S pos
+0-B,0. Baseline,B. Eliminate fishery 1,inshore mesh size,no response
+0-B,0. Baseline,B. Eliminate fishery 1,inshore recruits,S pos
+0-B,0. Baseline,B. Eliminate fishery 1,inshore small mesh effort,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,inshore small mesh fishing lg fish,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,inshore small mesh fishing sm fish,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,offshore biomass large,S pos
+0-B,0. Baseline,B. Eliminate fishery 1,offshore biomass small,S pos
+0-B,0. Baseline,B. Eliminate fishery 1,offshore large mesh effort,no response
+0-B,0. Baseline,B. Eliminate fishery 1,offshore large mesh fishing,no response
+0-B,0. Baseline,B. Eliminate fishery 1,offshore mesh size,no response
+0-B,0. Baseline,B. Eliminate fishery 1,offshore small mesh effort,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,offshore small mesh fishing lg fish,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,offshore small mesh fishing sm fish,S neg
+0-B,0. Baseline,B. Eliminate fishery 1,spawning biomass,S pos
+0-B,0. Baseline,B. Eliminate fishery 1,total biomass,S pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",Fishery 1 Lg,Equiv
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",Fishery 1 Sm,Equiv
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",Fishery 2,Equiv
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",Total catch Lg,Equiv
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",Total catch Sm,Equiv
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",inshore biomass small,W pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",inshore recruits,W pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore biomass large,Equiv
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore biomass small,Equiv
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore small mesh effort,S pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,S pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,S pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",spawning biomass,W pos
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",total biomass,W pos
+0-D,0. Baseline,D. Increase fishery mesh size,Fishery 1 Lg,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,Fishery 1 Sm,W pos
+0-D,0. Baseline,D. Increase fishery mesh size,Fishery 2,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,Total catch Lg,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,Total catch Sm,W pos
+0-D,0. Baseline,D. Increase fishery mesh size,inshore biomass large,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,inshore biomass small,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,inshore mesh size,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,inshore recruits,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,inshore small mesh effort,no response
+0-D,0. Baseline,D. Increase fishery mesh size,inshore small mesh fishing lg fish,no response
+0-D,0. Baseline,D. Increase fishery mesh size,inshore small mesh fishing sm fish,S neg
+0-D,0. Baseline,D. Increase fishery mesh size,offshore biomass large,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,offshore biomass small,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,offshore large mesh effort,no response
+0-D,0. Baseline,D. Increase fishery mesh size,offshore large mesh fishing,no response
+0-D,0. Baseline,D. Increase fishery mesh size,offshore mesh size,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,offshore small mesh effort,no response
+0-D,0. Baseline,D. Increase fishery mesh size,offshore small mesh fishing lg fish,no response
+0-D,0. Baseline,D. Increase fishery mesh size,offshore small mesh fishing sm fish,S neg
+0-D,0. Baseline,D. Increase fishery mesh size,spawning biomass,S pos
+0-D,0. Baseline,D. Increase fishery mesh size,total biomass,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",Fishery 1 Lg,W pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",Fishery 1 Sm,W pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",Fishery 2,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",Total catch Lg,W pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",Total catch Sm,W pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",inshore biomass small,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",inshore recruits,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore biomass large,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore biomass small,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore small mesh effort,no response
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,no response
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,no response
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",spawning biomass,S pos
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",total biomass,S pos
+1-A,1. Thorson effort,A. Status-quo,Fishery 1 Lg,no response
+1-A,1. Thorson effort,A. Status-quo,Fishery 1 Sm,no response
+1-A,1. Thorson effort,A. Status-quo,Fishery 2,no response
+1-A,1. Thorson effort,A. Status-quo,Total catch Lg,no response
+1-A,1. Thorson effort,A. Status-quo,Total catch Sm,no response
+1-A,1. Thorson effort,A. Status-quo,inshore biomass large,no response
+1-A,1. Thorson effort,A. Status-quo,inshore biomass small,no response
+1-A,1. Thorson effort,A. Status-quo,inshore mesh size,no response
+1-A,1. Thorson effort,A. Status-quo,inshore recruits,no response
+1-A,1. Thorson effort,A. Status-quo,inshore small mesh effort,no response
+1-A,1. Thorson effort,A. Status-quo,inshore small mesh fishing lg fish,no response
+1-A,1. Thorson effort,A. Status-quo,inshore small mesh fishing sm fish,no response
+1-A,1. Thorson effort,A. Status-quo,offshore biomass large,no response
+1-A,1. Thorson effort,A. Status-quo,offshore biomass small,no response
+1-A,1. Thorson effort,A. Status-quo,offshore large mesh effort,no response
+1-A,1. Thorson effort,A. Status-quo,offshore large mesh fishing,no response
+1-A,1. Thorson effort,A. Status-quo,offshore mesh size,no response
+1-A,1. Thorson effort,A. Status-quo,offshore small mesh effort,no response
+1-A,1. Thorson effort,A. Status-quo,offshore small mesh fishing lg fish,no response
+1-A,1. Thorson effort,A. Status-quo,offshore small mesh fishing sm fish,no response
+1-A,1. Thorson effort,A. Status-quo,spawning biomass,no response
+1-A,1. Thorson effort,A. Status-quo,total biomass,no response
+1-B,1. Thorson effort,B. Eliminate fishery 1,Fishery 1 Lg,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,Fishery 1 Sm,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,Fishery 2,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,Total catch Lg,Equiv
+1-B,1. Thorson effort,B. Eliminate fishery 1,Total catch Sm,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,inshore biomass large,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,inshore biomass small,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,inshore mesh size,no response
+1-B,1. Thorson effort,B. Eliminate fishery 1,inshore recruits,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,inshore small mesh effort,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,inshore small mesh fishing lg fish,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,inshore small mesh fishing sm fish,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore biomass large,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore biomass small,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore large mesh effort,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore large mesh fishing,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore mesh size,no response
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore small mesh effort,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore small mesh fishing lg fish,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,offshore small mesh fishing sm fish,S neg
+1-B,1. Thorson effort,B. Eliminate fishery 1,spawning biomass,S pos
+1-B,1. Thorson effort,B. Eliminate fishery 1,total biomass,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",Fishery 1 Lg,W pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",Fishery 1 Sm,Equiv
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",Fishery 2,W pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",Total catch Lg,W pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",Total catch Sm,Equiv
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",inshore biomass small,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",inshore recruits,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore biomass large,W pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore biomass small,Equiv
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore large mesh effort,W pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore large mesh fishing,W pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore small mesh effort,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",spawning biomass,S pos
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",total biomass,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,Fishery 1 Lg,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,Fishery 1 Sm,S neg
+1-D,1. Thorson effort,D. Increase fishery mesh size,Fishery 2,Equiv
+1-D,1. Thorson effort,D. Increase fishery mesh size,Total catch Lg,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,Total catch Sm,S neg
+1-D,1. Thorson effort,D. Increase fishery mesh size,inshore biomass large,Equiv
+1-D,1. Thorson effort,D. Increase fishery mesh size,inshore biomass small,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,inshore mesh size,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,inshore recruits,Equiv
+1-D,1. Thorson effort,D. Increase fishery mesh size,inshore small mesh effort,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,inshore small mesh fishing lg fish,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,inshore small mesh fishing sm fish,S neg
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore biomass large,Equiv
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore biomass small,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore large mesh effort,Equiv
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore large mesh fishing,Equiv
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore mesh size,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore small mesh effort,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore small mesh fishing lg fish,S pos
+1-D,1. Thorson effort,D. Increase fishery mesh size,offshore small mesh fishing sm fish,W neg
+1-D,1. Thorson effort,D. Increase fishery mesh size,spawning biomass,Equiv
+1-D,1. Thorson effort,D. Increase fishery mesh size,total biomass,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",Fishery 1 Lg,Equiv
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",Fishery 1 Sm,Equiv
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",Fishery 2,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",Total catch Lg,W pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",Total catch Sm,Equiv
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",inshore biomass small,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",inshore recruits,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore biomass large,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore biomass small,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore large mesh effort,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore large mesh fishing,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore small mesh effort,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",spawning biomass,S pos
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",total biomass,S pos
+2-A,2. Lower productivity,A. Status-quo,Fishery 1 Lg,S neg
+2-A,2. Lower productivity,A. Status-quo,Fishery 1 Sm,S neg
+2-A,2. Lower productivity,A. Status-quo,Fishery 2,S neg
+2-A,2. Lower productivity,A. Status-quo,Total catch Lg,S neg
+2-A,2. Lower productivity,A. Status-quo,Total catch Sm,S neg
+2-A,2. Lower productivity,A. Status-quo,inshore biomass large,S neg
+2-A,2. Lower productivity,A. Status-quo,inshore biomass small,S neg
+2-A,2. Lower productivity,A. Status-quo,inshore mesh size,no response
+2-A,2. Lower productivity,A. Status-quo,inshore recruits,S neg
+2-A,2. Lower productivity,A. Status-quo,inshore small mesh effort,no response
+2-A,2. Lower productivity,A. Status-quo,inshore small mesh fishing lg fish,no response
+2-A,2. Lower productivity,A. Status-quo,inshore small mesh fishing sm fish,no response
+2-A,2. Lower productivity,A. Status-quo,offshore biomass large,S neg
+2-A,2. Lower productivity,A. Status-quo,offshore biomass small,S neg
+2-A,2. Lower productivity,A. Status-quo,offshore large mesh effort,no response
+2-A,2. Lower productivity,A. Status-quo,offshore large mesh fishing,no response
+2-A,2. Lower productivity,A. Status-quo,offshore mesh size,no response
+2-A,2. Lower productivity,A. Status-quo,offshore small mesh effort,no response
+2-A,2. Lower productivity,A. Status-quo,offshore small mesh fishing lg fish,no response
+2-A,2. Lower productivity,A. Status-quo,offshore small mesh fishing sm fish,no response
+2-A,2. Lower productivity,A. Status-quo,spawning biomass,S neg
+2-A,2. Lower productivity,A. Status-quo,total biomass,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,Fishery 1 Lg,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,Fishery 1 Sm,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,Fishery 2,S pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,Total catch Lg,W pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,Total catch Sm,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,inshore biomass large,S pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,inshore biomass small,S pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,inshore mesh size,no response
+2-B,2. Lower productivity,B. Eliminate fishery 1,inshore recruits,S pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,inshore small mesh effort,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,inshore small mesh fishing lg fish,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,inshore small mesh fishing sm fish,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore biomass large,S pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore biomass small,S pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore large mesh effort,no response
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore large mesh fishing,no response
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore mesh size,no response
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore small mesh effort,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore small mesh fishing lg fish,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,offshore small mesh fishing sm fish,S neg
+2-B,2. Lower productivity,B. Eliminate fishery 1,spawning biomass,S pos
+2-B,2. Lower productivity,B. Eliminate fishery 1,total biomass,S pos
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",Fishery 1 Lg,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",Fishery 1 Sm,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",Fishery 2,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",Total catch Lg,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",Total catch Sm,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",inshore biomass large,W pos
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",inshore biomass small,W pos
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",inshore recruits,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore biomass large,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore biomass small,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore small mesh effort,S pos
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,S pos
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,S pos
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",spawning biomass,Equiv
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",total biomass,Equiv
+2-D,2. Lower productivity,D. Increase fishery mesh size,Fishery 1 Lg,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,Fishery 1 Sm,Equiv
+2-D,2. Lower productivity,D. Increase fishery mesh size,Fishery 2,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,Total catch Lg,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,Total catch Sm,Equiv
+2-D,2. Lower productivity,D. Increase fishery mesh size,inshore biomass large,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,inshore biomass small,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,inshore mesh size,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,inshore recruits,W pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,inshore small mesh effort,no response
+2-D,2. Lower productivity,D. Increase fishery mesh size,inshore small mesh fishing lg fish,no response
+2-D,2. Lower productivity,D. Increase fishery mesh size,inshore small mesh fishing sm fish,S neg
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore biomass large,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore biomass small,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore large mesh effort,no response
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore large mesh fishing,no response
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore mesh size,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore small mesh effort,no response
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore small mesh fishing lg fish,no response
+2-D,2. Lower productivity,D. Increase fishery mesh size,offshore small mesh fishing sm fish,S neg
+2-D,2. Lower productivity,D. Increase fishery mesh size,spawning biomass,S pos
+2-D,2. Lower productivity,D. Increase fishery mesh size,total biomass,S pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",Fishery 1 Lg,W pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",Fishery 1 Sm,Equiv
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",Fishery 2,S pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",Total catch Lg,W pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",Total catch Sm,Equiv
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",inshore biomass small,S pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",inshore recruits,W pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore biomass large,S pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore biomass small,S pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore small mesh effort,no response
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,no response
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,no response
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",spawning biomass,S pos
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",total biomass,S pos
+3-A,"3. Move ""far offshore""",A. Status-quo,Climate pressure,S pos
+3-A,"3. Move ""far offshore""",A. Status-quo,Fishery 1 Lg,W neg
+3-A,"3. Move ""far offshore""",A. Status-quo,Fishery 1 Sm,W neg
+3-A,"3. Move ""far offshore""",A. Status-quo,Fishery 2,S neg
+3-A,"3. Move ""far offshore""",A. Status-quo,Total catch Lg,W neg
+3-A,"3. Move ""far offshore""",A. Status-quo,Total catch Sm,W neg
+3-A,"3. Move ""far offshore""",A. Status-quo,inshore biomass large,Equiv
+3-A,"3. Move ""far offshore""",A. Status-quo,inshore biomass small,Equiv
+3-A,"3. Move ""far offshore""",A. Status-quo,inshore mesh size,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,inshore recruits,Equiv
+3-A,"3. Move ""far offshore""",A. Status-quo,inshore small mesh effort,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,inshore small mesh fishing lg fish,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,inshore small mesh fishing sm fish,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore biomass inaccessible large,S pos
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore biomass inaccessible small,S pos
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore biomass large,S neg
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore biomass small,S neg
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore large mesh effort,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore large mesh fishing,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore mesh size,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore small mesh effort,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore small mesh fishing lg fish,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,offshore small mesh fishing sm fish,no response
+3-A,"3. Move ""far offshore""",A. Status-quo,spawning biomass,Equiv
+3-A,"3. Move ""far offshore""",A. Status-quo,total biomass,Equiv
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,Climate pressure,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,Fishery 1 Lg,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,Fishery 1 Sm,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,Fishery 2,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,Total catch Lg,W pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,Total catch Sm,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,inshore biomass large,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,inshore biomass small,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,inshore mesh size,no response
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,inshore recruits,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,inshore small mesh effort,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,inshore small mesh fishing lg fish,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,inshore small mesh fishing sm fish,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore biomass inaccessible large,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore biomass inaccessible small,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore biomass large,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore biomass small,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore large mesh effort,no response
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore large mesh fishing,no response
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore mesh size,no response
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore small mesh effort,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore small mesh fishing lg fish,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,offshore small mesh fishing sm fish,S neg
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,spawning biomass,S pos
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,total biomass,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",Climate pressure,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",Fishery 1 Lg,Equiv
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",Fishery 1 Sm,Equiv
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",Fishery 2,Equiv
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",Total catch Lg,Equiv
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",Total catch Sm,Equiv
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",inshore biomass small,W pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",inshore recruits,W pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore biomass inaccessible large,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore biomass inaccessible small,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore biomass large,Equiv
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore biomass small,Equiv
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore small mesh effort,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,S pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",spawning biomass,W pos
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",total biomass,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,Climate pressure,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,Fishery 1 Lg,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,Fishery 1 Sm,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,Fishery 2,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,Total catch Lg,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,Total catch Sm,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,inshore biomass large,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,inshore biomass small,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,inshore mesh size,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,inshore recruits,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,inshore small mesh effort,no response
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,inshore small mesh fishing lg fish,no response
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,inshore small mesh fishing sm fish,S neg
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore biomass inaccessible large,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore biomass inaccessible small,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore biomass large,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore biomass small,W pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore large mesh effort,no response
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore large mesh fishing,no response
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore mesh size,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore small mesh effort,no response
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore small mesh fishing lg fish,no response
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,offshore small mesh fishing sm fish,S neg
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,spawning biomass,S pos
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,total biomass,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",Climate pressure,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",Fishery 1 Lg,Equiv
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",Fishery 1 Sm,Equiv
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",Fishery 2,W pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",Total catch Lg,Equiv
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",Total catch Sm,Equiv
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",inshore biomass small,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",inshore recruits,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore biomass inaccessible large,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore biomass inaccessible small,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore biomass large,W pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore biomass small,W pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore small mesh effort,no response
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,no response
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,no response
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",spawning biomass,S pos
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",total biomass,S pos
+4-A,4. Lower growth rate,A. Status-quo,Fishery 1 Lg,S pos
+4-A,4. Lower growth rate,A. Status-quo,Fishery 1 Sm,S pos
+4-A,4. Lower growth rate,A. Status-quo,Fishery 2,S pos
+4-A,4. Lower growth rate,A. Status-quo,Growth,S pos
+4-A,4. Lower growth rate,A. Status-quo,Total catch Lg,S pos
+4-A,4. Lower growth rate,A. Status-quo,Total catch Sm,S pos
+4-A,4. Lower growth rate,A. Status-quo,inshore biomass large,S pos
+4-A,4. Lower growth rate,A. Status-quo,inshore biomass small,S pos
+4-A,4. Lower growth rate,A. Status-quo,inshore mesh size,no response
+4-A,4. Lower growth rate,A. Status-quo,inshore recruits,S pos
+4-A,4. Lower growth rate,A. Status-quo,inshore small mesh effort,no response
+4-A,4. Lower growth rate,A. Status-quo,inshore small mesh fishing lg fish,no response
+4-A,4. Lower growth rate,A. Status-quo,inshore small mesh fishing sm fish,no response
+4-A,4. Lower growth rate,A. Status-quo,offshore biomass large,S pos
+4-A,4. Lower growth rate,A. Status-quo,offshore biomass small,S pos
+4-A,4. Lower growth rate,A. Status-quo,offshore large mesh effort,no response
+4-A,4. Lower growth rate,A. Status-quo,offshore large mesh fishing,no response
+4-A,4. Lower growth rate,A. Status-quo,offshore mesh size,no response
+4-A,4. Lower growth rate,A. Status-quo,offshore small mesh effort,no response
+4-A,4. Lower growth rate,A. Status-quo,offshore small mesh fishing lg fish,no response
+4-A,4. Lower growth rate,A. Status-quo,offshore small mesh fishing sm fish,no response
+4-A,4. Lower growth rate,A. Status-quo,spawning biomass,S pos
+4-A,4. Lower growth rate,A. Status-quo,total biomass,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,Fishery 1 Lg,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,Fishery 1 Sm,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,Fishery 2,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,Growth,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,Total catch Lg,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,Total catch Sm,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,inshore biomass large,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,inshore biomass small,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,inshore mesh size,no response
+4-B,4. Lower growth rate,B. Eliminate fishery 1,inshore recruits,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,inshore small mesh effort,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,inshore small mesh fishing lg fish,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,inshore small mesh fishing sm fish,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore biomass large,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore biomass small,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore large mesh effort,no response
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore large mesh fishing,no response
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore mesh size,no response
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore small mesh effort,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore small mesh fishing lg fish,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,offshore small mesh fishing sm fish,S neg
+4-B,4. Lower growth rate,B. Eliminate fishery 1,spawning biomass,S pos
+4-B,4. Lower growth rate,B. Eliminate fishery 1,total biomass,S pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",Fishery 1 Lg,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",Fishery 1 Sm,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",Fishery 2,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",Growth,S pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",Total catch Lg,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",Total catch Sm,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",inshore biomass small,S pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",inshore recruits,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore biomass large,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore biomass small,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore small mesh effort,S pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,S pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,S pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",spawning biomass,W pos
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",total biomass,W pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,Fishery 1 Lg,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,Fishery 1 Sm,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,Fishery 2,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,Growth,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,Total catch Lg,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,Total catch Sm,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,inshore biomass large,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,inshore biomass small,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,inshore mesh size,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,inshore recruits,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,inshore small mesh effort,no response
+4-D,4. Lower growth rate,D. Increase fishery mesh size,inshore small mesh fishing lg fish,no response
+4-D,4. Lower growth rate,D. Increase fishery mesh size,inshore small mesh fishing sm fish,S neg
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore biomass large,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore biomass small,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore large mesh effort,no response
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore large mesh fishing,no response
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore mesh size,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore small mesh effort,no response
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore small mesh fishing lg fish,no response
+4-D,4. Lower growth rate,D. Increase fishery mesh size,offshore small mesh fishing sm fish,S neg
+4-D,4. Lower growth rate,D. Increase fishery mesh size,spawning biomass,S pos
+4-D,4. Lower growth rate,D. Increase fishery mesh size,total biomass,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",Fishery 1 Lg,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",Fishery 1 Sm,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",Fishery 2,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",Growth,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",Total catch Lg,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",Total catch Sm,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",inshore biomass large,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",inshore biomass small,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",inshore mesh size,no response
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",inshore recruits,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",inshore small mesh effort,S neg
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing lg fish,S neg
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",inshore small mesh fishing sm fish,S neg
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore biomass large,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore biomass small,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore large mesh effort,no response
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore large mesh fishing,no response
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore mesh size,no response
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore small mesh effort,no response
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing lg fish,no response
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",offshore small mesh fishing sm fish,no response
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",spawning biomass,S pos
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",total biomass,S pos

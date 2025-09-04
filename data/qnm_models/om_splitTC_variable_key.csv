@@ -1,0 +1,27 @@
+variable,group,group_order,specific_order
+inshore biomass large,stock,1,3
+inshore biomass small,stock,1,2
+inshore mesh size,effort,3,20
+inshore recruits,stock,1,1
+inshore small mesh effort,effort,3,21
+inshore small mesh fishing lg fish,fishing,2,11
+inshore small mesh fishing sm fish,fishing,2,10
+offshore biomass large,stock,1,5
+offshore biomass small,stock,1,4
+offshore large mesh effort,fishing,2,23
+offshore large mesh fishing,fishing,2,14
+offshore mesh size,effort,3,22
+offshore small mesh effort,effort,3,24
+offshore small mesh fishing lg fish,fishing,2,13
+offshore small mesh fishing sm fish,fishing,2,12
+spawning biomass,stock,1,9
+total biomass,stock,1,8
+Fishery 1 Lg,fishing,2,15
+Fishery 1 Sm,fishing,2,16
+Fishery 2,fishing,2,17
+Total catch Sm,fishing,2,18
+Total catch Lg,fishing,2,19
+Climate pressure,external,4,25
+offshore biomass inaccessible large,stock,1,6
+offshore biomass inaccessible small,stock,1,7
+Growth,external,4,26

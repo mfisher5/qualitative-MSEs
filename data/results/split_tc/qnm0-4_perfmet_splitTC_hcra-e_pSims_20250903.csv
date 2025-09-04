@@ -1,0 +1,25 @@
+,,,Total Catch,,,Fishery 1 Catch,,
+Code,Operating model,Management strategy,All,Large fish,Small fish,All,Large,Small
+0-B,0. Baseline,B. Eliminate fishery 1,60,77,-100,,-100,-100
+0-C,0. Baseline,"C. Fishery 1 in ""offshore"" only",55,56,52,,56,52
+0-D,0. Baseline,D. Increase fishery mesh size,87,100,73,,100,73
+0-E,0. Baseline,"E. Fishery 1 in ""offshore"" only",74,76,63,,76,64
+1-B,1. Thorson effort,B. Eliminate fishery 1,-59,60,-100,,-100,-100
+1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",66,66,60,,61,60
+1-D,1. Thorson effort,D. Increase fishery mesh size,57,94,-82,,99,-82
+1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",66,70,55,,57,55
+2-A,2. Lower productivity,A. Status-quo,-100,-100,-100,,-100,-100
+2-B,2. Lower productivity,B. Eliminate fishery 1,55,73,-100,,-100,-100
+2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",-51,-50,-53,,-50,-54
+2-D,2. Lower productivity,D. Increase fishery mesh size,73,87,60,,87,59
+2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",61,66,51,,66,51
+3-A,"3. Move ""far offshore""",A. Status-quo,-77,-79,-72,,-79,-72
+3-B,"3. Move ""far offshore""",B. Eliminate fishery 1,-51,64,-100,,-100,-100
+3-C,"3. Move ""far offshore""","C. Fishery 1 in ""offshore"" only",-53,-54,-54,,-54,-55
+3-D,"3. Move ""far offshore""",D. Increase fishery mesh size,67,76,60,,75,61
+3-E,"3. Move ""far offshore""","E. Fishery 1 in ""offshore"" only",53,55,-53,,55,-53
+4-A,4. Lower growth rate,A. Status-quo,100,100,100,,100,100
+4-B,4. Lower growth rate,B. Eliminate fishery 1,68,82,-100,,-100,-100
+4-C,4. Lower growth rate,"C. Fishery 1 in ""offshore"" only",73,71,72,,70,72
+4-D,4. Lower growth rate,D. Increase fishery mesh size,95,100,87,,100,87
+4-E,4. Lower growth rate,"E. Fishery 1 in ""offshore"" only",88,86,81,,86,81

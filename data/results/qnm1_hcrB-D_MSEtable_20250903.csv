@@ -1,0 +1,111 @@
+QNM,HCR,Code,Operating model,Management strategy,Network file,variable,response,change,p_sim,node_to_perturb
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,Fishery 1 Lg,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,Fishery 1 Sm,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,Fishery 2,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,Total catch Lg,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,Total catch Sm,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,inshore biomass large,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,inshore biomass small,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,inshore mesh size,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,inshore recruits,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,inshore small mesh effort,no response,no response,0,y
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,inshore small mesh fishing lg fish,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,inshore small mesh fishing sm fish,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore biomass large,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore biomass small,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore large mesh effort,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore large mesh fishing,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore mesh size,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore small mesh effort,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore small mesh fishing lg fish,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,offshore small mesh fishing sm fish,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,spawning biomass,no response,no response,0,n
+1,A,1-A,1. Thorson effort,A. Status-quo,MSE-QNM_2023-Oct_2-thorsonF,total biomass,no response,no response,0,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,Fishery 1 Lg,S neg,neg,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,Fishery 1 Sm,S neg,neg,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,Fishery 2,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,Total catch Lg,Equiv,pos,60,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,Total catch Sm,S neg,neg,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,inshore biomass large,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,inshore biomass small,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,inshore mesh size,no response,no response,0,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,inshore recruits,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,inshore small mesh effort,S neg,neg,100,y
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,inshore small mesh fishing lg fish,S neg,neg,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,inshore small mesh fishing sm fish,S neg,neg,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore biomass large,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore biomass small,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore large mesh effort,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore large mesh fishing,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore mesh size,no response,no response,0,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore small mesh effort,S neg,neg,100,y
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore small mesh fishing lg fish,S neg,neg,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,offshore small mesh fishing sm fish,S neg,neg,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,spawning biomass,S pos,pos,100,n
+1,B,1-B,1. Thorson effort,B. Eliminate fishery 1,MSE-QNM_2023-Oct_2B-rm-small-mesh,total biomass,S pos,pos,100,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,Fishery 1 Lg,W pos,pos,61,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,Fishery 1 Sm,Equiv,pos,60,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,Fishery 2,W pos,pos,61,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,Total catch Lg,W pos,pos,66,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,Total catch Sm,Equiv,pos,60,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,inshore biomass large,S pos,pos,97,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,inshore biomass small,S pos,pos,94,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,inshore mesh size,no response,no response,0,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,inshore recruits,S pos,pos,85,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,inshore small mesh effort,S neg,neg,100,y
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,inshore small mesh fishing lg fish,S neg,neg,100,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,inshore small mesh fishing sm fish,S neg,neg,100,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore biomass large,W pos,pos,61,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore biomass small,Equiv,pos,60,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore large mesh effort,W pos,pos,61,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore large mesh fishing,W pos,pos,61,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore mesh size,no response,no response,0,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore small mesh effort,S pos,pos,99,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore small mesh fishing lg fish,S pos,pos,99,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,offshore small mesh fishing sm fish,S pos,pos,99,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,spawning biomass,S pos,pos,86,n
+1,C,1-C,1. Thorson effort,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small,total biomass,S pos,pos,88,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,Fishery 1 Lg,S pos,pos,99,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,Fishery 1 Sm,S neg,neg,82,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,Fishery 2,Equiv,pos,58,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,Total catch Lg,S pos,pos,94,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,Total catch Sm,S neg,neg,82,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,inshore biomass large,Equiv,pos,57,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,inshore biomass small,S pos,pos,93,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,inshore mesh size,S pos,pos,100,y
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,inshore recruits,Equiv,pos,58,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,inshore small mesh effort,S pos,pos,93,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,inshore small mesh fishing lg fish,S pos,pos,93,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,inshore small mesh fishing sm fish,S neg,neg,86,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore biomass large,Equiv,pos,58,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore biomass small,S pos,pos,98,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore large mesh effort,Equiv,pos,58,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore large mesh fishing,Equiv,pos,58,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore mesh size,S pos,pos,100,y
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore small mesh effort,S pos,pos,99,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore small mesh fishing lg fish,S pos,pos,99,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,offshore small mesh fishing sm fish,W neg,neg,69,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,spawning biomass,Equiv,pos,58,n
+1,D,1-D,1. Thorson effort,D. Increase fishery mesh size,MSE-QNM_2023-Oct_2-thorsonF,total biomass,S pos,pos,91,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,Fishery 1 Lg,Equiv,pos,57,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,Fishery 1 Sm,Equiv,pos,55,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,Fishery 2,S pos,pos,81,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,Total catch Lg,W pos,pos,70,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,Total catch Sm,Equiv,pos,55,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,inshore biomass large,S pos,pos,100,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,inshore biomass small,S pos,pos,100,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,inshore mesh size,no response,no response,0,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,inshore recruits,S pos,pos,96,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,inshore small mesh effort,S neg,neg,100,y
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,inshore small mesh fishing lg fish,S neg,neg,100,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,inshore small mesh fishing sm fish,S neg,neg,100,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore biomass large,S pos,pos,81,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore biomass small,S pos,pos,80,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore large mesh effort,S pos,pos,81,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore large mesh fishing,S pos,pos,81,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore mesh size,no response,no response,0,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore small mesh effort,S pos,pos,100,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore small mesh fishing lg fish,S pos,pos,100,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,offshore small mesh fishing sm fish,S pos,pos,100,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,spawning biomass,S pos,pos,95,n
+1,E,1-E,1. Thorson effort,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh,total biomass,S pos,pos,99,n

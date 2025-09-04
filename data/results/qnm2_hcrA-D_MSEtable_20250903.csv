@@ -1,0 +1,111 @@
+QNM,HCR,Code,Operating model,Management strategy,Network file,variable,response,change,p_sim,node_to_perturb
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,Fishery 1 Lg,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,Fishery 1 Sm,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,Fishery 2,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,Total catch Lg,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,Total catch Sm,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,inshore biomass large,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,inshore biomass small,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,inshore mesh size,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,inshore recruits,S neg,neg,100,y
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,inshore small mesh effort,no response,no response,0,y
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,inshore small mesh fishing lg fish,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,inshore small mesh fishing sm fish,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore biomass large,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore biomass small,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore large mesh effort,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore large mesh fishing,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore mesh size,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore small mesh effort,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore small mesh fishing lg fish,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,offshore small mesh fishing sm fish,no response,no response,0,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,spawning biomass,S neg,neg,100,n
+2,A,2-A,2. Lower productivity,A. Status-quo,MSE-QNM_2023-Oct_00-constantF,total biomass,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,Fishery 1 Lg,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,Fishery 1 Sm,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,Fishery 2,S pos,pos,99,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,Total catch Lg,W pos,pos,73,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,Total catch Sm,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,inshore biomass large,S pos,pos,98,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,inshore biomass small,S pos,pos,96,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,inshore mesh size,no response,no response,0,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,inshore recruits,S pos,pos,91,y
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,inshore small mesh effort,S neg,neg,100,y
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,inshore small mesh fishing lg fish,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,inshore small mesh fishing sm fish,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore biomass large,S pos,pos,99,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore biomass small,S pos,pos,98,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore large mesh effort,no response,no response,0,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore large mesh fishing,no response,no response,0,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore mesh size,no response,no response,0,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore small mesh effort,S neg,neg,100,y
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore small mesh fishing lg fish,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,offshore small mesh fishing sm fish,S neg,neg,100,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,spawning biomass,S pos,pos,98,n
+2,B,2-B,2. Lower productivity,B. Eliminate fishery 1,MSE-QNM_2023-Oct_00B-rm-small-mesh,total biomass,S pos,pos,98,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,Fishery 1 Lg,Equiv,neg,50,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,Fishery 1 Sm,Equiv,neg,54,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,Fishery 2,Equiv,neg,51,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,Total catch Lg,Equiv,neg,50,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,Total catch Sm,Equiv,neg,53,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,inshore biomass large,W pos,pos,75,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,inshore biomass small,W pos,pos,64,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,inshore mesh size,no response,no response,0,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,inshore recruits,Equiv,neg,50,y
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,inshore small mesh effort,S neg,neg,100,y
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,inshore small mesh fishing lg fish,S neg,neg,100,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,inshore small mesh fishing sm fish,S neg,neg,100,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore biomass large,Equiv,neg,51,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore biomass small,Equiv,neg,56,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore large mesh effort,no response,no response,0,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore large mesh fishing,no response,no response,0,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore mesh size,no response,no response,0,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore small mesh effort,S pos,pos,100,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore small mesh fishing lg fish,S pos,pos,100,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,offshore small mesh fishing sm fish,S pos,pos,100,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,spawning biomass,Equiv,pos,58,n
+2,C,2-C,2. Lower productivity,"C. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00C-rm-small-mesh-redistribute-small,total biomass,Equiv,pos,55,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,Fishery 1 Lg,S pos,pos,87,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,Fishery 1 Sm,Equiv,pos,59,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,Fishery 2,S pos,pos,88,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,Total catch Lg,S pos,pos,87,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,Total catch Sm,Equiv,pos,60,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,inshore biomass large,S pos,pos,82,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,inshore biomass small,S pos,pos,82,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,inshore mesh size,S pos,pos,100,y
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,inshore recruits,W pos,pos,69,y
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,inshore small mesh effort,no response,no response,0,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,inshore small mesh fishing lg fish,no response,no response,0,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,inshore small mesh fishing sm fish,S neg,neg,100,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore biomass large,S pos,pos,88,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore biomass small,S pos,pos,91,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore large mesh effort,no response,no response,0,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore large mesh fishing,no response,no response,0,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore mesh size,S pos,pos,100,y
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore small mesh effort,no response,no response,0,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore small mesh fishing lg fish,no response,no response,0,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,offshore small mesh fishing sm fish,S neg,neg,100,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,spawning biomass,S pos,pos,87,n
+2,D,2-D,2. Lower productivity,D. Increase fishery mesh size,MSE-QNM_2023-Oct_00-constantF,total biomass,S pos,pos,88,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,Fishery 1 Lg,W pos,pos,66,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,Fishery 1 Sm,Equiv,pos,51,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,Fishery 2,S pos,pos,90,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,Total catch Lg,W pos,pos,66,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,Total catch Sm,Equiv,pos,51,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,inshore biomass large,S pos,pos,93,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,inshore biomass small,S pos,pos,87,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,inshore mesh size,no response,no response,0,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,inshore recruits,W pos,pos,77,y
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,inshore small mesh effort,S neg,neg,100,y
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,inshore small mesh fishing lg fish,S neg,neg,100,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,inshore small mesh fishing sm fish,S neg,neg,100,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore biomass large,S pos,pos,90,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore biomass small,S pos,pos,87,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore large mesh effort,no response,no response,0,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore large mesh fishing,no response,no response,0,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore mesh size,no response,no response,0,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore small mesh effort,no response,no response,0,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore small mesh fishing lg fish,no response,no response,0,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,offshore small mesh fishing sm fish,no response,no response,0,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,spawning biomass,S pos,pos,91,n
+2,E,2-E,2. Lower productivity,"E. Fishery 1 in ""offshore"" only",MSE-QNM_2023-Oct_00E-rm-inshore-small-mesh,total biomass,S pos,pos,89,n

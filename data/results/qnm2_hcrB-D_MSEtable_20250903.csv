@@ -1,0 +1,111 @@
+QNM,HCR,Code,Operating model,Management strategy,Network file,variable,response,change,p_sim,node_to_perturb
+1,A,NA,NA,NA,NA,Fishery 1 Lg,no response,no response,0,n
+1,A,NA,NA,NA,NA,Fishery 1 Sm,no response,no response,0,n
+1,A,NA,NA,NA,NA,Fishery 2,no response,no response,0,n
+1,A,NA,NA,NA,NA,Total catch Lg,no response,no response,0,n
+1,A,NA,NA,NA,NA,Total catch Sm,no response,no response,0,n
+1,A,NA,NA,NA,NA,inshore biomass large,no response,no response,0,n
+1,A,NA,NA,NA,NA,inshore biomass small,no response,no response,0,n
+1,A,NA,NA,NA,NA,inshore mesh size,no response,no response,0,n
+1,A,NA,NA,NA,NA,inshore recruits,no response,no response,0,n
+1,A,NA,NA,NA,NA,inshore small mesh effort,no response,no response,0,y
+1,A,NA,NA,NA,NA,inshore small mesh fishing lg fish,no response,no response,0,n
+1,A,NA,NA,NA,NA,inshore small mesh fishing sm fish,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore biomass large,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore biomass small,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore large mesh effort,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore large mesh fishing,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore mesh size,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore small mesh effort,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore small mesh fishing lg fish,no response,no response,0,n
+1,A,NA,NA,NA,NA,offshore small mesh fishing sm fish,no response,no response,0,n
+1,A,NA,NA,NA,NA,spawning biomass,no response,no response,0,n
+1,A,NA,NA,NA,NA,total biomass,no response,no response,0,n
+1,B,NA,NA,NA,NA,Fishery 1 Lg,S neg,neg,100,n
+1,B,NA,NA,NA,NA,Fishery 1 Sm,S neg,neg,100,n
+1,B,NA,NA,NA,NA,Fishery 2,S pos,pos,100,n
+1,B,NA,NA,NA,NA,Total catch Lg,Equiv,pos,60,n
+1,B,NA,NA,NA,NA,Total catch Sm,S neg,neg,100,n
+1,B,NA,NA,NA,NA,inshore biomass large,S pos,pos,100,n
+1,B,NA,NA,NA,NA,inshore biomass small,S pos,pos,100,n
+1,B,NA,NA,NA,NA,inshore mesh size,no response,no response,0,n
+1,B,NA,NA,NA,NA,inshore recruits,S pos,pos,100,n
+1,B,NA,NA,NA,NA,inshore small mesh effort,S neg,neg,100,y
+1,B,NA,NA,NA,NA,inshore small mesh fishing lg fish,S neg,neg,100,n
+1,B,NA,NA,NA,NA,inshore small mesh fishing sm fish,S neg,neg,100,n
+1,B,NA,NA,NA,NA,offshore biomass large,S pos,pos,100,n
+1,B,NA,NA,NA,NA,offshore biomass small,S pos,pos,100,n
+1,B,NA,NA,NA,NA,offshore large mesh effort,S pos,pos,100,n
+1,B,NA,NA,NA,NA,offshore large mesh fishing,S pos,pos,100,n
+1,B,NA,NA,NA,NA,offshore mesh size,no response,no response,0,n
+1,B,NA,NA,NA,NA,offshore small mesh effort,S neg,neg,100,y
+1,B,NA,NA,NA,NA,offshore small mesh fishing lg fish,S neg,neg,100,n
+1,B,NA,NA,NA,NA,offshore small mesh fishing sm fish,S neg,neg,100,n
+1,B,NA,NA,NA,NA,spawning biomass,S pos,pos,100,n
+1,B,NA,NA,NA,NA,total biomass,S pos,pos,100,n
+1,C,NA,NA,NA,NA,Fishery 1 Lg,W pos,pos,61,n
+1,C,NA,NA,NA,NA,Fishery 1 Sm,Equiv,pos,60,n
+1,C,NA,NA,NA,NA,Fishery 2,W pos,pos,61,n
+1,C,NA,NA,NA,NA,Total catch Lg,W pos,pos,66,n
+1,C,NA,NA,NA,NA,Total catch Sm,Equiv,pos,60,n
+1,C,NA,NA,NA,NA,inshore biomass large,S pos,pos,97,n
+1,C,NA,NA,NA,NA,inshore biomass small,S pos,pos,94,n
+1,C,NA,NA,NA,NA,inshore mesh size,no response,no response,0,n
+1,C,NA,NA,NA,NA,inshore recruits,S pos,pos,85,n
+1,C,NA,NA,NA,NA,inshore small mesh effort,S neg,neg,100,y
+1,C,NA,NA,NA,NA,inshore small mesh fishing lg fish,S neg,neg,100,n
+1,C,NA,NA,NA,NA,inshore small mesh fishing sm fish,S neg,neg,100,n
+1,C,NA,NA,NA,NA,offshore biomass large,W pos,pos,61,n
+1,C,NA,NA,NA,NA,offshore biomass small,Equiv,pos,60,n
+1,C,NA,NA,NA,NA,offshore large mesh effort,W pos,pos,61,n
+1,C,NA,NA,NA,NA,offshore large mesh fishing,W pos,pos,61,n
+1,C,NA,NA,NA,NA,offshore mesh size,no response,no response,0,n
+1,C,NA,NA,NA,NA,offshore small mesh effort,S pos,pos,99,n
+1,C,NA,NA,NA,NA,offshore small mesh fishing lg fish,S pos,pos,99,n
+1,C,NA,NA,NA,NA,offshore small mesh fishing sm fish,S pos,pos,99,n
+1,C,NA,NA,NA,NA,spawning biomass,S pos,pos,86,n
+1,C,NA,NA,NA,NA,total biomass,S pos,pos,88,n
+1,D,NA,NA,NA,NA,Fishery 1 Lg,S pos,pos,99,n
+1,D,NA,NA,NA,NA,Fishery 1 Sm,S neg,neg,82,n
+1,D,NA,NA,NA,NA,Fishery 2,Equiv,pos,58,n
+1,D,NA,NA,NA,NA,Total catch Lg,S pos,pos,94,n
+1,D,NA,NA,NA,NA,Total catch Sm,S neg,neg,82,n
+1,D,NA,NA,NA,NA,inshore biomass large,Equiv,pos,57,n
+1,D,NA,NA,NA,NA,inshore biomass small,S pos,pos,93,n
+1,D,NA,NA,NA,NA,inshore mesh size,S pos,pos,100,y
+1,D,NA,NA,NA,NA,inshore recruits,Equiv,pos,58,n
+1,D,NA,NA,NA,NA,inshore small mesh effort,S pos,pos,93,n
+1,D,NA,NA,NA,NA,inshore small mesh fishing lg fish,S pos,pos,93,n
+1,D,NA,NA,NA,NA,inshore small mesh fishing sm fish,S neg,neg,86,n
+1,D,NA,NA,NA,NA,offshore biomass large,Equiv,pos,58,n
+1,D,NA,NA,NA,NA,offshore biomass small,S pos,pos,98,n
+1,D,NA,NA,NA,NA,offshore large mesh effort,Equiv,pos,58,n
+1,D,NA,NA,NA,NA,offshore large mesh fishing,Equiv,pos,58,n
+1,D,NA,NA,NA,NA,offshore mesh size,S pos,pos,100,y
+1,D,NA,NA,NA,NA,offshore small mesh effort,S pos,pos,99,n
+1,D,NA,NA,NA,NA,offshore small mesh fishing lg fish,S pos,pos,99,n
+1,D,NA,NA,NA,NA,offshore small mesh fishing sm fish,W neg,neg,69,n
+1,D,NA,NA,NA,NA,spawning biomass,Equiv,pos,58,n
+1,D,NA,NA,NA,NA,total biomass,S pos,pos,91,n
+1,E,NA,NA,NA,NA,Fishery 1 Lg,Equiv,pos,57,n
+1,E,NA,NA,NA,NA,Fishery 1 Sm,Equiv,pos,55,n
+1,E,NA,NA,NA,NA,Fishery 2,S pos,pos,81,n
+1,E,NA,NA,NA,NA,Total catch Lg,W pos,pos,70,n
+1,E,NA,NA,NA,NA,Total catch Sm,Equiv,pos,55,n
+1,E,NA,NA,NA,NA,inshore biomass large,S pos,pos,100,n
+1,E,NA,NA,NA,NA,inshore biomass small,S pos,pos,100,n
+1,E,NA,NA,NA,NA,inshore mesh size,no response,no response,0,n
+1,E,NA,NA,NA,NA,inshore recruits,S pos,pos,96,n
+1,E,NA,NA,NA,NA,inshore small mesh effort,S neg,neg,100,y
+1,E,NA,NA,NA,NA,inshore small mesh fishing lg fish,S neg,neg,100,n
+1,E,NA,NA,NA,NA,inshore small mesh fishing sm fish,S neg,neg,100,n
+1,E,NA,NA,NA,NA,offshore biomass large,S pos,pos,81,n
+1,E,NA,NA,NA,NA,offshore biomass small,S pos,pos,80,n
+1,E,NA,NA,NA,NA,offshore large mesh effort,S pos,pos,81,n
+1,E,NA,NA,NA,NA,offshore large mesh fishing,S pos,pos,81,n
+1,E,NA,NA,NA,NA,offshore mesh size,no response,no response,0,n
+1,E,NA,NA,NA,NA,offshore small mesh effort,S pos,pos,100,n
+1,E,NA,NA,NA,NA,offshore small mesh fishing lg fish,S pos,pos,100,n
+1,E,NA,NA,NA,NA,offshore small mesh fishing sm fish,S pos,pos,100,n
+1,E,NA,NA,NA,NA,spawning biomass,S pos,pos,95,n
+1,E,NA,NA,NA,NA,total biomass,S pos,pos,99,n

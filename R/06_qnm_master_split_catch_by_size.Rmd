@@ -46,13 +46,23 @@ source(here('R/fxns/compare.models.MSEtable.R'))
 
 ## let's time things
 end.timer <- function(s){round(Sys.time()-s,2)}
+
+## stuff for saving files
 write <- TRUE
-plot_out <- FALSE
+plot_out <- TRUE
+d <- format(Sys.Date(),"%Y%m%d")
 
 
 ## model variable key: I use this to order the variables in the output tables.
 vkey <- read_csv(here('data','qnm_models','om_variable_key.csv'))
 vkey %<>% bind_rows(
+  data.frame(variable=c("offshore biomass inaccessible large","offshore biomass inaccessible small"),
+             group=rep("ecosystem",2),
+             group_order=rep(1,2),specific_order=rep(6,2))
+  )
+
+vkey2 <- read_csv(here('data','qnm_models','om_splitTC_variable_key.csv'))
+vkey2 %<>% bind_rows(
   data.frame(variable=c("offshore biomass inaccessible large","offshore biomass inaccessible small"),
              group=rep("ecosystem",2),
              group_order=rep(1,2),specific_order=rep(6,2))
@@ -77,30 +87,30 @@ m0list <- list(
 )
 
 #### 2. Effort scales according to the Thorson effort model (Thorson et al., 2013) ####
-m2list <- list(
-  m2 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
-  m2.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]] , # no constraints
-  m2.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]] , # no constraints
-  m2.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]] # no constraints
+m1list <- list(
+  m1 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2-thorsonF',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m1.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]] , # no constraints
+  m1.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]] , # no constraints
+  m1.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_2E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]] # no constraints
 )
 
 #### 3. Climate reduces productivity ####
-m3list <- m0list
+m2list <- m0list
 
 #### 4. Animals move into the “far offshore” area ####
-m4list <- list(
-  m4 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-movement-to-inaccessible',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
-  m4.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
-  m4.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]],
-  m4.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]]
+m3list <- list(
+  m3 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004-movement-to-inaccessible',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m3.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m3.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]],
+  m3.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_004E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]]
 )
 
 #### 5. Climate increases growth rate ####
-m5list <- list(
-  m5 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005-growth-perturb',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
-  m5.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]],
-  m5.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]],
-  m5.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]]  # no constraints
+m4list <- list(
+  m4 <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005-growth-perturb',dia_path=here('data','qnm_models','split_tc'))[[1]],  # no constraints
+  m4.b <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005B-rm-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]],
+  m4.c <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005C-rm-small-mesh-redistribute-small',dia_path=here('data','qnm_models','split_tc'))[[1]],
+  m4.d <- prepare.dia(dia_name='MSE-QNM_2023-Oct_005E-rm-inshore-small-mesh',dia_path=here('data','qnm_models','split_tc'))[[1]]  # no constraints
 )
 
 
@@ -110,8 +120,8 @@ end.timer(s)
 
 Add all into a single list
 ```{r}
-mlist_all <- list(m0list,m2list,m3list,m4list,m5list)
-names(mlist_all) <- c("OM 0","OM 2 Thorson Effort","OM 3 Fewer Recruits", "OM 4 Offshore Inaccessible", "OM 5 Faster Growth")
+mlist_all <- list(m0list,m1list,m2list,m3list,m4list)
+names(mlist_all) <- c("OM 0","OM 1 Thorson Effort","OM 2 Fewer Recruits", "OM 3 Offshore Inaccessible", "OM 4 Faster Growth")
 ```
 ```{r eval=FALSE}
 ## check for duplicate edges
@@ -134,14 +144,14 @@ for(j in seq(1,length(mlist_all))){
 
 Some models require perturbations
 ```{r}
-# OM 3:  There is a negative perturbation on “inshore recruits”
-PertOM3 <- c(`inshore recruits`=-1)
+# OM 2:  There is a negative perturbation on “inshore recruits”
+PertOM2 <- c(`inshore recruits`=-1)
 
-# OM 4:  There a positive perturbation on “climate pressure"
-PertOM4 <- c(`Climate pressure`=1)
+# OM 3:  There a positive perturbation on “climate pressure"
+PertOM3 <- c(`Climate pressure`=1)
 
-# OM 5: There is a positive perturbation on "growth"
-PertOM5 <- c(`Growth`=1)
+# OM 4: There is a positive perturbation on "growth"
+PertOM4 <- c(`Growth`=1)
 ```
 
 
@@ -229,28 +239,21 @@ write_csv(complexity_df, here('data','qnm_models','qnm_complexity_stats_split_tc
 
 These are the HCRs and the associated perturbations to the QNMs:
 
-HCR A: Status Quo (empty perturbation)
+
 ```{r echo=TRUE}
+# HCR A: Status Quo (empty perturbation)
 PertA <-  c(`inshore small mesh effort`=0)
-```
-
-HCR B: Remove small mesh fleet, (fishery #1)
-```{r echo=TRUE}
+ 
+# HCR B: Remove small mesh fleet, (fishery #1)
 PertB <- c(`inshore small mesh effort`=-1,`offshore small mesh effort`=-1)
-```
-
-HCR C: Remove *inshore* small mesh fleet, allow effort redistribution to offshore small mesh fishery
-```{r echo=TRUE}
+ 
+# HCR C: Remove *inshore* small mesh fleet, allow effort redistribution to offshore small mesh fishery
 PertC <- c(`inshore small mesh effort`=-1)
-```
-
-HCR D: Increase the mesh size for the small mesh fleet (fishery #1)
-```{r echo=TRUE}
+ 
+# HCR D: Increase the mesh size for the small mesh fleet (fishery #1)
 PertD <- c(`inshore mesh size`=1,`offshore mesh size`=1)
-```
-
-HCR E: remove the small mesh fleet from the inshore area
-```{r echo=TRUE}
+ 
+# HCR E: remove the small mesh fleet from the inshore area
 PertE <- c(`inshore small mesh effort`=-1)
 ```
 
@@ -285,9 +288,9 @@ for(i in seq(1,length(mlist_hcr))){
   tmp_om_name <- names(mlist_hcr)[i]
   
   # adjust perturbation if needed
-  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
-  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
-  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  if(tmp_om_name=="OM 2 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM2)}
+  if(tmp_om_name=="OM 3 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Faster Growth"){p_hcr <- c(p_hcr,PertOM4)}
   
   
   s <- Sys.time()  # start timer
@@ -316,13 +319,13 @@ for(i in seq(1,length(mlist_hcr))){
 
 if(write){
   # save simulation outputs for future use
-  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
-   saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-3_splitTC_hcrA_10K_',d,'.rds')))
+   saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',d,'.rds')))
 }
 if(plot_out){
   # save simulation output as an image
-  # pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
-  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4))
+  # pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM2),c(p_hcr,PertOM3))
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM2),c(p_hcr,PertOM3),c(p_hcr,PertOM4))
   compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
                                              perturb.list=pert_list,
                                              monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
@@ -334,7 +337,7 @@ if(plot_out){
   plot.out <- compare.table[[3]] + ggtitle("HCR A: Status Quo")
   plot.out
   
-  png(here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+  png(here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',d,'.png')), res=300,height=1500,width=2800)
     plot.out
     dev.off()}
 
@@ -353,9 +356,9 @@ for(i in seq(1,length(mlist_hcr))){
   tmp_om_name <- names(mlist_hcr)[i]
   
   # adjust perturbation if needed
-  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
-  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
-  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  if(tmp_om_name=="OM 2 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM2)}
+  if(tmp_om_name=="OM 3 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Faster Growth"){p_hcr <- c(p_hcr,PertOM4)}
   
   s <- Sys.time()  # start timer
   
@@ -379,12 +382,12 @@ for(i in seq(1,length(mlist_hcr))){
 
 if(write){
   # save simulation outputs for future use
-  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
-  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-3_splitTC_hcrB_10K_',d,'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrB_10K_',d,'.rds')))
 }
   if(plot_out){
   # save simulation output as an image
-  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM2),c(p_hcr,PertOM3),c(p_hcr,PertOM4))
   compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
                                              perturb.list=pert_list,
                                              monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
@@ -397,7 +400,7 @@ if(write){
     ggtitle("HCR B: Remove Fishery 1 (Small Mesh)")
   plot.out
   
-png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrB_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrB_10K_',d,'.png')), res=300,height=1500,width=2800)
     plot.out
     dev.off()}
 
@@ -416,9 +419,9 @@ for(i in seq(1,length(mlist_hcr))){
   tmp_om_name <- names(mlist_hcr)[i]
   
   # adjust perturbation if needed
-  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
-  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
-  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  if(tmp_om_name=="OM 2 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM2)}
+  if(tmp_om_name=="OM 3 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Faster Growth"){p_hcr <- c(p_hcr,PertOM4)}
   
   s <- Sys.time()  # start timer
   
@@ -441,12 +444,12 @@ for(i in seq(1,length(mlist_hcr))){
 }
 if(write){
   # save simulation outputs for future use
-  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
-  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-3_splitTC_hcrC_10K_',d,'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrC_10K_',d,'.rds')))
 }
   if(plot_out){
   # save simulation output as an image
-  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM2),c(p_hcr,PertOM3),c(p_hcr,PertOM4))
   compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
                                              perturb.list=pert_list,
                                              monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
@@ -459,7 +462,7 @@ if(write){
     ggtitle("HCR C: Remove inshore small mesh, allow effort redistribution")
   plot.out
   
-  png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrC_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+  png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrC_10K_',d,'.png')), res=300,height=1500,width=2800)
     plot.out
     dev.off()}
 
@@ -480,9 +483,9 @@ for(i in seq(1,length(mlist_hcr))){
   tmp_om_name <- names(mlist_hcr)[i]
   
   # adjust perturbation if needed
-  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
-  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
-  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  if(tmp_om_name=="OM 2 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM2)}
+  if(tmp_om_name=="OM 3 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Faster Growth"){p_hcr <- c(p_hcr,PertOM4)}
   
   s <- Sys.time()  # start timer
   
@@ -506,13 +509,13 @@ for(i in seq(1,length(mlist_hcr))){
 
 if(write){
   # save simulation outputs for future use
-  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
-  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-3_splitTC_hcrD_10K_',d,'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrD_10K_',d,'.rds')))
 }
 
   if(plot_out){
   # save simulation output as an image
-  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM2),c(p_hcr,PertOM3),c(p_hcr,PertOM4))
   compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
                                              perturb.list=pert_list,
                                              monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
@@ -525,7 +528,7 @@ if(write){
     ggtitle("HCR D: Increase Mesh Size")
   plot.out
   
- png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrD_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+ png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrD_10K_',d,'.png')), res=300,height=1500,width=2800)
     plot.out
     dev.off()}
 
@@ -545,9 +548,9 @@ for(i in seq(1,length(mlist_hcr))){
   tmp_om_name <- names(mlist_hcr)[i]
   
   # adjust perturbation if needed
-  if(tmp_om_name=="OM 3 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM3)}
-  if(tmp_om_name=="OM 4 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM4)}
-  if(tmp_om_name=="OM 5 Faster Growth"){p_hcr <- c(p_hcr,PertOM5)}
+  if(tmp_om_name=="OM 2 Fewer Recruits"){p_hcr <- c(p_hcr,PertOM2)}
+  if(tmp_om_name=="OM 3 Offshore Inaccessible"){p_hcr <- c(p_hcr,PertOM3)}
+  if(tmp_om_name=="OM 4 Faster Growth"){p_hcr <- c(p_hcr,PertOM4)}
   
   
   s <- Sys.time()  # start timer
@@ -572,13 +575,13 @@ for(i in seq(1,length(mlist_hcr))){
 
 if(write){
   # save simulation outputs for future use
-  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
-  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-5_splitTC_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.rds')))
+  # saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-3_splitTC_hcrE_10K_',d,'.rds')))
+  saveRDS(hcr_out, here('data','qnm_out',paste0('mse0-4_splitTC_hcrE_10K_',d,'.rds')))
 } 
 
   if(plot_out){
   # save simulation output as an image
-  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM3),c(p_hcr,PertOM4),c(p_hcr,PertOM5))
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM2),c(p_hcr,PertOM3),c(p_hcr,PertOM4))
   compare.table <- compare.models.impact.tbl(sim.list=hcr_out, # **named** list of simulations to look at
                                              perturb.list=pert_list,
                                              monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
@@ -590,7 +593,7 @@ if(write){
   plot.out <- compare.table[[3]] + ggtitle("HCR E: Remove Inshore Small Mesh Fishery 1")
   plot.out
   
-  png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrE_10K_',format(Sys.Date(),"%Y%m%d"),'.png')), res=300,height=1500,width=2800)
+  png(here('data','qnm_out', paste0('mse0-4_splitTC_hcrE_10K_',d,'.png')), res=300,height=1500,width=2800)
     plot.out
     dev.off()}
 
@@ -644,18 +647,42 @@ dev.off()
 
 `system.simulate` output should have been saved as lists from qnm_mse_master.R
 ```{r}
-sim.date <- format(Sys.Date(),"%Y%m%d")
+sim.date <- d
 # sim.date <- '20250421'
-hcrA_out <- readRDS(here('data','qnm_out',paste0('mse0-5_splitTC_hcrA_10K_',sim.date,'.rds')))
-hcrB_out <- readRDS(here('data','qnm_out',paste0('mse0-5_splitTC_hcrB_10K_',sim.date,'.rds')))
-hcrC_out <- readRDS(here('data','qnm_out',paste0('mse0-5_splitTC_hcrC_10K_',sim.date,'.rds')))
-hcrD_out <- readRDS(here('data','qnm_out',paste0('mse0-5_splitTC_hcrD_10K_',sim.date,'.rds')))
-hcrE_out <- readRDS(here('data','qnm_out',paste0('mse0-5_splitTC_hcrE_10K_',sim.date,'.rds')))
+hcrA_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrA_10K_',sim.date,'.rds')))
+hcrB_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrB_10K_',sim.date,'.rds')))
+hcrC_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrC_10K_',sim.date,'.rds')))
+hcrD_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrD_10K_',sim.date,'.rds')))
+hcrE_out <- readRDS(here('data','qnm_out',paste0('mse0-4_splitTC_hcrE_10K_',sim.date,'.rds')))
 
 hcr_out <- list(hcrA_out,hcrB_out,hcrC_out,hcrD_out,hcrE_out)
 names(hcr_out) <- c("A","B","C","D","E")
 ```
 
+
+
+forgot to set plot_out = TRUE
+```{r}
+for(i in 1:length(hcr_out)){
+  tmp_hcr <- hcr_out[[i]]
+  p_hcr <- Pert.list[[i]]
+  # save simulation output as an image
+  pert_list <- list(p_hcr,p_hcr,c(p_hcr,PertOM2),c(p_hcr,PertOM3),c(p_hcr,PertOM4))
+  compare.table <- compare.models.impact.tbl(sim.list=tmp_hcr, # **named** list of simulations to look at
+                                             perturb.list=pert_list,
+                                             monitor.list=list(NA,NA,NA,NA,NA), # list of variable outcomes monitored (I don't use this)
+                                             strong_lower=0.8, weak_lower=0.6,
+                                             epsilon=1.0E-5,
+                                             plot=TRUE, main.axis="X",plot.perturbed=FALSE,
+                                             variable.key=vkey2,variable.order="specific_order")
+  ## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
+  compare.table[[3]] + ggtitle(paste0("HCR: ", names(hcr_out)[i]))
+  
+  png(here('data','qnm_out', paste0('mse0-4_splitTC_hcr',names(hcr_out)[i],'_10K_',d,'.png')), res=300,height=2200,width=1800)
+   compare.table[[3]] + ggtitle(paste0("HCR: ", names(hcr_out)[i]))
+    dev.off()
+    }
+```
 
 
 
@@ -664,13 +691,13 @@ names(hcr_out) <- c("A","B","C","D","E")
 
 Create a data frame to order the variables in the output tables (only including variables that are output for MSE)
 ```{r}
-vkey <- data.frame(variable=c("Total catch Lg","Total catch Sm", "Fishery 1 Lg", "Fishery 1 Sm", "Fishery 2", "spawning biomass"),
+vkey_sub <- data.frame(variable=c("Total catch Lg","Total catch Sm", "Fishery 1 Lg", "Fishery 1 Sm", "Fishery 2", "spawning biomass"),
                    specific.order=c(1,2,3,4,5,6))
 ```
 
 These match QNM / HCR codes to text descriptors, for table columns
 ```{r}
-table.key <- read_csv(here('data','mse_table_key.csv'))
+table.key <- read_csv(here('data','mse_table_key_revised.csv'))
 ```
 
 
@@ -690,14 +717,33 @@ table.0 %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg',
   dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
   mutate(p_sim=round(p_sim,0))
 
-# write_csv(table.0, here('results',paste0('qnm0_hcrB-D_MSEtable_',sim.date,'.csv')))
+write_csv(table.0, here('data','results',paste0('qnm0_hcrB-D_MSEtable_',sim.date,'.csv')))
 ```
 
 
-### QNM 2 Thorson Effort 
+### QNM 1 Thorson Effort 
 ```{r}
-pert.2 <- list(PertA,PertB,PertC,PertD,PertE)
-sims.2 <- sapply(hcr_out,"[",2)    # second simulation in every list
+pert.1 <- list(PertA,PertB,PertC,PertD,PertE)
+sims.1 <- sapply(hcr_out,"[",2)    # second simulation in every list
+names(sims.1) <- c("A","B","C","D","E")
+
+table.1 <- compare.models.MSEtable(sim.list = sims.1, perturb.list = pert.1,
+                                   monitor.list = list(NA,NA,NA,NA,NA), no.response=0) %>%
+  mutate(QNM=1) %>% rename(HCR=model) %>%
+  left_join(table.key)
+
+table.1 %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg',variable)) %>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
+  mutate(p_sim=round(p_sim,0))
+
+write_csv(table.1, here('data','results',paste0('qnm1_hcrB-D_MSEtable_',sim.date,'.csv')))
+```
+
+
+### QNM 2 Less recruitment
+```{r}
+pert.2 <- lapply(pert.1, FUN=function(x){return(c(x,PertOM2))})     
+
+sims.2 <- sapply(hcr_out,"[",3)    # third simulation in every list
 names(sims.2) <- c("A","B","C","D","E")
 
 table.2 <- compare.models.MSEtable(sim.list = sims.2, perturb.list = pert.2,
@@ -708,15 +754,15 @@ table.2 <- compare.models.MSEtable(sim.list = sims.2, perturb.list = pert.2,
 table.2 %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg',variable)) %>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
   mutate(p_sim=round(p_sim,0))
 
-# write_csv(table.2, here('results',paste0('qnm2_hcrB-D_MSEtable_',sim.date,'.csv')))
+write_csv(table.2, here('data','results',paste0('qnm2_hcrA-D_MSEtable_',sim.date,'.csv')))
 ```
 
 
-### QNM 3 Less recruitment
+### QNM 3 Offshore biomass inaccessible 
 ```{r}
-pert.3 <- lapply(pert.2, FUN=function(x){return(c(x,PertOM3))})     
+pert.3 <- lapply(pert.1, FUN=function(x){return(c(x,PertOM3))})     
 
-sims.3 <- sapply(hcr_out,"[",3)    # second simulation in every list
+sims.3 <- sapply(hcr_out,"[",4)    # fourth simulation in every list
 names(sims.3) <- c("A","B","C","D","E")
 
 table.3 <- compare.models.MSEtable(sim.list = sims.3, perturb.list = pert.3,
@@ -724,18 +770,18 @@ table.3 <- compare.models.MSEtable(sim.list = sims.3, perturb.list = pert.3,
   mutate(QNM=3) %>% rename("HCR"="model") %>%
   left_join(table.key)
 
-table.3 %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg',variable)) %>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
+table.3  %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg',variable)) %>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
   mutate(p_sim=round(p_sim,0))
 
-# write_csv(table.3, here('results',paste0('qnm3_hcrB-D_MSEtable_',sim.date,'.csv')))
+write_csv(table.3, here('data','results',paste0('qnm3_hcrA-D_MSEtable_',sim.date,'.csv')))
 ```
 
+### QNM 5 Faster growth
 
-### QNM 4 Offshore biomass inaccessible 
 ```{r}
-pert.4 <- lapply(pert.2, FUN=function(x){return(c(x,PertOM4))})     
+pert.4 <- lapply(pert.1, FUN=function(x){return(c(x,PertOM4))})     
 
-sims.4 <- sapply(hcr_out,"[",4)    # second simulation in every list
+sims.4 <- sapply(hcr_out,"[",5)    # fifth simulation in every list
 names(sims.4) <- c("A","B","C","D","E")
 
 table.4 <- compare.models.MSEtable(sim.list = sims.4, perturb.list = pert.4,
@@ -746,26 +792,7 @@ table.4 <- compare.models.MSEtable(sim.list = sims.4, perturb.list = pert.4,
 table.4  %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg',variable)) %>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
   mutate(p_sim=round(p_sim,0))
 
-# write_csv(table.4, here('results',paste0('qnm4_hcrB-D_MSEtable_',sim.date,'.csv')))
-```
-
-### QNM 5 Faster growth
-
-```{r}
-pert.5 <- lapply(pert.2, FUN=function(x){return(c(x,PertOM5))})     
-
-sims.5 <- sapply(hcr_out,"[",5)    # second simulation in every list
-names(sims.5) <- c("A","B","C","D","E")
-
-table.5 <- compare.models.MSEtable(sim.list = sims.5, perturb.list = pert.5,
-                                   monitor.list = list(NA,NA,NA,NA,NA), no.response=0) %>%
-  mutate(QNM=5) %>% rename("HCR"="model") %>%
-  left_join(table.key)
-
-table.5  %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg',variable)) %>% dplyr::select(all_of(colnames(table.key)),variable, response,change,p_sim, node_to_perturb) %>%
-  mutate(p_sim=round(p_sim,0))
-
-# write_csv(table.5, here('results',paste0('qnm5_hcrB-D_MSEtable_',sim.date,'.csv')))
+write_csv(table.4, here('data','results',paste0('qnm4_hcrA-D_MSEtable_',sim.date,'.csv')))
 ```
 
 
@@ -773,37 +800,37 @@ table.5  %<>% mutate(variable=ifelse(variable=='Total catch Ls','Total catch Lg'
 
 First, just for the variables tracked in the MSE
 ```{r}
-bind_rows(table.0,table.2,table.3,table.4,table.5) %>%
-  filter(variable %in% vkey$variable) %>%
+bind_rows(table.0,table.1,table.2,table.3,table.4) %>%
+  filter(variable %in% vkey_sub_sub$variable) %>%
   ## make each variable in the variable key its own column
   dplyr::select(Code,`Operating model`,`Management strategy`,variable,response) %>%
   pivot_wider(names_from="variable",values_from="response") %>%
-  ## reorder to match vkey specific order
-  dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey$variable)) %>%
-  write_csv(here('data','results','split_tc',paste0('qnm0-5_perfmet_splitTC_hcra-e_qualitative_',sim.date,'.csv')))
+  ## reorder to match vkey_sub specific order
+  dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey_sub$variable)) %>%
+  write_csv(here('data','results','split_tc',paste0('qnm0-4_perfmet_splitTC_hcra-e_qualitative_',sim.date,'.csv')))
 
-bind_rows(table.0,table.2,table.3,table.4,table.5) %>% 
-  filter(variable %in% vkey$variable) %>%
+bind_rows(table.0,table.1,table.2,table.3,table.4) %>% 
+  filter(variable %in% vkey_sub$variable) %>%
   ## make each variable in the variable key its own column
   mutate(p_sim=ifelse(change=="neg",p_sim*-1,p_sim)) %>%
   dplyr::select(Code,`Operating model`,`Management strategy`,variable,p_sim) %>%
   pivot_wider(names_from="variable",values_from="p_sim") %>%
-  ## reorder to match vkey specific order
-  dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey$variable)) %>%
-  write_csv(here('data','results','split_tc',paste0('qnm0-5_perfmet_splitTC_hcra-e_pSims_',sim.date,'.csv')))
+  ## reorder to match vkey_sub specific order
+  dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey_sub$variable)) %>%
+  write_csv(here('data','results','split_tc',paste0('qnm0-4_perfmet_splitTC_hcra-e_pSims_',sim.date,'.csv')))
 ```
 
 
 Then, for every variable in the QNMs
 ```{r}
-bind_rows(table.0,table.2,table.3,table.4,table.5) %>%
+bind_rows(table.0,table.1,table.2,table.3,table.4) %>%
   dplyr::select(Code,`Operating model`,`Management strategy`,variable,response) %>%
-  write_csv(here('data','qnm_out',paste0('qnm0-5_splitTC_hcra-e_qualitative_',sim.date,'.csv')))
+  write_csv(here('data','qnm_out',paste0('qnm0-4_splitTC_hcra-e_qualitative_',sim.date,'.csv')))
 
-bind_rows(table.0,table.2,table.3,table.4,table.5) %>% 
+bind_rows(table.0,table.1,table.2,table.3,table.4) %>% 
   mutate(p_sim=ifelse(change=="neg",p_sim*-1,p_sim)) %>%
   dplyr::select(Code,`Operating model`,`Management strategy`,variable,p_sim) %>%
-  write_csv(here('data','qnm_out',paste0('qnm0-5_splitTC_hcra-e_pSims_',sim.date,'.csv')))
+  write_csv(here('data','qnm_out',paste0('qnm0-4_splitTC_hcra-e_pSims_',sim.date,'.csv')))
 ```
 
 
@@ -811,7 +838,7 @@ bind_rows(table.0,table.2,table.3,table.4,table.5) %>%
 
 melt tables from previous section so that they can be combined
 ```{r eval=TRUE}
-qnm <- bind_rows(table.0,table.2,table.3,table.4,table.5) %>% 
+qnm <- bind_rows(table.0,table.1,table.2,table.3,table.4) %>% 
   mutate(p_sim=ifelse(change=="neg",p_sim*-1,p_sim)) %>%
   dplyr::select(Code,`Operating model`,`Management strategy`,variable,p_sim)
 
@@ -829,11 +856,28 @@ qnm0 <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allH
 qnm0 %<>% filter(variable_out %in% c("fishery_1_catch","total_catch"))
 ```
 
+[update model numbers from unsplit output]
+```{r}
+qnm0 %<>% mutate(code=case_when(
+  grepl('2',code) ~ str_replace(code,'2','1'),
+  grepl('3',code) ~ str_replace(code,'3','2'),
+  grepl('4',code) ~ str_replace(code,'4','3'),
+  grepl('5',code) ~ str_replace(code,'5','4'), .default=code
+))
+qnm0 %<>% mutate(operating_model=case_when(
+  grepl('2.',operating_model) ~ str_replace(operating_model,'2.','1.'),
+  grepl('3.',operating_model) ~ str_replace(operating_model,'3.','2.'),
+  grepl('4.',operating_model) ~ str_replace(operating_model,'4.','3.'),
+  grepl('5.',operating_model) ~ str_replace(operating_model,'5.','4.'), .default=operating_model
+))
+```
 
 match
 ```{r}
 qvq <- qnm %>%
   bind_rows(select(qnm0 %>% rename(variable=variable_out, p_sim=psims), all_of(colnames(qnm))))
+
+qvq %<>% filter(code!='1-A')
 ```
 
 
@@ -841,20 +885,18 @@ qvq <- qnm %>%
 msorder <- c("A. Status-quo","B. Eliminate fishery 1","C. Fishery 1 in \"offshore\" only, effort changes",
              "D. Increase fishery mesh size", "E. Fishery 1 in \"offshore\" only")
 qvq %>% mutate(group=ifelse(grepl('1',variable),'Fishery 1','Total catch')) %>%
+  mutate(certainty=case_when(abs(p_sim)<60 ~ 0,
+                               abs(p_sim)>=60 & abs(p_sim)<80 ~ 1,
+                               abs(p_sim)>=80 ~ 2)) %>%
   filter(!grepl('5',code)) %>%
   mutate(management_strategy=fct_relevel(management_strategy,rev(msorder))) %>%
 ggplot(aes(y=management_strategy,x=variable)) +
-  geom_point(aes(size=p_sim, col=p_sim)) +
+  geom_point(aes(size=certainty, col=p_sim)) +
   facet_wrap(~operating_model*group, ncol=4, scales='free_x') +
   scale_color_gradient(low='darkorange',high='deepskyblue') +
   theme_bw() + theme(axis.text.x=element_text(angle=30,hjust=1))
 ```
 
-list when things look different:
-```{r}
-to_keep <- data.frame(code=c('0-B','2-D','2-B','2-D','3-C','3-B','3-C','4-E','4-B','4-E'),
-                      group='total_catch','fishery_1','total_catch','total_catch','fishery_1','total_catch','total_catch','fishery_1','total_catch','total_catch')
-```
 
 do we get fewer equivocal answers when splitting into large/small?
 ```{r}
