@@ -914,6 +914,16 @@ The original MSE table is from the MSE software. If this isn't the first time ru
 ```{r eval=TRUE}
 mse_format <- read_csv(here('data','results','split_tc','mse0-7_splitTC_hcrb-d_species1-2_202504246.csv'))
 ```
+adjust model names
+```{r}
+mse_format %<>% mutate(code=case_when(
+  grepl('2',code) ~ str_replace(code,'2','1'),
+  grepl('3',code) ~ str_replace(code,'3','2'),
+  grepl('4',code) ~ str_replace(code,'4','3'),
+  grepl('5',code) ~ str_replace(code,'5','4'), .default=code
+))
+```
+
 
 ### first run: formatting
 ```{r eval=FALSE}
@@ -971,16 +981,10 @@ triage_sm <- qvm_sm %>%
   mutate(triage_noEquiv=ifelse(qnm_equiv==1 & mse_prob < 0, 'false positive', 
                                ifelse(qnm_equiv==1 & mse_prob > 0, 'true positive',
                                       ifelse(qnm_equiv==0, triage, NA))))
+
+triage_sm %<>% mutate(group="small fish")
 ## check against excel table
 to_plot_sm <- triage_sm %>%
-  ## rename oms!
-  mutate(operating_model=case_when(
-    operating_model=="2. Thorson effort" ~ "1. Thorson effort",
-    operating_model=="3. Lower productivity" ~ "2. Lower productivity",
-    operating_model=="4. Move \"far offshore\"" ~ "3. Move \"far offshore\"",
-    operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
-    .default=operating_model
-  )) %>%
   mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
   mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
@@ -989,7 +993,7 @@ to_plot_sm <- triage_sm %>%
   mutate(variable=case_when(variable=='fishery_1_sm' ~ 'Fishery 1',
                                                variable=='total_catch_sm' ~ 'Total catch')) %>%
   mutate(variable=factor(variable,levels=c('Total catch','Fishery 1'))) %>% 
-  mutate(management_strat_short=str_sub(management_strategy,1,1)) %>%
+  separate(code, into=c('om_short','management_strat_short'), sep='-',remove=FALSE) %>%
   mutate(management_strat_short=fct_rev(management_strat_short))
   
   ggplot(to_plot_sm, aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
@@ -997,8 +1001,10 @@ to_plot_sm <- triage_sm %>%
   facet_grid(rows=vars(species), cols=vars(variable)) +
   # scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
   # scale_alpha_manual(values=c(1,0.5,1,0.5)) +
-  scale_fill_manual(values=c('dodgerblue4','dodgerblue4','darkorange'), na.value='white') + theme_bw() +
-  scale_alpha_manual(values=c(1,0.5,1), na.value=0) +
+  scale_fill_manual(values=c('dodgerblue4','dodgerblue4','darkorange'), 
+                    breaks=c('false positive','false positive, equiv','false negative'), na.value='white') + theme_bw() +
+  scale_alpha_manual(values=c(1,0.5,1), 
+                     breaks=c('false positive','false positive, equiv','false negative'), na.value=0) +
   labs(x='Operating model scenario',y='Management strategy') +
   theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
                      legend.title=element_blank())
@@ -1047,7 +1053,8 @@ triage_lg <- qvm_lg %>%
                                      ifelse(qnm_psims < 0 & mse_prob > 0, 'false negative', NA))))) %>%
   mutate(triage_noEquiv=ifelse(qnm_equiv==1 & mse_prob < 0, 'false positive', 
                                ifelse(qnm_equiv==1 & mse_prob > 0, 'true positive',
-                                      ifelse(qnm_equiv==0, triage, NA))))
+                                      ifelse(qnm_equiv==0, triage, NA)))) %>%
+  mutate(group='large fish')
 ## check against excel table
 to_plot_lg <- triage_lg %>%
   ## rename oms!
@@ -1066,7 +1073,7 @@ to_plot_lg <- triage_lg %>%
   mutate(variable=case_when(variable=='fishery_1_catch' ~ 'Fishery 1',
                                                variable=='total_catch' ~ 'Total catch')) %>%
   mutate(variable=factor(variable,levels=c('Total catch','Fishery 1'))) %>% 
-  mutate(management_strat_short=str_sub(management_strategy,1,1)) %>%
+  separate(code, into=c('om_short','management_strat_short'), sep='-',remove=FALSE) %>%
   mutate(management_strat_short=fct_rev(management_strat_short))
 
   ggplot(to_plot_lg, aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
@@ -1099,9 +1106,10 @@ dev.off()
 
 we need to read in the table from the original.
 ```{r}
-qvm0 <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_20240923.csv')))
-
-qvm0 %<>% filter(variable_out %in% c("fishery_1_catch","total_catch"))
+# qvm0 <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_20240923.csv')))
+# 
+# qvm0 %<>% filter(variable_out %in% c("fishery_1_catch","total_catch"))
+# 
 
 # Identify false/true positives/negatives ---------------------------------------------------------
 
@@ -1120,10 +1128,12 @@ triage0 <- qvm0 %>%
   mutate(triage_noEquiv=ifelse(qnm_equiv==1 & mse_prob < 0, 'false positive', 
                                ifelse(qnm_equiv==1 & mse_prob > 0, 'true positive',
                                       ifelse(qnm_equiv==0, triage, NA))))
-## check against excel table
+
+triage0 %<>% mutate(group='all')
+
 to_plot0 <- triage0 %>%
   rename(variable=variable_out) %>%
-  ## rename oms!
+  # rename oms!
   mutate(operating_model=case_when(
     operating_model=="2. Thorson effort" ~ "1. Thorson effort",
     operating_model=="3. Lower productivity" ~ "2. Lower productivity",
@@ -1131,6 +1141,12 @@ to_plot0 <- triage0 %>%
     operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
     .default=operating_model
   )) %>%
+  mutate(code=case_when(
+  grepl('2',code) ~ str_replace(code,'2','1'),
+  grepl('3',code) ~ str_replace(code,'3','2'),
+  grepl('4',code) ~ str_replace(code,'4','3'),
+  grepl('5',code) ~ str_replace(code,'5','4'), .default=code
+)) %>%
   mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
   mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
@@ -1139,7 +1155,7 @@ to_plot0 <- triage0 %>%
   mutate(variable=case_when(variable=='fishery_1_catch' ~ 'Fishery 1',
                                                variable=='total_catch' ~ 'Total catch')) %>%
   mutate(variable=factor(variable,levels=c('Total catch','Fishery 1'))) %>% 
-  mutate(management_strat_short=str_sub(management_strategy,1,1)) %>%
+  separate(code, into=c('om_short','management_strat_short'), sep='-',remove=FALSE) %>%
   mutate(management_strat_short=fct_rev(management_strat_short))
 
 
@@ -1147,46 +1163,90 @@ to_plot0 <- triage0 %>%
 
 put everything in one data frame.
 ```{r}
-to_plot_all <- bind_rows(to_plot0 %>% mutate(set='combined'),
-          to_plot_lg %>% mutate(set='large / adults'),
-          to_plot_sm %>% mutate(set='small / juveniles'))
+to_plot_all <- bind_rows(to_plot0,
+          to_plot_lg,
+          to_plot_sm)
+# to_plot_all <- bind_rows(to_plot0 %>% mutate(set='combined'),
+#           to_plot_lg %>% mutate(set='large / adults'),
+#           to_plot_sm %>% mutate(set='small / juveniles'))
 ```
 
-plot
+plot -- this is too wide!
 ```{r}
-msorder <- c("A. Status-quo","B. Eliminate fishery 1","C. Fishery 1 in \"offshore\" only, effort changes",
+msorder <- c("A. Status-quo","B. Eliminate fishery 1","C. Fishery 1 in \"offshore\" only, effort spillover",
              "D. Increase fishery mesh size", "E. Fishery 1 in \"offshore\" only")
 to_plot_all %>%
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
                                                   'false positive', 'false positive, equiv'))) %>%
-   ggplot(aes(x=set,y=management_strat_short, fill=triage_equiv, alpha=triage_equiv)) +
+   ggplot(aes(x=group,y=management_strat_short, fill=triage_equiv, alpha=triage_equiv)) +
   geom_tile() +
   facet_grid(species ~ variable+operating_model) +
-  scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), na.value='white') + theme_bw() +
-  scale_alpha_manual(values=c(1,0.5,1,0.5), na.value=0) +
-  labs(x='Operating model scenario',y='Management strategy', title='large / adults') +
+  scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), 
+                    breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                    na.value='white', name='') + theme_bw() +
+  scale_alpha_manual(values=c(1,0.5,1,0.5), 
+                     breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                     na.value=0, name='') +
+  labs(x='Size Class',y='Management strategy') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
+```
+```{r}
+to_plot_all %>%
+  mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
+                                                  'false positive', 'false positive, equiv'))) %>%
+  mutate(management_strat_short=fct_relevel(management_strat_short,c('A','B','C','D','E'))) %>%
+   ggplot(aes(y=fct_rev(group),x=rev(management_strat_short), fill=triage_equiv, alpha=triage_equiv)) +
+  geom_tile() +
+  facet_grid(variable+om_short~species) +
+  scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), 
+                    breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                    na.value='white', name='') + theme_bw() +
+  scale_alpha_manual(values=c(1,0.5,1,0.5), 
+                     breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                     na.value=0, name='') +
+  labs(y='Size Class',x='Management strategy') +
   theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
 ```
 
 save
 ```{r}
-png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison.png'), res=300, height=1300,width=3500)
+png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison.png'), res=300, height=3200,width=1800)
 to_plot_all %>%
-  mutate(om_short=case_when(grepl("0",code) ~ operating_model,
-                            grepl("2",code) ~ "1.Thorson E",
-                            grepl("3",code) ~ "2.Low Product",
-                            grepl("4",code) ~ "3.Far Offshore",
-                            grepl("5",code) ~ "4.Fast Growth")) %>%
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
                                                   'false positive', 'false positive, equiv'))) %>%
-   ggplot(aes(x=set,y=management_strat_short, fill=triage_equiv, alpha=triage_equiv)) +
+  mutate(management_strat_short=fct_relevel(management_strat_short,c('A','B','C','D','E'))) %>%
+   ggplot(aes(y=fct_rev(group),x=rev(management_strat_short), fill=triage_equiv, alpha=triage_equiv)) +
   geom_tile() +
-  facet_grid(species ~ variable+om_short) +
-  scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), na.value='white') + theme_bw() +
-  scale_alpha_manual(values=c(1,0.5,1,0.5), na.value=0) +
-  labs(x='Which Fish?',y='Management strategy') +
-  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),legend.title=element_blank())
+  facet_grid(variable+om_short~species) +
+  scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), 
+                    breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                    na.value='white', name='') + theme_bw() +
+  scale_alpha_manual(values=c(1,0.5,1,0.5), 
+                     breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                     na.value=0, name='') +
+  labs(y='Size Class',x='Management strategy') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
 dev.off()
 ```
 
 
+I actually like when they results are grouped by size class better...
+```{r}
+png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison2.png'), res=300, height=1200,width=3200)
+to_plot_all %>%
+  mutate(management_strategy=ifelse(grepl("C", management_strategy), str_replace(management_strategy, "changes","spillover"), as.character(management_strategy))) %>%
+  mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
+                                                  'false positive', 'false positive, equiv'))) %>%
+ ggplot(aes(x=operating_model,y=fct_rev(management_strategy), fill=triage_equiv, alpha=triage_equiv)) +
+  geom_tile() +
+  facet_grid(species~variable+group) +
+  scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), 
+                    breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                    na.value='white', name='') + theme_bw() +
+  scale_alpha_manual(values=c(1,0.5,1,0.5), 
+                     breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+                     na.value=0, name='') +
+  labs(x='Operating model scenario',y='Management strategy') +
+  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
+dev.off()
+```
