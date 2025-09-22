@@ -200,24 +200,29 @@ summarise_mismatches <- speciesALL_compare %>%
                               ifelse(psims > 0 & abs(psims) != 50, "positive","split")),
          mse_direction=ifelse(prob < 0, "negative","positive")) %>%
   mutate(qnm_equiv=ifelse(abs(psims) < 60, 1,0)) %>%
-  mutate(directional_mismatch=ifelse(qnm_direction==mse_direction,0,
-                                     ifelse(qnm_equiv==1,1,2))) %>%
-  dplyr::select(code,model.y,variable_out,directional_mismatch) %>%
-  pivot_wider(id_cols=c(code,model.y), names_from=variable_out,values_from=directional_mismatch)
+  mutate(compare_dir=case_when(
+    qnm_direction==mse_direction & qnm_equiv==0 ~ 'match',
+    qnm_direction==mse_direction & qnm_equiv==1 ~ 'match - qnm equivocal',
+    qnm_direction!=mse_direction & qnm_equiv==0 ~ 'mismatch',
+    qnm_direction!=mse_direction & qnm_equiv==1 ~ 'mismatch - qnm equivocal',.default=NA)) %>%
+  dplyr::select(code,model.y,variable_out,compare_dir) 
 ```
 
 
 mismatches summarized across OMs/HCRs for each variable:
 ```{r}
 out1 <- summarise_mismatches %>% 
-  pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
-  group_by(model.y,variable,mismatch_type) %>%
+  # pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
+  group_by(model.y,variable_out,compare_dir) %>%
   summarise(n=n()) %>%
-  pivot_wider(names_from="mismatch_type",values_from="n", values_fill = 0) %>%
-  adorn_percentages(denominator="row") %>%
-  mutate(match=round(`0`,2),
-         `mismatch - qnm equivocal`=round(`1`,2),
-         `mismatch`=round(`2`,2)) %>% dplyr::select(-c(`0`,`1`,`2`))
+  bind_rows(
+    summarise_mismatches %>% 
+      # pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
+      group_by(model.y,compare_dir) %>%
+      summarise(n=n()) %>% mutate(variable_out='all')
+  ) %>%
+  pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0) %>%
+  adorn_percentages(denominator="row")
 
 kbl(out1)
 ```
@@ -227,11 +232,10 @@ Add a list column that saves exactly which OM-HCRs were true mismatches
 out1 %<>%
   left_join(
     summarise_mismatches %>% 
-      pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
-      group_by(model.y,variable,mismatch_type) %>%
+      group_by(model.y,variable_out,compare_dir) %>%
       summarise(mismatch_codes=paste0(code,collapse=", ")) %>%
-      filter(mismatch_type==2) %>%
-      dplyr::select(model.y,variable,mismatch_codes)
+      filter(compare_dir=='mismatch') %>%
+      dplyr::select(model.y,variable_out,mismatch_codes)
   )
 ```
 
@@ -242,16 +246,17 @@ write_csv(out1, here('data','results',paste0('qnmVmse_mismatches_bySpbyVar',sim.
 
 # as nice table
 out1 %>%
-  mutate(across(match:mismatch, as.character)) %>%
-  pivot_longer(cols=c("match","mismatch - qnm equivocal","mismatch","mismatch_codes"), names_to="Qual v Quant", values_to="tmp_p") %>%
-  pivot_wider(id_cols=c("model.y","Qual v Quant"), names_from="variable",values_from="tmp_p") %>%
-  ungroup() %>% dplyr::select(`Qual v Quant`, total_catch, fishery_1_catch, fishery_2_catch,spawning_biomass) %>%
-  rename(Total=total_catch, `Fishery 1`=fishery_1_catch, `Fishery 2`=fishery_2_catch, `Spawning Biomass`=spawning_biomass) %>%
+  mutate(across(match:`mismatch - qnm equivocal`, round,digits=3)) %>%
+  mutate(across(match:`mismatch - qnm equivocal`, as.character)) %>%
+  pivot_longer(cols=c("match","match - qnm equivocal","mismatch - qnm equivocal","mismatch","mismatch_codes"), names_to="Qual v Quant", values_to="tmp_p") %>%
+  pivot_wider(id_cols=c("model.y","Qual v Quant"), names_from="variable_out",values_from="tmp_p") %>%
+  ungroup() %>% dplyr::select(`Qual v Quant`, total_catch, fishery_1_catch, fishery_2_catch,spawning_biomass, all) %>%
+  rename(Total=total_catch, `Fishery 1`=fishery_1_catch, `Fishery 2`=fishery_2_catch, `Spawning Biomass`=spawning_biomass, Overall=all) %>%
     kbl() %>%
     kable_classic_2(full_width = F) %>%
-      add_header_above(c(" ", "Catch" = 3, " " = 1)) %>%
-  pack_rows("Species 1", 1, 4) %>%
-  pack_rows("Species 2", 5, 8)
+      add_header_above(c(" ", "Catch" = 3, " " = 2)) %>%
+  pack_rows("Species 1", 1, 5) %>%
+  pack_rows("Species 2", 6, 10)
   
 ```
 
@@ -259,30 +264,74 @@ out1 %>%
 mismatches summarized across variables for OMs/HCRs:
 ```{r}
 out2 <- summarise_mismatches %>% 
-  pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
-  group_by(model.y,code,mismatch_type) %>%
+  group_by(model.y,code,compare_dir) %>%
   summarise(n=n()) %>%
-  pivot_wider(names_from="mismatch_type",values_from="n", values_fill = 0) %>%
-  rename(match=`0`,
-         `mismatch - qnm equivocal`=`1`,
-         `mismatch`=`2`) %>%
-  filter(`mismatch` > 0) %>%
+  pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0) %>%
   dplyr::select(model.y,code,mismatch) %>%
   separate(code, into=c("OM","HCR")) %>%
-  pivot_wider(names_from="HCR",values_from="mismatch",values_fill=0) %>%
+  mutate(OM=ifelse(as.numeric(OM) > 0, as.numeric(as.character(OM))-1, OM)) %>%
+  pivot_wider(names_from="HCR",values_from="mismatch",values_fill=NA) %>%
   dplyr::select(model.y,OM, A,B,C,D,E) 
+# totals for each row (OM)
+out2 %<>% mutate(total =rowSums(across(where(is.numeric)), na.rm=TRUE))
+# totals for each column (HCR)
+out2 %<>% filter(grepl('1',model.y)) %>%
+  adorn_totals("row", name='MSE-Species1') %>%
+  bind_rows(out2 %>% filter(grepl('2',model.y)) %>%
+  adorn_totals("row", name=' MSE-Species2', na.rm=TRUE))
+out2 %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
+
  out2 %>%
    ungroup() %>% dplyr::select(-model.y) %>%
    kbl() %>%
     kable_paper(full_width = T) %>%
-   pack_rows("Species 1", 1, 4) %>%
-  pack_rows("Species 2", 5, 9) %>%
-   column_spec(1, bold=T)
+   pack_rows("Species 1", 1, 6) %>%
+  pack_rows("Species 2", 7,12) %>%
+   column_spec(1, bold=T) %>%
+   column_spec(7, italic=T) %>%
+  row_spec(c(6,12), italic=T)
 ```
  
 ```{r eval=FALSE}
-  write_csv(out2, here('data','results',paste0('qnmVmse_mismatches_byOMbyHCR',sim.date,'.csv')))
+  write_csv(out2, here('data','results',paste0('qnmVmse_mismatches_count_byOMbyHCR',sim.date,'.csv')))
 ```
+
+
+what happens when we include equivocal results?
+```{r}
+out2e <- summarise_mismatches %>% 
+  mutate(compare_dir=ifelse(compare_dir=='mismatch - qnm equivocal','mismatch',compare_dir)) %>%
+  group_by(model.y,code,compare_dir) %>%
+  summarise(n=n()) %>%
+  pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0) %>%
+  dplyr::select(model.y,code,mismatch) %>%
+  separate(code, into=c("OM","HCR")) %>%
+  mutate(OM=ifelse(as.numeric(OM) > 0, as.numeric(as.character(OM))-1, OM)) %>%
+  pivot_wider(names_from="HCR",values_from="mismatch",values_fill=0) %>%
+  dplyr::select(model.y,OM, A,B,C,D,E) 
+# totals for each row (OM)
+out2e %<>% mutate(total =rowSums(across(where(is.numeric))))
+# totals for each column (HCR)
+out2e %<>% filter(grepl('1',model.y)) %>%
+  adorn_totals("row", name='MSE-Species1') %>%
+  bind_rows(out2e %>% filter(grepl('2',model.y)) %>%
+  adorn_totals("row", name=' MSE-Species2'))
+out2e %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
+
+ out2e %>%
+   ungroup() %>% dplyr::select(-model.y) %>%
+   kbl() %>%
+    kable_paper(full_width = T) %>%
+   pack_rows("Species 1", 1, 6) %>%
+  pack_rows("Species 2", 7,12) %>%
+   column_spec(1, bold=T) %>%
+   column_spec(7, italic=T) %>%
+  row_spec(c(6,12), italic=T)
+```
+
+
+
+
 
 plotting. aggregate across HCRs; look at OMs (x facet) by species (y facet)
 ```{r eval=FALSE}
