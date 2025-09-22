@@ -229,7 +229,7 @@ tos2_total %>%
   scale_x_discrete(position='top') +
   scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
-  theme(legend.title=element_blank()) -> plot.total.equiv
+  theme(legend.title=element_blank(), strip.text=element_blank()) -> plot.total.equiv
 
 plot.total.equiv
 
@@ -357,7 +357,7 @@ tos2_fish1 %>%
   scale_x_discrete(position='top') +
   scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
-  theme(legend.title=element_blank()) -> plot.fish1.equiv
+  theme(legend.title=element_blank(), strip.text=element_blank()) -> plot.fish1.equiv
 
 plot.fish1.equiv
 
@@ -485,7 +485,7 @@ tos2_fish2 %>%
   scale_x_discrete(position='top') +
   scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
-  theme(legend.title=element_blank()) -> plot.fish2.equiv
+  theme(legend.title=element_blank(), strip.text=element_blank()) -> plot.fish2.equiv
 
 plot.fish2.equiv
 
@@ -511,15 +511,22 @@ plot_grid(plotlist=list(
 ), ncol=1, nrow=3)
 dev.off()
 
-png(here('data','results','fig7-tradeoffs-separate-equiv.png'), res=300,height=3100,width=2100)
-plot_grid(plotlist=list(
-  plot.total.equiv+theme(plot.margin = unit(c(1, 0, 2, 0), "lines")),
-  plot.fish1.equiv+theme(plot.margin = unit(c(0, 0, 2, 0), "lines")),
-  plot.fish2.equiv+theme(plot.margin = unit(c(0, 0, 2, 0), "lines"))
-), labels=c("(a) Total catch (sp.1)                         (d) Total catch (sp.2)", 
-            "(b) Fishery 1 catch (sp.1)                  (e) Fishery 1 catch (sp.2)", 
-            "(c) Fishery 2 catch (sp.1)                  (f) Fishery 2 catch (sp.2)"), 
-label_x=c(-0.08, -0.1, -0.1),label_y=c(1.01,1.05,1.05), hjust=c(-0.25,-0.25,-0.25), vjust=c(1.2,0.75,0.75), ncol=1, nrow=3)
+png(here('data','results','fig7-tradeoffs-separate-equiv.png'), res=300,height=2600,width=2100)
+ggdraw(plot_grid(plotlist=list(
+  plot.total.equiv+theme(legend.position='none',plot.margin = unit(c(1, 3.75, 2, 2), "lines"), axis.title=element_blank()),
+  plot.fish1.equiv+theme(plot.margin = unit(c(0, 0, 2, 2), "lines"), axis.title=element_blank()),
+  plot.fish2.equiv+theme(legend.position='none',plot.margin = unit(c(0, 3.75, 2, 2), "lines"), axis.title=element_blank())
+), labels=c("(a) Total catch (sp.1)                           (d) Total catch (sp.2)", 
+            "(b) Fishery 1 catch (sp.1)                    (e) Fishery 1 catch (sp.2)", 
+            "(c) Fishery 2 catch (sp.1)                    (f) Fishery 2 catch (sp.2)"), 
+label_size=12.5,
+label_x=c(-0.08, -0.1, -0.1),label_y=c(1.01,1.05,1.05), hjust=c(-0.25,-0.25,-0.25), vjust=c(1.2,0.75,0.75), 
+ncol=1, nrow=3))  + draw_label("Quantitative MSE", x = 0.5, y = 0.02, color = "gray20", size=11) +
+  draw_line(x = c(0.61, 0.9),y = c(0.02, 0.02), color = "gray20", size = 0.25)+
+  draw_line(x = c(0.16, 0.39),y = c(0.02, 0.02), color = "gray20", size = 0.25) +
+  draw_label("QNMs", x = 0.02, y = 0.5, angle=90,  color = "gray20", size=11) +
+  draw_line(y = c(0.54, 0.9),x = c(0.02, 0.02), color = "gray20", size = 0.25)+
+  draw_line(y = c(0.1, 0.46),x = c(0.02, 0.02), color = "gray20", size = 0.25)
 dev.off()
 
 

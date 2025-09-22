@@ -31,7 +31,7 @@ compare.models.impact.tbl <- function(sim.list,perturb.list=0,monitor.list=NA,
                                       common.variables=FALSE,variable.key=NA,variable.order=NA,
                                       plot=FALSE, main.axis="X",
                                       plot.perturbed=TRUE, common.perturbed=FALSE,
-                                      table.palette=c("#04BC09", "#ABF1AD","#BBBBBB", "#dfc27d","#a6611a","black")) {
+                                      table.palette=c("#04BC09", "#ABF1AD","#BBBBBB", "#dfc27d","#a6611a","black"), fix.lg=FALSE) {
   
   
   ## Utility functions
@@ -125,6 +125,8 @@ compare.models.impact.tbl <- function(sim.list,perturb.list=0,monitor.list=NA,
   }
   
   # Generate tables ---------------------------------------------------------
+  
+  if(fix.lg){all.results.df %<>% mutate(variable=ifelse(grepl("Ls", variable), str_replace(variable,"Ls","Lg"), variable))}
   
   # if there is a variable key, the variable type can be used to organize all variables listed in the key. perturbed nodes go at the end of the table
   if(any(!is.na(variable.key)) & common.variables==FALSE){

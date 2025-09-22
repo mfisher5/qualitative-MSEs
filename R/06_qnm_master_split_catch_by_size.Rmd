@@ -50,7 +50,8 @@ end.timer <- function(s){round(Sys.time()-s,2)}
 ## stuff for saving files
 write <- TRUE
 plot_out <- TRUE
-d <- format(Sys.Date(),"%Y%m%d")
+# d <- format(Sys.Date(),"%Y%m%d")
+d <- '20250903'
 
 
 ## model variable key: I use this to order the variables in the output tables.
@@ -674,7 +675,7 @@ for(i in 1:length(hcr_out)){
                                              strong_lower=0.8, weak_lower=0.6,
                                              epsilon=1.0E-5,
                                              plot=TRUE, main.axis="X",plot.perturbed=FALSE,
-                                             variable.key=vkey2,variable.order="specific_order")
+                                             variable.key=vkey2,variable.order="specific_order", fix.lg = TRUE)
   ## plot (this one should show all perturbations in a single plot, so no need to use plot_grid)
   compare.table[[3]] + ggtitle(paste0("HCR: ", names(hcr_out)[i]))
   
@@ -1232,7 +1233,7 @@ dev.off()
 
 I actually like when they results are grouped by size class better...
 ```{r}
-png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison2.png'), res=300, height=1200,width=3200)
+png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison2.png'), res=300, height=1300,width=3300)
 to_plot_all %>%
   mutate(management_strategy=ifelse(grepl("C", management_strategy), str_replace(management_strategy, "changes","spillover"), as.character(management_strategy))) %>%
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
