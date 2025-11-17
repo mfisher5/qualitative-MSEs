@@ -76,6 +76,16 @@ mse_format <- mse %>% pivot_longer(cols=2:(dim(mse)[2]),names_to="variable",valu
 ```{r eval=write_out}
 ## save
 write_csv(mse_format, here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
+
+## save for table 1
+mse_format %>% 
+  mutate(prob=case_when(
+    prob < 0 ~ 100+prob,
+    .default=prob
+  )) %>% pivot_wider(
+    names_from=variable_out,values_from=prob
+  ) %>%
+  write_csv(here('data','results','table1_mse0-5_hcrb-d_species1-2_20240206.csv'))
 ```
 
 
