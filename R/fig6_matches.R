@@ -115,6 +115,10 @@ triage_df %>% filter(triage_noEquiv=='false positive') %>%
 
 
 # Figure 6 -------------------------------------------------------------------
+
+triage_df %<>%
+  mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) 
+
 png(here('data','results','Fig7-equiv.png'), res=300, height=1300,width=2900)
 triage_df %>%
   ## rename oms!
@@ -125,7 +129,6 @@ triage_df %>%
     operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
     .default=operating_model
   )) %>%
-  mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative, equiv',
                                                   'false positive', 'false positive, equiv'))) %>%
   mutate(variable_out=fct_relevel(variable_out, c("Total Catch", "Fishery 1 Catch", "Fishery 2 Catch", "Spawning Biomass"))) %>%
@@ -133,6 +136,8 @@ triage_df %>%
   filter(triage %in% c('false negative','false positive')) %>%
   ggplot(aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
   geom_tile() +
+  geom_point(aes(x=c(1),y=c(5)),pch=4, col='gray50', size=3, show.legend=FALSE) +
+  geom_point(aes(x=c(2),y=c(5)),pch=4, col='gray50', size=3, show.legend=FALSE) +
   facet_grid(rows=vars(species), cols=vars(variable_out)) +
   scale_fill_manual(values=c('darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
   scale_alpha_manual(values=c(0.5,1,0.5)) +

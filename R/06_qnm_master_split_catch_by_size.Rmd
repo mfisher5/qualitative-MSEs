@@ -662,7 +662,7 @@ names(hcr_out) <- c("A","B","C","D","E")
 
 
 
-forgot to set plot_out = TRUE
+forgot to set plot_out = TRUE above...
 ```{r}
 for(i in 1:length(hcr_out)){
   tmp_hcr <- hcr_out[[i]]
@@ -925,6 +925,40 @@ mse_format %<>% mutate(code=case_when(
 ))
 ```
 
+adjust variable names
+```{r}
+mse %<>% mutate(variable_out=str_replace_all(variable_out,'_',' '))
+```
+
+read in the qnm output again
+```{r}
+qnm <- read_csv(here('data','qnm_out',paste0('qnm0-4_splitTC_hcra-e_pSims_',d,'.csv')))
+qnm %<>% clean_names()
+qnm %<>% mutate(variable=make_clean_names(variable, allow_dupes=TRUE))
+```
+we'll also want the unsplit output
+```{r}
+qvm0 <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_20240923.csv')))
+
+qvm0 %<>% filter(variable_out %in% c("fishery_1_catch","total_catch"))
+qvm0 %<>% filter(!is.na(prob))  ## no qnm to compare to mse 2-A
+```
+
+[update model numbers from unsplit output]
+```{r}
+qvm0 %<>% mutate(code=case_when(
+  grepl('2',code) ~ str_replace(code,'2','1'),
+  grepl('3',code) ~ str_replace(code,'3','2'),
+  grepl('4',code) ~ str_replace(code,'4','3'),
+  grepl('5',code) ~ str_replace(code,'5','4'), .default=code
+))
+qvm0 %<>% mutate(operating_model=case_when(
+  grepl('2.',operating_model) ~ str_replace(operating_model,'2.','1.'),
+  grepl('3.',operating_model) ~ str_replace(operating_model,'3.','2.'),
+  grepl('4.',operating_model) ~ str_replace(operating_model,'4.','3.'),
+  grepl('5.',operating_model) ~ str_replace(operating_model,'5.','4.'), .default=operating_model
+))
+```
 
 ### first run: formatting
 ```{r eval=FALSE}
@@ -962,12 +996,14 @@ write_csv(mse_format, here('data','results','split_tc','mse0-7_splitTC_hcrb-d_sp
 ```{r}
 qvm_sm <- qnm %>% filter(grepl('sm',variable)) %>%
   left_join(mse_format,by=c('code','variable'='variable_out'))
+qvm_sm %<>% filter(!is.na(prob))
 ```
 
-```{r}
-# Identify false/true positives/negatives ---------------------------------------------------------
 
-## count the number of times there is a mismatch for plot 1, create dataframe for plotting
+Identify false/true positives/negatives. 
+
+first, count the number of times there is a mismatch for plot 1.
+```{r}
 triage_sm <- qvm_sm %>%
   filter(p_sim != 0) %>%
   rename(qnm_psims=p_sim, mse_prob=prob, species=model) %>%
@@ -984,12 +1020,17 @@ triage_sm <- qvm_sm %>%
                                       ifelse(qnm_equiv==0, triage, NA))))
 
 triage_sm %<>% mutate(group="small fish")
-## check against excel table
+```
+
+re-format data frame for plotting
+```{r}
 to_plot_sm <- triage_sm %>%
   mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
   mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
                                                   'false positive', 'false positive, equiv'))) %>%
+  mutate(management_strategy=ifelse(grepl("C.", management_strategy,
+                                          'C. Fishery 1 in "offshore" only, effort changes',management_strategy)) %>%
   mutate(management_strategy=fct_rev(management_strategy)) %>%
   mutate(variable=case_when(variable=='fishery_1_sm' ~ 'Fishery 1',
                                                variable=='total_catch_sm' ~ 'Total catch')) %>%
@@ -1034,13 +1075,14 @@ dev.off()
 ```{r}
 qvm_lg <-  qnm %>% filter(grepl('lg',variable))  %>%
   left_join(mse_format,by=c('code','variable'='variable_out')) %>% mutate(variable=case_when(variable=='fishery_1_lg' ~ 'fishery_1_catch',
-                                               variable=='total_catch_lg' ~ 'total_catch'))
+                                               variable=='total_catch_lg' ~ 'total_catch',
+                                               .default=variable)) %>%
+  filter(!is.na(prob))
 ```
 
-```{r}
-# Identify false/true positives/negatives ---------------------------------------------------------
+Identify false/true positives/negatives. count the number of times there is a mismatch for plot 1
 
-## count the number of times there is a mismatch for plot 1, create dataframe for plotting
+```{r}
 triage_lg <- qvm_lg %>%
   filter(p_sim != 0) %>%
   rename(qnm_psims=p_sim, mse_prob=prob, species=model) %>%
@@ -1105,7 +1147,7 @@ dev.off()
 
 ### compare: one plot
 
-we need to read in the table from the original.
+Identify false/true positives/negatives in the original (all fish) QNM data.
 ```{r}
 # qvm0 <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_20240923.csv')))
 # 
@@ -1134,20 +1176,6 @@ triage0 %<>% mutate(group='all')
 
 to_plot0 <- triage0 %>%
   rename(variable=variable_out) %>%
-  # rename oms!
-  mutate(operating_model=case_when(
-    operating_model=="2. Thorson effort" ~ "1. Thorson effort",
-    operating_model=="3. Lower productivity" ~ "2. Lower productivity",
-    operating_model=="4. Move \"far offshore\"" ~ "3. Move \"far offshore\"",
-    operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
-    .default=operating_model
-  )) %>%
-  mutate(code=case_when(
-  grepl('2',code) ~ str_replace(code,'2','1'),
-  grepl('3',code) ~ str_replace(code,'3','2'),
-  grepl('4',code) ~ str_replace(code,'4','3'),
-  grepl('5',code) ~ str_replace(code,'5','4'), .default=code
-)) %>%
   mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,', equiv', sep=''), triage)) %>%
   mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
@@ -1209,25 +1237,24 @@ to_plot_all %>%
   theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
 ```
 
-save
 ```{r}
-png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison.png'), res=300, height=3200,width=1800)
-to_plot_all %>%
-  mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
-                                                  'false positive', 'false positive, equiv'))) %>%
-  mutate(management_strat_short=fct_relevel(management_strat_short,c('A','B','C','D','E'))) %>%
-   ggplot(aes(y=fct_rev(group),x=rev(management_strat_short), fill=triage_equiv, alpha=triage_equiv)) +
-  geom_tile() +
-  facet_grid(variable+om_short~species) +
-  scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), 
-                    breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
-                    na.value='white', name='') + theme_bw() +
-  scale_alpha_manual(values=c(1,0.5,1,0.5), 
-                     breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
-                     na.value=0, name='') +
-  labs(y='Size Class',x='Management strategy') +
-  theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
-dev.off()
+# png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison.png'), res=300, height=3200,width=1800)
+# to_plot_all %>%
+#   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
+#                                                   'false positive', 'false positive, equiv'))) %>%
+#   mutate(management_strat_short=fct_relevel(management_strat_short,c('A','B','C','D','E'))) %>%
+#    ggplot(aes(y=fct_rev(group),x=rev(management_strat_short), fill=triage_equiv, alpha=triage_equiv)) +
+#   geom_tile() +
+#   facet_grid(variable+om_short~species) +
+#   scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), 
+#                     breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+#                     na.value='white', name='') + theme_bw() +
+#   scale_alpha_manual(values=c(1,0.5,1,0.5), 
+#                      breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 
+#                      na.value=0, name='') +
+#   labs(y='Size Class',x='Management strategy') +
+#   theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05))
+# dev.off()
 ```
 
 
@@ -1240,6 +1267,8 @@ to_plot_all %>%
                                                   'false positive', 'false positive, equiv'))) %>%
  ggplot(aes(x=operating_model,y=fct_rev(management_strategy), fill=triage_equiv, alpha=triage_equiv)) +
   geom_tile() +
+  geom_point(aes(x=c(1),y=c(5)),pch=4, col='gray50', size=3, show.legend=FALSE) +
+  geom_point(aes(x=c(2),y=c(5)),pch=4, col='gray50', size=3, show.legend=FALSE) +
   facet_grid(species~variable+group) +
   scale_fill_manual(values=c('darkorange','darkorange','dodgerblue4','dodgerblue4'), 
                     breaks=c('false negative','false negative, equiv','false positive', 'false positive, equiv'), 

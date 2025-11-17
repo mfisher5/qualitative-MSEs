@@ -407,12 +407,12 @@ p2 <- speciesALL_compare %>%
 p2
 
 # plot separately
-png(here('data','results','FigC3a.png'), res=300, height=1300,width=2800)
+png(here('data','results','FigC4a.png'), res=300, height=1300,width=2800)
 p1
 dev.off()
 
 
-png(here('data','results','FigC3b.png'), res=300, height=1300,width=3200)
+png(here('data','results','FigC4b.png'), res=300, height=1300,width=3200)
 p2
 dev.off()
 
