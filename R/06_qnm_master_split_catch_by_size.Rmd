@@ -1029,7 +1029,7 @@ to_plot_sm <- triage_sm %>%
   mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
                                                   'false positive', 'false positive, equiv'))) %>%
-  mutate(management_strategy=ifelse(grepl("C.", management_strategy,
+  mutate(management_strategy=ifelse(grepl("C.", management_strategy),
                                           'C. Fishery 1 in "offshore" only, effort changes',management_strategy)) %>%
   mutate(management_strategy=fct_rev(management_strategy)) %>%
   mutate(variable=case_when(variable=='fishery_1_sm' ~ 'Fishery 1',
@@ -1055,7 +1055,7 @@ to_plot_sm <- triage_sm %>%
 
 save it!
 ```{r}
-png(here('data','results','split_tc','Fig-6-mismatch-small-fish-only.png'), res=300, height=1300,width=1500)
+png(here('data','results','split_tc','Fig-c5-mismatch-small-fish-only.png'), res=300, height=1300,width=1500)
  ggplot(to_plot_sm, aes(x=operating_model,y=management_strat_short, fill=triage_equiv, alpha=triage_equiv)) +
   geom_tile() +
   facet_grid(rows=vars(species), cols=vars(variable)) +
@@ -1112,6 +1112,8 @@ to_plot_lg <- triage_lg %>%
   mutate(triage_equiv=ifelse(grepl('true',triage_equiv),NA,triage_equiv) ) %>%    # this leaves *true* pos/neg empty
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
                                                   'false positive', 'false positive, equiv'))) %>%
+  mutate(management_strategy=ifelse(grepl("C.", management_strategy),
+                                          'C. Fishery 1 in "offshore" only, effort changes',management_strategy)) %>%
   mutate(management_strategy=fct_rev(management_strategy)) %>%
   mutate(variable=case_when(variable=='fishery_1_catch' ~ 'Fishery 1',
                                                variable=='total_catch' ~ 'Total catch')) %>%
@@ -1132,7 +1134,7 @@ to_plot_lg <- triage_lg %>%
 
 save it!
 ```{r}
-png(here('data','results','split_tc','Fig-6-mismatch-large-fish-only.png'), res=300, height=1300,width=1500)
+png(here('data','results','split_tc','Fig-c5-mismatch-large-fish-only.png'), res=300, height=1300,width=1500)
   ggplot(to_plot_lg, aes(x=operating_model,y=management_strat_short, fill=triage_equiv, alpha=triage_equiv)) +
   geom_tile() +
   facet_grid(rows=vars(species), cols=vars(variable)) +
@@ -1260,7 +1262,7 @@ to_plot_all %>%
 
 I actually like when they results are grouped by size class better...
 ```{r}
-png(here('data','results','split_tc','Fig-6-mismatch-split-by-size-comparison2.png'), res=300, height=1300,width=3300)
+png(here('doc','supplement','Fig-C5-mismatch-split-by-size-comparison2.png'), res=300, height=1300,width=3300)
 to_plot_all %>%
   mutate(management_strategy=ifelse(grepl("C", management_strategy), str_replace(management_strategy, "changes","spillover"), as.character(management_strategy))) %>%
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative','false negative, equiv',
