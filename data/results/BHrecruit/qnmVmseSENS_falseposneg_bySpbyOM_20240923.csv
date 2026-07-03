@@ -1,0 +1,50 @@
+mse_param,operating_model,species,Fishery 1 Catch,Spawning Biomass,Total Catch,Fishery 2 Catch,mismatch
+BH,0. Baseline,(sp.1) med longevity,2,1,2,NA,"false positive, no equiv"
+BH,2. Thorson effort,(sp.1) med longevity,NA,1,NA,1,"false positive, no equiv"
+BH,3. Lower productivity,(sp.1) med longevity,1,NA,1,NA,"false positive, no equiv"
+BH,"4. Move ""far offshore""",(sp.1) med longevity,1,1,NA,NA,"false positive, no equiv"
+BH,5. Lower growth rate,(sp.1) med longevity,3,1,3,2,"false positive, no equiv"
+BH,0. Baseline,(sp.2) short longevity,2,NA,3,NA,"false positive, no equiv"
+BH,2. Thorson effort,(sp.2) short longevity,NA,NA,NA,1,"false positive, no equiv"
+BH,3. Lower productivity,(sp.2) short longevity,2,NA,2,NA,"false positive, no equiv"
+BH,"4. Move ""far offshore""",(sp.2) short longevity,1,NA,1,NA,"false positive, no equiv"
+BH,5. Lower growth rate,(sp.2) short longevity,4,1,5,1,"false positive, no equiv"
+sp2alt,0. Baseline,(sp.1) med longevity,1,NA,2,NA,"false positive, no equiv"
+sp2alt,2. Thorson effort,(sp.1) med longevity,NA,1,NA,1,"false positive, no equiv"
+sp2alt,3. Lower productivity,(sp.1) med longevity,1,NA,NA,NA,"false positive, no equiv"
+sp2alt,5. Lower growth rate,(sp.1) med longevity,3,1,3,2,"false positive, no equiv"
+sp2alt,0. Baseline,(sp.2) short longevity,2,NA,3,NA,"false positive, no equiv"
+sp2alt,2. Thorson effort,(sp.2) short longevity,NA,NA,1,1,"false positive, no equiv"
+sp2alt,3. Lower productivity,(sp.2) short longevity,2,NA,2,NA,"false positive, no equiv"
+sp2alt,"4. Move ""far offshore""",(sp.2) short longevity,1,NA,1,NA,"false positive, no equiv"
+sp2alt,5. Lower growth rate,(sp.2) short longevity,4,1,5,1,"false positive, no equiv"
+BH,0. Baseline,(sp.1) med longevity,2,1,2,1,false positive
+BH,2. Thorson effort,(sp.1) med longevity,NA,1,NA,1,false positive
+BH,3. Lower productivity,(sp.1) med longevity,1,1,2,NA,false positive
+BH,"4. Move ""far offshore""",(sp.1) med longevity,2,1,1,NA,false positive
+BH,5. Lower growth rate,(sp.1) med longevity,3,1,3,2,false positive
+BH,0. Baseline,(sp.2) short longevity,3,NA,4,NA,false positive
+BH,2. Thorson effort,(sp.2) short longevity,NA,NA,NA,1,false positive
+BH,3. Lower productivity,(sp.2) short longevity,2,NA,3,NA,false positive
+BH,"4. Move ""far offshore""",(sp.2) short longevity,2,NA,2,NA,false positive
+BH,5. Lower growth rate,(sp.2) short longevity,4,1,5,1,false positive
+sp2alt,0. Baseline,(sp.1) med longevity,1,NA,2,1,false positive
+sp2alt,2. Thorson effort,(sp.1) med longevity,NA,1,NA,1,false positive
+sp2alt,3. Lower productivity,(sp.1) med longevity,1,NA,1,NA,false positive
+sp2alt,"4. Move ""far offshore""",(sp.1) med longevity,1,NA,1,NA,false positive
+sp2alt,5. Lower growth rate,(sp.1) med longevity,3,1,3,2,false positive
+sp2alt,0. Baseline,(sp.2) short longevity,3,NA,4,NA,false positive
+sp2alt,2. Thorson effort,(sp.2) short longevity,2,NA,2,1,false positive
+sp2alt,3. Lower productivity,(sp.2) short longevity,2,NA,3,NA,false positive
+sp2alt,"4. Move ""far offshore""",(sp.2) short longevity,2,NA,2,NA,false positive
+sp2alt,5. Lower growth rate,(sp.2) short longevity,4,1,5,1,false positive
+BH,2. Thorson effort,(sp.1) med longevity,NA,NA,1,NA,false negative
+BH,3. Lower productivity,(sp.1) med longevity,1,NA,1,NA,false negative
+BH,"4. Move ""far offshore""",(sp.1) med longevity,1,NA,1,NA,false negative
+BH,3. Lower productivity,(sp.2) short longevity,NA,NA,NA,1,false negative
+BH,"4. Move ""far offshore""",(sp.2) short longevity,NA,NA,NA,1,false negative
+sp2alt,2. Thorson effort,(sp.1) med longevity,NA,NA,1,NA,false negative
+sp2alt,3. Lower productivity,(sp.1) med longevity,1,NA,1,NA,false negative
+sp2alt,"4. Move ""far offshore""",(sp.1) med longevity,1,NA,1,NA,false negative
+sp2alt,3. Lower productivity,(sp.2) short longevity,NA,NA,NA,1,false negative
+sp2alt,"4. Move ""far offshore""",(sp.2) short longevity,NA,NA,NA,1,false negative
