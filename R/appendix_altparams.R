@@ -45,6 +45,50 @@ speciesALL_compare %<>% mutate(management_strategy=ifelse(
   management_strategy
 ))
 
+
+# Table 3 -------------------------------------------------
+
+## identify match/mismatch
+match_df <- speciesALL_compare  %>%
+  dplyr::select(-model.x) %>%
+  rename(qnm_psims=psims, mse_prob=prob, species=mse_species) %>%
+  mutate(species=case_when(
+    species=="Species1" ~ "(sp.1) med longevity", 
+    species=="Species2" ~ "(sp.2) short longevity")) %>%
+  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
+         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) %>%
+  mutate(match=ifelse(abs(qnm_psims)==50, 'uninf qnm',
+                      ifelse((qnm_psims < 0 & mse_prob < 50) |
+                         (qnm_psims > 0 & mse_prob > 50), 'match','mismatch')))
+
+tbl3 <- match_df %>% group_by(mse_param,species,variable_out,qnm_equiv,match) %>%
+  summarise(n=n()) %>% mutate(p=round(n/23,3)) %>% dplyr::select(-n) %>% 
+  mutate(qnm_equiv=case_when(
+    qnm_equiv==1 ~ '_qnm_equiv',
+    .default=''
+  )) %>% unite(match,qnm_equiv,sep='',col='match2') %>% ungroup() %>%
+  pivot_wider(names_from='match2',values_from='p',values_fill=0) %>%
+  rowwise() %>%
+  mutate(total_match=sum(across(c(match,match_qnm_equiv))),
+         total_mismatch=sum(across(c(mismatch,mismatch_qnm_equiv)))) %>%
+  bind_rows(
+    match_df %>% group_by(mse_param,species,variable_out,qnm_equiv,match) %>%
+      summarise(n=n())%>% 
+      mutate(qnm_equiv=case_when(
+        qnm_equiv==1 ~ '_qnm_equiv',
+        .default=''
+      )) %>% unite(match,qnm_equiv,sep='',col='match2') %>% ungroup() %>%
+      pivot_wider(names_from='match2',values_from='n',values_fill=0) %>%
+      rowwise() %>%
+      mutate(total_match=sum(across(c(match,match_qnm_equiv))),
+             total_mismatch=sum(across(c(mismatch,mismatch_qnm_equiv))))
+  )
+tbl3_mse_equivs <- match_df %>% group_by(mse_param,species,variable_out,qnm_equiv,match) %>%
+  summarise(n=sum(mse_equiv)) %>% filter(n>0)
+View(tbl3_mse_equivs)
+write_csv(tbl3,here('data','results','BHrecruit','qnmVmseSENS_tbl3_mismatches_20240923.csv'))
+
+
 # Identify false/true positives/negatives ---------------------------------------------------------
 
 
@@ -422,6 +466,67 @@ plot_grid(
     geom_tile() +
     geom_point(data=no_qnms, aes(x=mse_param,y=management_strategy),pch=4, col='gray50', size=3, inherit.aes=FALSE) +
     geom_point(data=all_mse_equiv,aes(x=mse_param,y=management_strategy),pch=8,col='gray50', size=1, inherit.aes=FALSE) +
+    facet_grid(rows=vars(operating_model), cols=vars(variable_out)) +
+    scale_fill_manual(values=c('darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
+    scale_alpha_manual(values=c(0.5,1,0.5)) +
+    labs(x='',y='Management strategy') +
+    theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
+                       axis.text.y=element_blank(),
+                       axis.title.y=element_blank(),
+                       legend.title=element_blank(),
+                       panel.spacing.y = unit(0,'lines')),
+  nrow=1,ncol=2,rel_widths=c(1,0.85),
+  labels = "AUTO",hjust=c(-19,0.3)
+  
+)
+dev.off()
+
+
+
+tmp_no_qnms <- no_qnms %>% filter(mse_param!='Alt. Sp 2')
+tmp_mse_equiv <- all_mse_equiv %>% filter(mse_param!='Alt. Sp 2')
+png(here('doc','supplement','Fig6-equiv-bh.png'), res=300, height=1600,width=3000)
+plot_grid(
+  all_to_plot  %>%
+    filter(mse_param!='Alt. Sp 2') %>%
+    filter(grepl('sp.1',species)) %>%
+    mutate(variable_out=case_when(
+      variable_out=='Total Catch' ~ 'Total\nCatch',
+      variable_out=='Fishery 1 Catch' ~ 'Fishery 1\nCatch',
+      variable_out=='Fishery 2 Catch' ~ 'Fishery 2\nCatch',
+      variable_out=='Spawning Biomass' ~ 'Spawning\nBiomass',
+      .default=NA
+    )) %>%
+    mutate(variable_out=fct_relevel(variable_out, c("Total\nCatch", "Fishery 1\nCatch", "Fishery 2\nCatch", "Spawning\nBiomass"))) %>%
+    filter(triage %in% c('false negative','false positive')) %>%
+    ggplot(aes(x=mse_param,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
+    geom_tile() +
+    geom_point(data=tmp_no_qnms, aes(x=mse_param,y=management_strategy),pch=4, col='gray50', size=3, inherit.aes=FALSE) +
+    geom_point(data=tmp_mse_equiv,aes(x=mse_param,y=management_strategy),pch=8,col='gray50', size=1, inherit.aes=FALSE) +
+    facet_grid(rows=vars(operating_model), cols=vars(variable_out)) +
+    scale_fill_manual(values=c('darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
+    scale_alpha_manual(values=c(0.5,1,0.5)) +
+    labs(x='MSE parameterization',y='Management strategy') +
+    theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1.05),
+                       legend.position='none',
+                       panel.spacing.y = unit(0,'lines'),
+                       strip.text.y=element_blank()),
+  all_to_plot  %>%
+    filter(mse_param!='Alt. Sp 2') %>%
+    filter(grepl('sp.2',species)) %>%
+    mutate(variable_out=case_when(
+      variable_out=='Total Catch' ~ 'Total\nCatch',
+      variable_out=='Fishery 1 Catch' ~ 'Fishery 1\nCatch',
+      variable_out=='Fishery 2 Catch' ~ 'Fishery 2\nCatch',
+      variable_out=='Spawning Biomass' ~ 'Spawning\nBiomass',
+      .default=NA
+    )) %>%
+    mutate(variable_out=fct_relevel(variable_out, c("Total\nCatch", "Fishery 1\nCatch", "Fishery 2\nCatch", "Spawning\nBiomass"))) %>%
+    filter(triage %in% c('false negative','false positive')) %>%
+    ggplot(aes(x=mse_param,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
+    geom_tile() +
+    geom_point(data=tmp_no_qnms, aes(x=mse_param,y=management_strategy),pch=4, col='gray50', size=3, inherit.aes=FALSE) +
+    geom_point(data=tmp_mse_equiv,aes(x=mse_param,y=management_strategy),pch=8,col='gray50', size=1, inherit.aes=FALSE) +
     facet_grid(rows=vars(operating_model), cols=vars(variable_out)) +
     scale_fill_manual(values=c('darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
     scale_alpha_manual(values=c(0.5,1,0.5)) +

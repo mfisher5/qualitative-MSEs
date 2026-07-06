@@ -1,0 +1,33 @@
+mse_param,species,variable_out,match,mismatch,match_qnm_equiv,mismatch_qnm_equiv,uninf qnm_qnm_equiv,total_match,total_mismatch
+BH,(sp.1) med longevity,Fishery 1 Catch,0.435,0.304,0.13,0.13,0,0.565,0.434
+BH,(sp.1) med longevity,Fishery 2 Catch,0.696,0.13,0.13,0.043,0,0.826,0.173
+BH,(sp.1) med longevity,Spawning Biomass,0.696,0.174,0.043,0.043,0.043,0.739,0.21699999999999997
+BH,(sp.1) med longevity,Total Catch,0.391,0.261,0.13,0.217,0,0.521,0.478
+BH,(sp.2) short longevity,Fishery 1 Catch,0.348,0.391,0.087,0.174,0,0.43499999999999994,0.565
+BH,(sp.2) short longevity,Fishery 2 Catch,0.739,0.087,0.087,0.087,0,0.826,0.174
+BH,(sp.2) short longevity,Spawning Biomass,0.826,0.043,0.087,0,0.043,0.9129999999999999,0.043
+BH,(sp.2) short longevity,Total Catch,0.174,0.478,0.174,0.174,0,0.348,0.6519999999999999
+sp2alt,(sp.1) med longevity,Fishery 1 Catch,0.522,0.217,0.13,0.13,0,0.652,0.347
+sp2alt,(sp.1) med longevity,Fishery 2 Catch,0.696,0.13,0.13,0.043,0,0.826,0.173
+sp2alt,(sp.1) med longevity,Spawning Biomass,0.783,0.087,0.087,0,0.043,0.87,0.087
+sp2alt,(sp.1) med longevity,Total Catch,0.435,0.217,0.13,0.217,0,0.565,0.434
+sp2alt,(sp.2) short longevity,Fishery 1 Catch,0.348,0.391,0.087,0.174,0,0.43499999999999994,0.565
+sp2alt,(sp.2) short longevity,Fishery 2 Catch,0.739,0.087,0.087,0.087,0,0.826,0.174
+sp2alt,(sp.2) short longevity,Spawning Biomass,0.826,0.043,0.087,0,0.043,0.9129999999999999,0.043
+sp2alt,(sp.2) short longevity,Total Catch,0.13,0.522,0.174,0.174,0,0.304,0.696
+BH,(sp.1) med longevity,Fishery 1 Catch,10,7,3,3,0,13,10
+BH,(sp.1) med longevity,Fishery 2 Catch,16,3,3,1,0,19,4
+BH,(sp.1) med longevity,Spawning Biomass,16,4,1,1,1,17,5
+BH,(sp.1) med longevity,Total Catch,9,6,3,5,0,12,11
+BH,(sp.2) short longevity,Fishery 1 Catch,8,9,2,4,0,10,13
+BH,(sp.2) short longevity,Fishery 2 Catch,17,2,2,2,0,19,4
+BH,(sp.2) short longevity,Spawning Biomass,19,1,2,0,1,21,1
+BH,(sp.2) short longevity,Total Catch,4,11,4,4,0,8,15
+sp2alt,(sp.1) med longevity,Fishery 1 Catch,12,5,3,3,0,15,8
+sp2alt,(sp.1) med longevity,Fishery 2 Catch,16,3,3,1,0,19,4
+sp2alt,(sp.1) med longevity,Spawning Biomass,18,2,2,0,1,20,2
+sp2alt,(sp.1) med longevity,Total Catch,10,5,3,5,0,13,10
+sp2alt,(sp.2) short longevity,Fishery 1 Catch,8,9,2,4,0,10,13
+sp2alt,(sp.2) short longevity,Fishery 2 Catch,17,2,2,2,0,19,4
+sp2alt,(sp.2) short longevity,Spawning Biomass,19,1,2,0,1,21,1
+sp2alt,(sp.2) short longevity,Total Catch,3,12,4,4,0,7,16
