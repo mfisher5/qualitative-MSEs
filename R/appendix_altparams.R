@@ -25,6 +25,8 @@ library(magrittr)
 library(ggplot2)
 library(janitor)
 library(gridExtra)
+library(PNWColors)
+library(cowplot)
 
 
 # Data --------------------------------------------------------------------
@@ -256,6 +258,14 @@ dev.off()
 ## prep df to describe trade-offs
 tos <- speciesALL_compare  %>%
   dplyr::select(-model.x) %>%
+  ## rename oms!
+  mutate(operating_model=case_when(
+    operating_model=="2. Thorson effort" ~ "1. Thorson effort",
+    operating_model=="3. Lower productivity" ~ "2. Lower productivity",
+    operating_model=="4. Move \"far offshore\"" ~ "3. Move \"far offshore\"",
+    operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
+    .default=operating_model
+  )) %>%
   filter(mse_param=='BH') %>% dplyr::select(-mse_param) %>%
   rename(qnm_psims=psims, mse_prob=prob) %>%
   mutate(mse_species=case_when(
@@ -562,9 +572,10 @@ tos_total2 <- tos %>%
   dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, qnm_equiv, mse_prob, mse_species) %>%
   mutate(QNM=case_when(
     (qnm_psims > 0 & qnm_equiv==0) ~ '+',
-    (qnm_psims > 0 & qnm_equiv==1) ~ '(+)',
+    (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
     (qnm_psims < 0 & qnm_equiv==0) ~ '-',
-    (qnm_psims < 0 & qnm_equiv==1) ~ '(-)'
+    (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
+    abs(qnm_psims)==50 ~ ''
   )) %>%
   mutate(MSE=case_when(
     (mse_prob > 60) ~ '+',
@@ -579,7 +590,11 @@ tos_total2 %<>%
   mutate(qnm_compare=case_when(
     (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
     ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
-    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic"))
+    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
+    QNM=="" ~ "50/50"))
+
+tos_total2 %<>% 
+  mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
 any(is.na(tos_total2$qnm_compare))
 
 ## create table
@@ -606,7 +621,7 @@ p2_total <- tos_total2 %>%
   labs(y="",x="") +
   scale_x_discrete(position='bottom') +
   scale_y_discrete(position='right')+
-  scale_fill_manual(values=c("goldenrod","#8da0cb","white"), na.value="white",name='QNM is...') +
+  scale_fill_manual(values=c("goldenrod","#8da0cb","white","gray80"), na.value="white",name='QNM is...') +
   guides(fill=guide_legend(nrow=2, position='bottom')) +
   theme_bw() +
   theme(strip.background=element_rect(fill='white'),
@@ -627,9 +642,10 @@ tos3_fish1 <- tos %>%
   dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, qnm_equiv, mse_prob, mse_species) %>%
   mutate(QNM=case_when(
     (qnm_psims > 0 & qnm_equiv==0) ~ '+',
-    (qnm_psims > 0 & qnm_equiv==1) ~ '(+)',
+    (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
     (qnm_psims < 0 & qnm_equiv==0) ~ '-',
-    (qnm_psims < 0 & qnm_equiv==1) ~ '(-)'
+    (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
+    abs(qnm_psims)==50 ~ ''
   )) %>%
   mutate(MSE=case_when(
     (mse_prob > 60) ~ '+',
@@ -644,9 +660,13 @@ tos3_fish1 %<>%
   mutate(qnm_compare=case_when(
     (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
     ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
-    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic"))
+    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
+    QNM=="" ~ "50/50"))
 
+tos3_fish1 %<>% 
+  mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
 any(is.na(tos3_fish1$qnm_compare))
+
 
 ## create table
 p2_fish1 <- tos3_fish1 %>%
@@ -672,7 +692,7 @@ p2_fish1 <- tos3_fish1 %>%
   labs(y="",x="") +
   scale_x_discrete(position='bottom') +
   scale_y_discrete(position='right')+
-  scale_fill_manual(values=c("goldenrod","#8da0cb","white"), na.value="white",name='QNM is...') +
+  scale_fill_manual(values=c("goldenrod","#8da0cb","white","gray80"), na.value="white",name='QNM is...') +
   theme_bw() +
   theme(strip.background=element_rect(fill='white'),
         strip.placement = "outside",
@@ -690,9 +710,10 @@ tos3_fish2 <- tos %>%
   dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, qnm_equiv, mse_prob, mse_species) %>%
   mutate(QNM=case_when(
     (qnm_psims > 0 & qnm_equiv==0) ~ '+',
-    (qnm_psims > 0 & qnm_equiv==1) ~ '(+)',
+    (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
     (qnm_psims < 0 & qnm_equiv==0) ~ '-',
-    (qnm_psims < 0 & qnm_equiv==1) ~ '(-)'
+    (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
+    abs(qnm_psims)==50 ~ ''
   )) %>%
   mutate(MSE=case_when(
     (mse_prob > 60) ~ '+',
@@ -707,8 +728,11 @@ tos3_fish2 %<>%
   mutate(qnm_compare=case_when(
     (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
     ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
-    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic"))
+    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
+    QNM=="" ~ "50/50"))
 
+tos3_fish2 %<>% 
+  mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
 any(is.na(tos3_fish2$qnm_compare))
 
 ## create table
@@ -735,7 +759,7 @@ p2_fish2 <- tos3_fish2 %>%
   labs(y="",x="") +
   scale_x_discrete(position='bottom') +
   scale_y_discrete(position='right')+
-  scale_fill_manual(values=c("goldenrod","white"), na.value="white",name='QNM is...') +
+  scale_fill_manual(values=c("goldenrod","white","gray80"), na.value="white",name='QNM is...') +
   theme_bw() +
   theme(strip.background=element_rect(fill='white'),
         strip.placement = "outside",
@@ -793,7 +817,7 @@ p2s2_total <- tos_total2 %>%
   labs(y="",x="") +
   scale_x_discrete(position='bottom') +
   scale_y_discrete(position='right')+
-  scale_fill_manual(values=c("goldenrod","#8da0cb","white"), na.value="white",name='QNM is...') +
+  scale_fill_manual(values=c("goldenrod","#8da0cb","white","gray80"), na.value="white",name='QNM is...') +
   guides(fill=guide_legend(nrow=2, position='bottom')) +
   theme_bw() +
   theme(strip.background=element_rect(fill='white'),
@@ -832,7 +856,7 @@ p2s2_fish1 <- tos3_fish1 %>%
   labs(y="",x="") +
   scale_x_discrete(position='bottom') +
   scale_y_discrete(position='right')+
-  scale_fill_manual(values=c("goldenrod","white"), na.value="white",name='QNM is...') +
+  scale_fill_manual(values=c("goldenrod","white","gray80"), na.value="white",name='QNM is...') +
   theme_bw() +
   theme(strip.background=element_rect(fill='white'),
         strip.placement = "outside",
@@ -867,7 +891,7 @@ p2s2_fish2 <- tos3_fish2 %>%
   labs(y="",x="") +
   scale_x_discrete(position='bottom') +
   scale_y_discrete(position='right')+
-  scale_fill_manual(values=c("goldenrod","#8da0cb","white"), na.value="white",name='QNM is...') +
+  scale_fill_manual(values=c("goldenrod","#8da0cb","white","gray80"), na.value="white",name='QNM is...') +
   theme_bw() +
   theme(strip.background=element_rect(fill='white'),
         strip.placement = "outside",
@@ -1194,3 +1218,39 @@ dev.off()
 
 
 
+
+
+
+# Table S... --------------------------------------------------------------
+
+## how well do equivocal QNM outcomes match qMSE?
+
+match_equiv <- speciesALL_compare  %>%
+  dplyr::select(-model.x) %>%
+  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
+  filter(abs(qnm_psims) < 60)
+
+match_equiv <- match_equiv %>%
+  mutate(species=case_when(
+    species=="MSE-Species1" ~ "(sp.1) med longevity", 
+    species=="MSE-Species2" ~ "(sp.2) short longevity")) %>%
+  mutate(mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) %>%
+  mutate(match=ifelse(abs(qnm_psims)==50, 'uninf qnm',
+                      ifelse((qnm_psims < 0 & mse_prob < 50) |
+                               (qnm_psims > 0 & mse_prob > 50), 'match','mismatch')))
+
+tbleq <- match_equiv %>% 
+  group_by(species,variable_out) %>% mutate(totaln=n()) %>%
+  ungroup() %>%
+  group_by(species,variable_out,match) %>%
+  summarise(n=n()) %>% mutate(p=round(n/23,3)) %>% dplyr::select(-n) %>%
+  pivot_wider(names_from='match',values_from='p',values_fill=0) %>%
+  rowwise() %>%
+  mutate(total_match=sum(across(c(match,match_qnm_equiv))),
+         total_mismatch=sum(across(c(mismatch,mismatch_qnm_equiv))))
+
+
+tbl3_mse_equivs <- match_df %>% group_by(mse_param,species,variable_out,qnm_equiv,match) %>%
+  summarise(n=sum(mse_equiv)) %>% filter(n>0)
+View(tbl3_mse_equivs)
+write_csv(tbl3,here('data','results','BHrecruit','qnmVmseSENS_tbl3_mismatches_20240923.csv'))
