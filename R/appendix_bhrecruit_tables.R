@@ -111,6 +111,9 @@ tbl3_mse_equivs <- match_df %>% group_by(mse_param,species,variable_out,qnm_equi
 View(tbl3_mse_equivs)
 write_csv(tbl3,here('data','results','BHrecruit','qnmVmseSENS_tbl3_mismatches_20240923.csv'))
 
+
+
+
 # Table 4 -----------------------------------------------------------------
 
 triage_df %>% filter(triage=='false negative') %>%
@@ -261,7 +264,8 @@ write_csv(,here('doc','supplement','qnmVmseBH_false_positive_rates_20240923.csv'
 # Table S... --------------------------------------------------------------
 
 ## data
-rm(list=ls()) # clear
+# rm(list=ls()) # clear
+sim.date <- '20240923'
 speciesALL_compare <- load_data() #bh
 #ricker (main text)
 compare_main <- read_csv(here('data','results',
@@ -279,6 +283,7 @@ compare_main <- read_csv(here('data','results',
     management_strategy
   )) %>%
   mutate(mse_param='Ricker')
+
 
 
 ## how well do equivocal QNM outcomes match qMSE?
@@ -300,8 +305,8 @@ match_equiv <- match_equiv %>%
     grepl("Species2",mse_species) ~ "Species 2")) %>%
   mutate(mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, '_mse_equiv', '')) %>%
   mutate(match=ifelse(abs(qnm_psims)==50, 'uninf qnm',
-                      ifelse((qnm_psims < 0 & mse_prob < 40) |
-                               (qnm_psims > 0 & mse_prob > 60), 'match','mismatch'))) %>%
+                      ifelse((qnm_psims < 0 & mse_prob < 50) |
+                               (qnm_psims > 0 & mse_prob > 50), 'match','mismatch'))) %>%
   unite(match,mse_equiv,col='match',sep='')
 
 tbleq <- match_equiv %>% 
@@ -311,7 +316,8 @@ tbleq <- match_equiv %>%
   summarise(n=n()) %>% mutate(p=round(n/totaln,3)) %>% dplyr::select(-n) %>%
   pivot_wider(names_from='match',values_from='p',values_fill=0) %>%
   rowwise() %>%
-  mutate(total_mismatch=sum(across(c(mismatch,mismatch_mse_equiv))))
+  mutate(total_mismatch=sum(across(c(mismatch,mismatch_mse_equiv))),
+         total_match=sum(across(c(match,match_mse_equiv))))
 
 # check
 sum(tbleq$totaln)==dim(match_equiv)[1]
@@ -326,13 +332,44 @@ tbleq <- tbleq %>%
       summarise(n=n()) %>% mutate(p=round(n/totaln,3)) %>% dplyr::select(-n) %>%
       pivot_wider(names_from='match',values_from='p',values_fill=0) %>%
       rowwise() %>%
-      mutate(total_mismatch=sum(across(c(mismatch,mismatch_mse_equiv)))) %>%
+      mutate(total_mismatch=sum(across(c(mismatch,mismatch_mse_equiv))),
+             total_match=sum(across(c(match,match_mse_equiv)))) %>%
       mutate(variable_out='Overall')
   )
+
+# add whether false positive / false negative
+mismatch_equiv <- match_equiv %>% 
+  filter(grepl('mismatch',match)) %>%
+  mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 50, 'true_negative',
+                       ifelse(qnm_psims > 0 & mse_prob > 50, 'true_positive',
+                              ifelse(qnm_psims > 0 & mse_prob < 50, 'false_positive',
+                                     ifelse(qnm_psims < 0 & mse_prob > 50, 'false_negative', NA))))) %>%
+  mutate(triage=ifelse(grepl('mse_equiv',match),paste0(triage,'_mse_equiv'),triage))
+          
+tbleq2 <- mismatch_equiv %>%
+  ungroup() %>%
+  group_by(mse_species,mse_param,variable_out,triage) %>%
+  summarise(n=n()) %>%
+  pivot_wider(names_from='triage',values_from='n',values_fill=0) %>%
+  # add overall
+  bind_rows(
+    tbleq2 %>%
+      ungroup() %>%
+      group_by(mse_species,mse_param,triage) %>%
+      summarise(n=n()) %>%
+      pivot_wider(names_from='triage',values_from='n',values_fill=0) %>%
+      mutate(variable_out='Overall')
+  )
+
 
 
 tbleq %>% 
   mutate(variable_out=factor(variable_out,levels=c('Total Catch','Fishery 1 Catch','Fishery 2 Catch','Spawning Biomass','Overall'))) %>%
   arrange(mse_species,variable_out,desc(mse_param)) %>%
-write_csv(here('doc','supplement','qnmEquiv_V_mseBHvRicker_summary_20240923.csv'))
+write_csv(here('data','results','BHrecruit','qnmEquiv_V_mseBHvRicker_summary_20240923.csv'))
+
+tbleq2 %>% 
+  mutate(variable_out=factor(variable_out,levels=c('Total Catch','Fishery 1 Catch','Fishery 2 Catch','Spawning Biomass','Overall'))) %>%
+  arrange(mse_species,variable_out,desc(mse_param)) %>%
+  write_csv(here('data','results','BHrecruit','qnmEquiv_V_mseBHvRicker_mismatch_type_20240923.csv'))
 
