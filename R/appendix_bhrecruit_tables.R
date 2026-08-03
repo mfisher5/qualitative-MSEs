@@ -63,9 +63,11 @@ triage_df <- speciesALL_compare  %>%
   #                      ifelse(qnm_psims > 0 & mse_prob > 60, 'true positive',
   mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 50, 'true negative',
                        ifelse(qnm_psims > 0 & mse_prob > 50, 'true positive',
-                              ifelse(qnm_psims > 0 & mse_prob < 40, 'false positive',
-                                     ifelse(qnm_psims < 0 & mse_prob > 60, 'false negative', NA))))) %>%
-  mutate(triage_noEquiv=ifelse(qnm_equiv==0 & mse_equiv==0, triage, NA))
+                              ifelse(qnm_psims > 0 & mse_prob < 50, 'false positive',
+                                     ifelse(qnm_psims < 0 & mse_prob > 50, 'false negative', NA))))) %>%
+                       #        ifelse(qnm_psims > 0 & mse_prob < 40, 'false positive',
+                       #               ifelse(qnm_psims < 0 & mse_prob > 60, 'false negative', NA))))) %>%
+  mutate(triage_noEquiv=ifelse(qnm_equiv==0, triage, NA))
 
 
 
@@ -210,9 +212,9 @@ triage_main <- compare_main  %>%
   #                      ifelse(qnm_psims > 0 & mse_prob > 60, 'true positive',
   mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 50, 'true negative',
                        ifelse(qnm_psims > 0 & mse_prob > 50, 'true positive',
-                              ifelse(qnm_psims > 0 & mse_prob < 40, 'false positive',
-                                     ifelse(qnm_psims < 0 & mse_prob > 60, 'false negative', NA))))) %>%
-  mutate(triage_noEquiv=ifelse(qnm_equiv==0 & mse_equiv==0, triage, NA))
+                              ifelse(qnm_psims > 0 & mse_prob < 50, 'false positive',
+                                     ifelse(qnm_psims < 0 & mse_prob > 50, 'false negative', NA))))) %>%
+  mutate(triage_noEquiv=ifelse(qnm_equiv==0, triage, NA))
 
 
 ## false positive rates by strategy / metric, include equivocal QNM output
@@ -221,7 +223,7 @@ tbl_fp <- triage_df %>%
   group_by(species,management_strategy, variable_out) %>%
   mutate(totn=n()) %>%
   ungroup() %>% group_by(species,management_strategy, variable_out, totn,triage) %>%
-  summarise(n=n()) %>%
+  summarise(n=n(),mse_equiv=sum(mse_equiv)) %>%
   mutate(p=n/totn)  %>% mutate(include_equiv='y') %>%
   bind_rows(
     
@@ -229,9 +231,9 @@ tbl_fp <- triage_df %>%
     triage_df %>% group_by(species,management_strategy, variable_out) %>%
       mutate(totn=n()) %>%
       ungroup() %>% group_by(species,management_strategy, variable_out, totn,triage_noEquiv) %>%
-      summarise(n=n()) %>%
+      summarise(n=n(),mse_equiv=sum(mse_equiv)) %>%
       mutate(p=n/totn) %>%
-      rename(triage=triage_noEquiv) %>% mutate(include_equiv='n')
+      rename(triage=triage_noEquiv) %>% filter(!is.na(triage)) %>% mutate(include_equiv='n')
   ) %>% mutate(mse_param='BH')
 
 tbl_fp <- tbl_fp %>% bind_rows(
@@ -239,7 +241,7 @@ tbl_fp <- tbl_fp %>% bind_rows(
     group_by(species,management_strategy, variable_out) %>%
     mutate(totn=n()) %>%
     ungroup() %>% group_by(species,management_strategy, variable_out, totn,triage) %>%
-    summarise(n=n()) %>%
+    summarise(n=n(),mse_equiv=sum(mse_equiv)) %>%
     mutate(p=n/totn)  %>% mutate(include_equiv='y') %>% 
     bind_rows(
       
@@ -247,17 +249,23 @@ tbl_fp <- tbl_fp %>% bind_rows(
       triage_main %>% group_by(species,management_strategy, variable_out) %>%
         mutate(totn=n()) %>%
         ungroup() %>% group_by(species,management_strategy, variable_out, totn,triage_noEquiv) %>%
-        summarise(n=n()) %>%
+        summarise(n=n(),mse_equiv=sum(mse_equiv)) %>%
         mutate(p=n/totn) %>%
-        rename(triage=triage_noEquiv)  %>% mutate(include_equiv='n')
+        rename(triage=triage_noEquiv)  %>% filter(!is.na(triage)) %>% mutate(include_equiv='n')
     ) %>% mutate(mse_param='Ricker')
 )
 
-tbl_fp %>% dplyr::select(-totn,-n) %>%
-  
+tbl_fp <- tbl_fp %>% filter(triage=='false positive') %>%
   mutate(variable_out=factor(variable_out,levels=c('Total Catch','Fishery 1 Catch','Fishery 2 Catch','Spawning Biomass','Overall'))) %>%
-  arrange(mse_species,variable_out,desc(mse_param)) %>%
-write_csv(,here('doc','supplement','qnmVmseBH_false_positive_rates_20240923.csv'))
+  arrange(include_equiv, species, variable_out, desc(mse_param))
+
+tbl_fp %>% ungroup() %>% dplyr::select(-mse_equiv) %>% dplyr::select(-n,-totn) %>%
+  pivot_wider(names_from='variable_out',values_from='p')%>% mutate(display='fp_rate') %>%
+  bind_rows(
+    tbl_fp %>% ungroup() %>% dplyr::select(-p) %>% dplyr::select(-n,-totn) %>%
+      pivot_wider(names_from='variable_out',values_from='mse_equiv') %>% mutate(display='mse_equiv')
+  ) %>% arrange(include_equiv, species, management_strategy) %>%
+write_csv(here('data','results','BHrecruit','qnmVmseBH_false_positive_rates_20240923.csv'))
 
 
 

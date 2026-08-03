@@ -1,70 +1,81 @@
-species,management_strategy,variable_out,totn,triage,n,p_equiv,p_no_equiv
-(sp.1) med longevity,A. Status-quo,Fishery 1 Catch,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.1) med longevity,A. Status-quo,Fishery 1 Catch,3,true negative,2,0.6666666666666666,0.6666666666666666
-(sp.1) med longevity,A. Status-quo,Fishery 2 Catch,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.1) med longevity,A. Status-quo,Fishery 2 Catch,3,true negative,2,0.6666666666666666,0.6666666666666666
-(sp.1) med longevity,A. Status-quo,Spawning Biomass,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.1) med longevity,A. Status-quo,Spawning Biomass,3,true negative,2,0.6666666666666666,NA
-(sp.1) med longevity,A. Status-quo,Total Catch,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.1) med longevity,A. Status-quo,Total Catch,3,true negative,2,0.6666666666666666,0.6666666666666666
-(sp.1) med longevity,B. Eliminate fishery 1,Fishery 1 Catch,5,true negative,5,1,1
-(sp.1) med longevity,B. Eliminate fishery 1,Fishery 2 Catch,5,true positive,5,1,1
-(sp.1) med longevity,B. Eliminate fishery 1,Spawning Biomass,5,true positive,5,1,1
-(sp.1) med longevity,B. Eliminate fishery 1,Total Catch,5,false negative,1,0.2,NA
-(sp.1) med longevity,B. Eliminate fishery 1,Total Catch,5,false positive,3,0.6,NA
-(sp.1) med longevity,B. Eliminate fishery 1,Total Catch,5,true negative,1,0.2,NA
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 1 Catch,5,false negative,2,0.4,NA
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 1 Catch,5,true positive,3,0.6,NA
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 2 Catch,5,false positive,3,0.6,NA
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 2 Catch,5,true negative,2,0.4,NA
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Spawning Biomass,5,false positive,4,0.8,NA
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Spawning Biomass,5,true positive,1,0.2,0.2
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Total Catch,5,false negative,2,0.4,NA
-(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Total Catch,5,true positive,3,0.6,NA
-(sp.1) med longevity,D. Increase fishery mesh size,Fishery 1 Catch,5,false positive,3,0.6,0.6
-(sp.1) med longevity,D. Increase fishery mesh size,Fishery 1 Catch,5,true positive,2,0.4,NA
-(sp.1) med longevity,D. Increase fishery mesh size,Fishery 2 Catch,5,true positive,5,1,NA
-(sp.1) med longevity,D. Increase fishery mesh size,Spawning Biomass,5,true positive,5,1,NA
-(sp.1) med longevity,D. Increase fishery mesh size,Total Catch,5,true positive,5,1,NA
-(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",Fishery 1 Catch,5,false positive,4,0.8,NA
-(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",Fishery 1 Catch,5,true positive,1,0.2,NA
-(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",Fishery 2 Catch,5,true positive,5,1,1
-(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",Spawning Biomass,5,true positive,5,1,1
-(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",Total Catch,5,false positive,4,0.8,NA
-(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",Total Catch,5,true positive,1,0.2,0.2
-(sp.2) short longevity,A. Status-quo,Fishery 1 Catch,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.2) short longevity,A. Status-quo,Fishery 1 Catch,3,true negative,2,0.6666666666666666,0.6666666666666666
-(sp.2) short longevity,A. Status-quo,Fishery 2 Catch,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.2) short longevity,A. Status-quo,Fishery 2 Catch,3,true negative,2,0.6666666666666666,0.6666666666666666
-(sp.2) short longevity,A. Status-quo,Spawning Biomass,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.2) short longevity,A. Status-quo,Spawning Biomass,3,true negative,2,0.6666666666666666,NA
-(sp.2) short longevity,A. Status-quo,Total Catch,3,false positive,1,0.3333333333333333,0.3333333333333333
-(sp.2) short longevity,A. Status-quo,Total Catch,3,true negative,2,0.6666666666666666,0.6666666666666666
-(sp.2) short longevity,B. Eliminate fishery 1,Fishery 1 Catch,5,true negative,5,1,1
-(sp.2) short longevity,B. Eliminate fishery 1,Fishery 2 Catch,5,true positive,5,1,1
-(sp.2) short longevity,B. Eliminate fishery 1,Spawning Biomass,5,true positive,5,1,1
-(sp.2) short longevity,B. Eliminate fishery 1,Total Catch,5,false positive,3,0.6,NA
-(sp.2) short longevity,B. Eliminate fishery 1,Total Catch,5,true negative,1,0.2,NA
-(sp.2) short longevity,B. Eliminate fishery 1,Total Catch,5,NA,1,0.2,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 1 Catch,5,false positive,2,0.4,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 1 Catch,5,true negative,2,0.4,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 1 Catch,5,true positive,1,0.2,0.2
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 2 Catch,5,false negative,2,0.4,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 2 Catch,5,false positive,1,0.2,0.2
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Fishery 2 Catch,5,true positive,2,0.4,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Spawning Biomass,5,true positive,5,1,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Total Catch,5,false positive,2,0.4,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Total Catch,5,true negative,2,0.4,NA
-(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",Total Catch,5,true positive,1,0.2,0.2
-(sp.2) short longevity,D. Increase fishery mesh size,Fishery 1 Catch,5,false positive,4,0.8,0.8
-(sp.2) short longevity,D. Increase fishery mesh size,Fishery 1 Catch,5,NA,1,0.2,0.2
-(sp.2) short longevity,D. Increase fishery mesh size,Fishery 2 Catch,5,true positive,5,1,NA
-(sp.2) short longevity,D. Increase fishery mesh size,Spawning Biomass,5,true positive,5,1,NA
-(sp.2) short longevity,D. Increase fishery mesh size,Total Catch,5,false positive,4,0.8,0.8
-(sp.2) short longevity,D. Increase fishery mesh size,Total Catch,5,true positive,1,0.2,NA
-(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",Fishery 1 Catch,5,false positive,4,0.8,NA
-(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",Fishery 1 Catch,5,NA,1,0.2,NA
-(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",Fishery 2 Catch,5,true positive,5,1,1
-(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",Spawning Biomass,5,true positive,5,1,1
-(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",Total Catch,5,false positive,4,0.8,NA
-(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",Total Catch,5,true positive,1,0.2,NA
+species,management_strategy,triage,include_equiv,mse_param,Total Catch,Fishery 1 Catch,Fishery 2 Catch,Spawning Biomass,display
+(sp.1) med longevity,A. Status-quo,false positive,n,Ricker,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.1) med longevity,A. Status-quo,false positive,n,BH,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.1) med longevity,A. Status-quo,false positive,n,Ricker,0,0,0,0,mse_equiv
+(sp.1) med longevity,A. Status-quo,false positive,n,BH,0,0,0,0,mse_equiv
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,n,Ricker,0.4,NA,NA,NA,fp_rate
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,n,BH,0.4,NA,NA,NA,fp_rate
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,n,Ricker,0,NA,NA,NA,mse_equiv
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,n,BH,0,NA,NA,NA,mse_equiv
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,Ricker,NA,NA,0.4,0.2,fp_rate
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,BH,NA,NA,0.4,0.6,fp_rate
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,Ricker,NA,NA,0,0,mse_equiv
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,BH,NA,NA,0,0,mse_equiv
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,n,Ricker,NA,0.2,NA,NA,fp_rate
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,n,BH,NA,0.6,NA,NA,fp_rate
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,n,Ricker,NA,0,NA,NA,mse_equiv
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,n,BH,NA,0,NA,NA,mse_equiv
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,Ricker,0.4,0.6,NA,NA,fp_rate
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,BH,0.6,0.6,NA,NA,fp_rate
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,Ricker,0,0,NA,NA,mse_equiv
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,BH,0,0,NA,NA,mse_equiv
+(sp.2) short longevity,A. Status-quo,false positive,n,Ricker,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.2) short longevity,A. Status-quo,false positive,n,BH,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.2) short longevity,A. Status-quo,false positive,n,Ricker,0,0,0,0,mse_equiv
+(sp.2) short longevity,A. Status-quo,false positive,n,BH,0,0,0,0,mse_equiv
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,n,Ricker,0.4,NA,NA,NA,fp_rate
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,n,BH,0.4,NA,NA,NA,fp_rate
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,n,Ricker,0,NA,NA,NA,mse_equiv
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,n,BH,0,NA,NA,NA,mse_equiv
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,Ricker,0.4,0.2,0.2,NA,fp_rate
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,BH,0.2,0.2,0.2,NA,fp_rate
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,Ricker,0,0,0,NA,mse_equiv
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,n,BH,0,0,0,NA,mse_equiv
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,n,Ricker,0.8,0.8,NA,NA,fp_rate
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,n,BH,0.8,0.8,NA,NA,fp_rate
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,n,Ricker,0,0,NA,NA,mse_equiv
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,n,BH,0,0,NA,NA,mse_equiv
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,Ricker,0.8,0.6,NA,NA,fp_rate
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,BH,0.6,0.6,NA,NA,fp_rate
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,Ricker,0,0,NA,NA,mse_equiv
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,n,BH,0,0,NA,NA,mse_equiv
+(sp.1) med longevity,A. Status-quo,false positive,y,Ricker,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.1) med longevity,A. Status-quo,false positive,y,BH,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.1) med longevity,A. Status-quo,false positive,y,Ricker,0,0,0,0,mse_equiv
+(sp.1) med longevity,A. Status-quo,false positive,y,BH,0,0,0,0,mse_equiv
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,y,Ricker,0.6,NA,NA,NA,fp_rate
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,y,BH,0.6,NA,NA,NA,fp_rate
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,y,Ricker,0,NA,NA,NA,mse_equiv
+(sp.1) med longevity,B. Eliminate fishery 1,false positive,y,BH,0,NA,NA,NA,mse_equiv
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,Ricker,NA,NA,0.6,0.2,fp_rate
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,BH,NA,NA,0.6,0.8,fp_rate
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,Ricker,NA,NA,0,0,mse_equiv
+(sp.1) med longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,BH,NA,NA,0,0,mse_equiv
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,y,Ricker,NA,0.2,NA,NA,fp_rate
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,y,BH,NA,0.6,NA,NA,fp_rate
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,y,Ricker,NA,0,NA,NA,mse_equiv
+(sp.1) med longevity,D. Increase fishery mesh size,false positive,y,BH,NA,0,NA,NA,mse_equiv
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,Ricker,0.6,0.8,NA,NA,fp_rate
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,BH,0.8,0.8,NA,NA,fp_rate
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,Ricker,0,0,NA,NA,mse_equiv
+(sp.1) med longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,BH,0,0,NA,NA,mse_equiv
+(sp.2) short longevity,A. Status-quo,false positive,y,Ricker,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.2) short longevity,A. Status-quo,false positive,y,BH,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333,fp_rate
+(sp.2) short longevity,A. Status-quo,false positive,y,Ricker,0,0,0,0,mse_equiv
+(sp.2) short longevity,A. Status-quo,false positive,y,BH,0,0,0,0,mse_equiv
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,y,Ricker,0.6,NA,NA,NA,fp_rate
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,y,BH,0.6,NA,NA,NA,fp_rate
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,y,Ricker,0,NA,NA,NA,mse_equiv
+(sp.2) short longevity,B. Eliminate fishery 1,false positive,y,BH,0,NA,NA,NA,mse_equiv
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,Ricker,0.6,0.4,0.2,NA,fp_rate
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,BH,0.4,0.4,0.2,NA,fp_rate
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,Ricker,0,0,0,NA,mse_equiv
+(sp.2) short longevity,"C. Fishery 1 in ""offshore"" only, effort changes",false positive,y,BH,0,0,0,NA,mse_equiv
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,y,Ricker,1,1,NA,NA,fp_rate
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,y,BH,0.8,1,NA,NA,fp_rate
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,y,Ricker,0,0,NA,NA,mse_equiv
+(sp.2) short longevity,D. Increase fishery mesh size,false positive,y,BH,0,1,NA,NA,mse_equiv
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,Ricker,1,1,NA,NA,fp_rate
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,BH,0.8,1,NA,NA,fp_rate
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,Ricker,0,0,NA,NA,mse_equiv
+(sp.2) short longevity,"E. Fishery 1 in ""offshore"" only",false positive,y,BH,0,1,NA,NA,mse_equiv
