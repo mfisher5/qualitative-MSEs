@@ -43,6 +43,22 @@ The QNM table is from script 02
 qnm <- read_csv(here('data','results',paste0('qnm0-5_hcra-e_pSims_',sim.date,'.csv'))) %>% clean_names()
 ```
 
+fix the operating model scenario numbers. 
+```{r}
+qnm %<>% mutate(code=case_when(
+  grepl('2-',code)~str_replace(code,'2-','1-'),
+  grepl('3-',code)~str_replace(code,'3-','2-'),
+  grepl('4-',code)~str_replace(code,'4-','3-'),
+  grepl('5-',code)~str_replace(code,'5-','4-'),.default=code
+))
+qnm %<>% mutate(operating_model=case_when(
+  grepl('2.',operating_model)~str_replace(operating_model,'2.','1.'),
+  grepl('3.',operating_model)~str_replace(operating_model,'3.','2.'),
+  grepl('4.',operating_model)~str_replace(operating_model,'4.','3.'),
+  grepl('5.',operating_model)~str_replace(operating_model,'5.','4.'),.default=operating_model
+))
+```
+
 The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
 ```{r eval=TRUE}
 mse_format <- read_csv(here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
@@ -51,14 +67,15 @@ mse_format <- read_csv(here('data','results','mse0-5_hcrb-d_species1-2_20240206.
 
 First time running the script? We need to clean up a little and re-format the original MSE output table.
 ```{r eval=FALSE}
-mse <- read_csv(here('data','results','raw','mse_Table4_Species12_20240206.csv')) %>% clean_names()
+mse <- read_csv(here('data','results','raw','mse_Table4_Species12_Ricker_20260819.csv')) %>% clean_names()
 mse_column_key <- data.frame(mse_column=c("total_c","cat_fl1","cat_fl2","ssb_ssb",
                                           "eff_fl1","eff_fl2"),
                              new_name=c("total_catch","fishery_1_catch","fishery_2_catch","spawning_biomass",
                                         "fishery_1_effort","fishery_2_effort"))
 
 # clean up MSE output table
-mse %<>% mutate(trial=str_replace(trial,'Results//Resu',''))
+# mse %<>% mutate(trial=str_replace(trial,'Results//Resu',''))
+mse %<>% mutate(trial=str_replace(trial,'Resu',''))
 mse %<>% mutate(trial=str_replace(trial,'.out',''))
 mse %<>% separate(col='trial',into=c('tmp1','tmp2','tmp3','tmp4'), sep='') %>%
   unite(tmp2,tmp4,col='code',sep="-") %>% dplyr::select(-tmp1,-tmp3)
@@ -67,15 +84,26 @@ mse_format <- mse %>% pivot_longer(cols=2:(dim(mse)[2]),names_to="variable",valu
   mutate(variable=ifelse(grepl("ssb",variable), paste0("ssb_",variable),variable)) %>%
   separate(variable,into=c("v1","v2","col_num"),sep="_") %>%
   filter(!is.na(col_num)) %>%    ## gets rid of column that just lists sim coutn (num_s1)
-  mutate(model=ifelse(as.numeric(col_num) < 9, "MSE-Species1","MSE-Species2")) %>%
+  mutate(model=ifelse(as.numeric(col_num) < 15, "MSE-Species1","MSE-Species2")) %>%
   unite(v1,v2, col="variable",sep="_") %>%
   left_join(mse_column_key,by=c("variable"="mse_column")) %>%
   dplyr::select(-col_num, -variable) %>% rename(variable_out=new_name)
+
+# get rid of adult / juvenile split output for now.
+mse_format %<>% filter(!is.na(model))
+
+# re-number the cases
+mse_format %<>% mutate(code=case_when(
+  grepl('2-',code)~str_replace(code,'2-','1-'),
+  grepl('3-',code)~str_replace(code,'3-','2-'),
+  grepl('4-',code)~str_replace(code,'4-','3-'),
+  grepl('5-',code)~str_replace(code,'5-','4-'),.default=code
+))
 ```
 
 ```{r eval=write_out}
 ## save
-write_csv(mse_format, here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
+write_csv(mse_format, here('data','results','table1_mse1-4_hcrb-d_species1-2_Ricker_20260819.csv'))
 
 ## save for table 1
 mse_format %>% 
@@ -85,7 +113,7 @@ mse_format %>%
   )) %>% pivot_wider(
     names_from=variable_out,values_from=prob
   ) %>%
-  write_csv(here('data','results','table1_mse0-5_hcrb-d_species1-2_20240206.csv'))
+  write_csv(here('data','results','table1_qnmstyle_mse1-4_hcrb-d_species1-2_Ricker_20260819.csv'))
 ```
 
 
@@ -117,16 +145,17 @@ qnm %<>% pivot_longer(cols=c(total_catch, fishery_1,fishery_2,spawning_biomass),
 
 mse1 <- mse_format %>% filter(model=="MSE-Species1") %>%
   filter(variable_out %in% qnm$variable_out) %>%
-  filter(code != "2-A")
+  filter(!(code %in% c("0-A","1-A")))
 
 mse2 <- mse_format %>% filter(model=="MSE-Species2") %>%
   filter(variable_out %in% qnm$variable_out) %>%
-  filter(code != "2-A")
+  filter(!(code %in% c("0-A","1-A")))
 ```
 
 match mse species 1 / qnm
 ```{r eval=TRUE}
-species1_compare <- qnm %>% left_join(mse1, by=c("code","variable_out"))
+species1_compare <- qnm %>% filter(code != "1-A") %>%
+  left_join(mse1, by=c("code","variable_out"))
 ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
   geom_hline(aes(yintercept=60), col="orange", lty=2) +
@@ -142,7 +171,8 @@ ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
 
 match mse species 2 / qnm
 ```{r eval=TRUE}
-species2_compare <- qnm %>% left_join(mse2, by=c("code","variable_out"))
+species2_compare <- qnm %>% filter(code != "1-A") %>%
+  left_join(mse2, by=c("code","variable_out"))
 ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
   geom_hline(aes(yintercept=60), col="orange", lty=2) +
@@ -157,8 +187,8 @@ ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
 ```
 
 match multiple MSE versions of 2 Thorson Effort to QNM
-```{r eval=TRUE}
-compareThorson <- qnm %>% filter(operating_model=="2. Thorson effort") %>% 
+```{r eval=FALSE}
+compareThorson <- qnm %>% filter(operating_model=="1. Thorson effort") %>% 
   filter(`ms-code` != "A") %>%
   separate(code, into=c("om-code","ms-code"),sep="-",remove=FALSE) %>%
   dplyr::select(-"om-code") %>%
@@ -180,10 +210,10 @@ save
 ```{r eval=TRUE}
 ## all hcrs, oms
 speciesALL_compare <- bind_rows(species1_compare, species2_compare)
-write_csv(speciesALL_compare, here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv')))
+write_csv(speciesALL_compare, here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv')))
 
 ## thorson
-write_csv(compareThorson, here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'.csv')))
+# write_csv(compareThorson, here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'_2026review.csv')))
 ```
 
 
@@ -205,12 +235,12 @@ any(abs(speciesALL_compare$psims) == 50)
 ok, we need to account for 50/50 output (which shouldn't be considered positive/negative) in the QNMs.
 ```{r}
 summarise_mismatches <- speciesALL_compare %>%
-  filter(code != "2-A") %>%    # no perturbation in 2-A so can't compare to MSE
   mutate(qnm_direction=ifelse(psims < 0 & abs(psims) != 50, "negative", 
                               ifelse(psims > 0 & abs(psims) != 50, "positive","split")),
          mse_direction=ifelse(prob < 0, "negative","positive")) %>%
   mutate(qnm_equiv=ifelse(abs(psims) < 60, 1,0)) %>%
   mutate(compare_dir=case_when(
+    qnm_direction=='split' ~ 'split',
     qnm_direction==mse_direction & qnm_equiv==0 ~ 'match',
     qnm_direction==mse_direction & qnm_equiv==1 ~ 'match - qnm equivocal',
     qnm_direction!=mse_direction & qnm_equiv==0 ~ 'mismatch',
@@ -231,15 +261,31 @@ out1 <- summarise_mismatches %>%
       group_by(model.y,compare_dir) %>%
       summarise(n=n()) %>% mutate(variable_out='all')
   ) %>%
-  pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0) %>%
+  pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0)
+
+#check cases in each row. should be 23
+# rowSums(out1[,c(3:6)])
+
+# percent out of 23
+out1_pall <- out1 %>%
   adorn_percentages(denominator="row")
 
-kbl(out1)
+# percent out of number of non-equivocal
+out1_pcertain <- out1 %>%
+  dplyr::select(-contains('equivocal')) %>%
+  adorn_percentages(denominator="row")
+
+# percent out of equivocal
+out1_pequiv <- out1 %>%
+  dplyr::select(model.y, variable_out, contains('equivocal')) %>%
+  adorn_percentages(denominator="row")
+
+kbl(out1_pall)
 ```
 
 Add a list column that saves exactly which OM-HCRs were true mismatches
 ```{r}
-out1 %<>%
+out1_pall %<>%
   left_join(
     summarise_mismatches %>% 
       group_by(model.y,variable_out,compare_dir) %>%
@@ -248,28 +294,38 @@ out1 %<>%
       dplyr::select(model.y,variable_out,mismatch_codes)
   )
 ```
-
-save to file
-```{r eval=write_out}
-# as csv
-write_csv(out1, here('data','results',paste0('qnmVmse_mismatches_bySpbyVar',sim.date,'.csv')))
-
-# as nice table
-out1 %>%
-  mutate(across(match:`mismatch - qnm equivocal`, round,digits=3)) %>%
-  mutate(across(match:`mismatch - qnm equivocal`, as.character)) %>%
-  pivot_longer(cols=c("match","match - qnm equivocal","mismatch - qnm equivocal","mismatch","mismatch_codes"), names_to="Qual v Quant", values_to="tmp_p") %>%
+```{r}
+# print as nice table
+out1_pall %>%
+  mutate(across(match:split, round,digits=3)) %>%
+  mutate(across(match:split, as.character)) %>%
+  pivot_longer(cols=c("match","match - qnm equivocal","mismatch - qnm equivocal","mismatch","split","mismatch_codes"), names_to="Qual v Quant", values_to="tmp_p") %>%
   pivot_wider(id_cols=c("model.y","Qual v Quant"), names_from="variable_out",values_from="tmp_p") %>%
   ungroup() %>% dplyr::select(`Qual v Quant`, total_catch, fishery_1_catch, fishery_2_catch,spawning_biomass, all) %>%
   rename(Total=total_catch, `Fishery 1`=fishery_1_catch, `Fishery 2`=fishery_2_catch, `Spawning Biomass`=spawning_biomass, Overall=all) %>%
     kbl() %>%
     kable_classic_2(full_width = F) %>%
       add_header_above(c(" ", "Catch" = 3, " " = 2)) %>%
-  pack_rows("Species 1", 1, 5) %>%
-  pack_rows("Species 2", 6, 10)
+  pack_rows("Species 1", 1, 6) %>%
+  pack_rows("Species 2", 7, 12)
   
 ```
 
+
+save to file
+```{r eval=write_out}
+# as csv
+write_csv(out1_pall, here('data','results',paste0('Table_3_qnmVmse_mismatches_bySpbyVar',sim.date,'_2026review.csv')))
+
+# as excel
+x <- list(out1_pall, out1, out1_pcertain, out1_pequiv)
+names(x) <- c('table_3','case_counts','table_3_nonequiv_only','table_3_equiv_only')
+writexl::write_xlsx(
+  x,
+  path = here('data','results',paste0('Table_3_qnmVmse_mismatches_bySpbyVar',sim.date,'_2026review.xlsx')),
+  col_names = TRUE
+)
+```
 
 mismatches summarized across variables for OMs/HCRs:
 ```{r}
@@ -279,7 +335,6 @@ out2 <- summarise_mismatches %>%
   pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0) %>%
   dplyr::select(model.y,code,mismatch) %>%
   separate(code, into=c("OM","HCR")) %>%
-  mutate(OM=ifelse(as.numeric(OM) > 0, as.numeric(as.character(OM))-1, OM)) %>%
   pivot_wider(names_from="HCR",values_from="mismatch",values_fill=NA) %>%
   dplyr::select(model.y,OM, A,B,C,D,E) 
 # totals for each row (OM)
@@ -298,12 +353,11 @@ out2 %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
    pack_rows("Species 1", 1, 6) %>%
   pack_rows("Species 2", 7,12) %>%
    column_spec(1, bold=T) %>%
-   column_spec(7, italic=T) %>%
   row_spec(c(6,12), italic=T)
 ```
  
 ```{r eval=FALSE}
-  write_csv(out2, here('data','results',paste0('qnmVmse_mismatches_count_byOMbyHCR',sim.date,'.csv')))
+  write_csv(out2, here('data','results',paste0('qnmVmse_mismatches_count_byOMbyHCR',sim.date,'_2026review.csv')))
 ```
 
 
@@ -316,7 +370,6 @@ out2e <- summarise_mismatches %>%
   pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0) %>%
   dplyr::select(model.y,code,mismatch) %>%
   separate(code, into=c("OM","HCR")) %>%
-  mutate(OM=ifelse(as.numeric(OM) > 0, as.numeric(as.character(OM))-1, OM)) %>%
   pivot_wider(names_from="HCR",values_from="mismatch",values_fill=0) %>%
   dplyr::select(model.y,OM, A,B,C,D,E) 
 # totals for each row (OM)
@@ -339,7 +392,9 @@ out2e %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
   row_spec(c(6,12), italic=T)
 ```
 
-
+write that out nicely
+```{r}
+```
 
 
 
@@ -357,7 +412,7 @@ ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
   theme_bw() + theme(legend.title=element_blank())
 
 
-png(here('data','results','qnmVmse_scatterplot_OM_by_species_2024-03-28.png'), width=2800,height=2000,res=300)
+png(here('data','results','qnmVmse_scatterplot_OM_by_species_2026-08.png'), width=2800,height=2000,res=300)
 ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
   geom_hline(aes(yintercept=60), col="orange", lty=2) +
@@ -374,7 +429,7 @@ dev.off()
 
 for each species, look at OM (x facet) by hcr (y facet)
 ```{r eval=FALSE}
-png(here('data','results','qnmVmse_scatterplot_sp2_OM_by_HCR_2024-03-28.png'), width=2600,height=2000,res=300)
+png(here('data','results','qnmVmse_scatterplot_sp2_OM_by_HCR_2026-08.png'), width=2600,height=2000,res=300)
 ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
   geom_hline(aes(yintercept=60), col="orange", lty=2) +
@@ -402,66 +457,6 @@ dev.off()
 #   theme_bw() + theme(strip.text.y=element_text(hjust=0))
 # dev.off()
 ```
-
-
-
-### Explore results: Thorson Effort
-
-The Thorson effort quant MSE was run with different values of a parameter. Do quant MSE / QNM results match better at certain values of that parameter?
-```{r}
-thorson_mismatches <- compareThorson %>%
-  filter(`ms-code` != "A") %>%
-  mutate(qnm_direction=ifelse(psims < 0 & abs(psims) != 50, "negative", 
-                              ifelse(psims > 0 & abs(psims) != 50, "positive","split")),
-         mse_direction=ifelse(prob < 0, "negative","positive")) %>%
-  mutate(qnm_equiv=ifelse(abs(psims) < 60, 1,0)) %>%
-  mutate(directional_mismatch=ifelse(qnm_direction==mse_direction,0,
-                                     ifelse(qnm_equiv==1,1,2))) %>%
-  dplyr::select(code,mse_code,operating_model,model.y, variable_out,directional_mismatch) %>%
-  pivot_wider(id_cols=c(code,mse_code,operating_model,model.y), names_from=variable_out,values_from=directional_mismatch) %>%
-  rename(species=model.y)
-
-thorson_mismatches_summary <- thorson_mismatches %>%
-  pivot_longer(cols=5:8, names_to="variable",values_to="mismatch_type") %>%
-  group_by(species,operating_model,mismatch_type) %>%
-  summarise(n=n()) %>%
-  pivot_wider(names_from="mismatch_type",values_from="n", values_fill = 0) %>%
-  rename(match=`0`,
-         `mismatch - qnm equivocal`=`1`,
-         `mismatch`=`2`) %>%
-  mutate(sum = as.character(rowSums(across(where(is.numeric))))) %>%
-  adorn_percentages(denominator="row")
-
-thorson_mismatches_summary %>% kbl() %>% 
-    kable_paper()
-```
-
-Save tables.
-```{r}
-write_csv(thorson_mismatches_summary, here('data','results','qnm2Vmse2_mismatches_byTarget.csv'))
-write_csv(thorson_mismatches, here('data','results','qnm2Vmse2_mismatches_byVar.csv'))
-```
-
-
-
-```{r eval=FALSE}
-png(here('data','results','qnmVmse_OM2ThorsonEffort_scatterplot_20240919.png'), width=3300,height=1600,res=300)
-compareThorson %>%
-  filter(`ms-code` != "A") %>%
-  ggplot(aes(x=prob,y=psims, pch=variable_out)) +
-  geom_point() +
-  geom_hline(aes(yintercept=60), col="orange", lty=2) +
-  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
-  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
-  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
-  facet_grid(cols=vars(management_strategy), rows=vars(operating_model)) +
-  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
-  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion with Increase/Decrease",
-       title="MSE 2 v. QNM 2 (Thorson Effort)") +
-  theme_bw() + theme(legend.title=element_blank())
-dev.off()
-```
-QNM 2 x HCR C seems to perform better when target set to 1.25x biomass in the quant MSE, although the probability of increase for some of the variables is nearly 50%.
 
 
 
@@ -579,7 +574,7 @@ speciesALL_equiv %>% filter(grepl("Species2",model.y)) %>%
 
 for specific operating models, break out comparisons by management strategies and species
 ```{r eval=write_out}
-png(here('results','QNM_v_MSE_0BaseModel_quantitative_scatterplot_2024-02-01.png'), width=3200,height=1500,res=300)
+png(here('results','QNM_v_MSE_0BaseModel_quantitative_scatterplot_2026-08.png'), width=3200,height=1500,res=300)
 speciesALL_compare %>%
   filter(grepl('0',operating_model)) %>%
   ggplot(aes(x=prob,y=psims, pch=variable_out)) +
@@ -596,7 +591,7 @@ speciesALL_compare %>%
 dev.off()
 
 
-png(here('results','QNM_v_MSE_3LowerProductivity_quantitative_scatterplot_2024-02-01.png'), width=3200,height=1500,res=300)
+png(here('results','QNM_v_MSE_3LowerProductivity_quantitative_scatterplot_2026-08.png'), width=3200,height=1500,res=300)
 speciesALL_compare %>%
   filter(grepl('3',operating_model)) %>%
   ggplot(aes(x=prob,y=psims, pch=variable_out)) +
