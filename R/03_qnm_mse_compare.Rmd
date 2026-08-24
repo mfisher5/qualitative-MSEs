@@ -10,7 +10,7 @@ output:
 
 **Date written: 2023-12-20**
 
-Last Updated: 2024-02-06 mcf
+Last Updated: 2026-08-18 mcf
 
 ## Description
 ```{r setup, include=FALSE}
@@ -61,13 +61,13 @@ qnm %<>% mutate(operating_model=case_when(
 
 The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
 ```{r eval=TRUE}
-mse_format <- read_csv(here('data','results','mse0-5_hcrb-d_species1-2_20240206.csv'))
+mse_format <- read_csv(here('data','results','table1_mse0-4_species1-2_Ricker_20260819.csv'))
 ```
 
 
 First time running the script? We need to clean up a little and re-format the original MSE output table.
 ```{r eval=FALSE}
-mse <- read_csv(here('data','results','raw','mse_Table4_Species12_Ricker_20260819.csv')) %>% clean_names()
+mse <- read_csv(here('data','mse_out','Table_Mary_0_1_Ricker_20260821.csv')) %>% clean_names()
 mse_column_key <- data.frame(mse_column=c("total_c","cat_fl1","cat_fl2","ssb_ssb",
                                           "eff_fl1","eff_fl2"),
                              new_name=c("total_catch","fishery_1_catch","fishery_2_catch","spawning_biomass",
@@ -75,22 +75,27 @@ mse_column_key <- data.frame(mse_column=c("total_c","cat_fl1","cat_fl2","ssb_ssb
 
 # clean up MSE output table
 # mse %<>% mutate(trial=str_replace(trial,'Results//Resu',''))
-mse %<>% mutate(trial=str_replace(trial,'Resu',''))
+mse %<>% mutate(trial=str_replace(label,'Resu',''))
 mse %<>% mutate(trial=str_replace(trial,'.out',''))
 mse %<>% separate(col='trial',into=c('tmp1','tmp2','tmp3','tmp4'), sep='') %>%
   unite(tmp2,tmp4,col='code',sep="-") %>% dplyr::select(-tmp1,-tmp3)
 
-mse_format <- mse %>% pivot_longer(cols=2:(dim(mse)[2]),names_to="variable",values_to="prob") %>%
+mse_format <- mse %>% 
+  dplyr::relocate(code, .after=label) %>%
+  dplyr::select(-label) %>%
+  pivot_longer(cols=2:(dim(mse)[2]-1),names_to="variable",values_to="prob") %>%
   mutate(variable=ifelse(grepl("ssb",variable), paste0("ssb_",variable),variable)) %>%
   separate(variable,into=c("v1","v2","col_num"),sep="_") %>%
+  filter(!(v2 %in% c('j','a','s'))) %>%  ## ignore adult/juveniles split for now
   filter(!is.na(col_num)) %>%    ## gets rid of column that just lists sim coutn (num_s1)
   mutate(model=ifelse(as.numeric(col_num) < 15, "MSE-Species1","MSE-Species2")) %>%
   unite(v1,v2, col="variable",sep="_") %>%
   left_join(mse_column_key,by=c("variable"="mse_column")) %>%
   dplyr::select(-col_num, -variable) %>% rename(variable_out=new_name)
 
-# get rid of adult / juvenile split output for now.
+# get rid of the column with the number of iterations.
 mse_format %<>% filter(!is.na(model))
+mse_format %<>% filter(!is.na(variable_out))
 
 # re-number the cases
 mse_format %<>% mutate(code=case_when(
@@ -103,7 +108,7 @@ mse_format %<>% mutate(code=case_when(
 
 ```{r eval=write_out}
 ## save
-write_csv(mse_format, here('data','results','table1_mse1-4_hcrb-d_species1-2_Ricker_20260819.csv'))
+write_csv(mse_format, here('data','results','table1_mse0-4_species1-2_Ricker_20260819.csv'))
 
 ## save for table 1
 mse_format %>% 
@@ -113,7 +118,7 @@ mse_format %>%
   )) %>% pivot_wider(
     names_from=variable_out,values_from=prob
   ) %>%
-  write_csv(here('data','results','table1_qnmstyle_mse1-4_hcrb-d_species1-2_Ricker_20260819.csv'))
+  write_csv(here('data','results','table1_qnmstyle_mse0-4_hcrb-d_species1-2_Ricker_20260819.csv'))
 ```
 
 
@@ -188,8 +193,8 @@ ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
 
 match multiple MSE versions of 2 Thorson Effort to QNM
 ```{r eval=FALSE}
-compareThorson <- qnm %>% filter(operating_model=="1. Thorson effort") %>% 
-  filter(`ms-code` != "A") %>%
+compareThorson <- qnm %>% filter(grepl('1.',operating_model)) %>% 
+  filter(code != '1-A') %>%
   separate(code, into=c("om-code","ms-code"),sep="-",remove=FALSE) %>%
   dplyr::select(-"om-code") %>%
   left_join(mse_format %>% rename(mse_code=code) %>%
@@ -237,7 +242,7 @@ ok, we need to account for 50/50 output (which shouldn't be considered positive/
 summarise_mismatches <- speciesALL_compare %>%
   mutate(qnm_direction=ifelse(psims < 0 & abs(psims) != 50, "negative", 
                               ifelse(psims > 0 & abs(psims) != 50, "positive","split")),
-         mse_direction=ifelse(prob < 0, "negative","positive")) %>%
+         mse_direction=ifelse(prob < 50, "negative","positive")) %>%
   mutate(qnm_equiv=ifelse(abs(psims) < 60, 1,0)) %>%
   mutate(compare_dir=case_when(
     qnm_direction=='split' ~ 'split',
@@ -245,13 +250,20 @@ summarise_mismatches <- speciesALL_compare %>%
     qnm_direction==mse_direction & qnm_equiv==1 ~ 'match - qnm equivocal',
     qnm_direction!=mse_direction & qnm_equiv==0 ~ 'mismatch',
     qnm_direction!=mse_direction & qnm_equiv==1 ~ 'mismatch - qnm equivocal',.default=NA)) %>%
-  dplyr::select(code,model.y,variable_out,compare_dir) 
+  mutate(mse_equiv= case_when(
+    prob < 60 & prob > 50 ~ 1,
+    prob > 40 & prob < 50 ~ 1,
+    .default=0
+  ))
+
+summarise_mismatches %<>% dplyr::select(code,model.y,variable_out,compare_dir, mse_equiv) 
 ```
 
 
 mismatches summarized across OMs/HCRs for each variable:
 ```{r}
 out1 <- summarise_mismatches %>% 
+  dplyr::select(-mse_equiv) %>%
   # pivot_longer(cols=3:6, names_to="variable",values_to="mismatch_type") %>%
   group_by(model.y,variable_out,compare_dir) %>%
   summarise(n=n()) %>%
@@ -297,8 +309,8 @@ out1_pall %<>%
 ```{r}
 # print as nice table
 out1_pall %>%
-  mutate(across(match:split, round,digits=3)) %>%
-  mutate(across(match:split, as.character)) %>%
+  mutate(across(match:split, \(x) round(x, digits=3))) %>%
+  mutate(across(match:split,  \(x) as.character(x))) %>%
   pivot_longer(cols=c("match","match - qnm equivocal","mismatch - qnm equivocal","mismatch","split","mismatch_codes"), names_to="Qual v Quant", values_to="tmp_p") %>%
   pivot_wider(id_cols=c("model.y","Qual v Quant"), names_from="variable_out",values_from="tmp_p") %>%
   ungroup() %>% dplyr::select(`Qual v Quant`, total_catch, fishery_1_catch, fishery_2_catch,spawning_biomass, all) %>%
@@ -315,14 +327,14 @@ out1_pall %>%
 save to file
 ```{r eval=write_out}
 # as csv
-write_csv(out1_pall, here('data','results',paste0('Table_3_qnmVmse_mismatches_bySpbyVar',sim.date,'_2026review.csv')))
+write_csv(out1_pall, here('data','results',paste0('table3_qnmVmse_mismatches_bySpbyVar',sim.date,'_2026review.csv')))
 
 # as excel
-x <- list(out1_pall, out1, out1_pcertain, out1_pequiv)
-names(x) <- c('table_3','case_counts','table_3_nonequiv_only','table_3_equiv_only')
+x <- list(out1_pall, out1, out1_pcertain, out1_pequiv,summarise_mismatches)
+names(x) <- c('table_3','case_counts','table_3_nonequiv_only','table_3_equiv_only','all_data')
 writexl::write_xlsx(
   x,
-  path = here('data','results',paste0('Table_3_qnmVmse_mismatches_bySpbyVar',sim.date,'_2026review.xlsx')),
+  path = here('data','results',paste0('table3_qnmVmse_mismatches_bySpbyVar',sim.date,'_2026review.xlsx')),
   col_names = TRUE
 )
 ```
@@ -357,7 +369,7 @@ out2 %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
 ```
  
 ```{r eval=FALSE}
-  write_csv(out2, here('data','results',paste0('qnmVmse_mismatches_count_byOMbyHCR',sim.date,'_2026review.csv')))
+  write_csv(out2, here('data','results',paste0('qnmVmse_mismatch_count_byOMbyHCR',sim.date,'_2026review.csv')))
 ```
 
 
@@ -392,8 +404,9 @@ out2e %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
   row_spec(c(6,12), italic=T)
 ```
 
-write that out nicely
-```{r}
+
+```{r eval=FALSE}
+  write_csv(out2e, here('data','results',paste0('qnmVmse_mismatch_count_equiv_byOMbyHCR',sim.date,'_2026review.csv')))
 ```
 
 
@@ -429,8 +442,8 @@ dev.off()
 
 for each species, look at OM (x facet) by hcr (y facet)
 ```{r eval=FALSE}
-png(here('data','results','qnmVmse_scatterplot_sp2_OM_by_HCR_2026-08.png'), width=2600,height=2000,res=300)
-ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
+png(here('data','results','qnmVmse_scatterplot_OM_by_HCR_2026-08.png'), width=2600,height=2000,res=300)
+ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
   geom_point() +
   geom_hline(aes(yintercept=60), col="orange", lty=2) +
   geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
@@ -568,6 +581,9 @@ speciesALL_equiv %>% filter(grepl("Species2",model.y)) %>%
   kbl() %>% kable_paper(full_width=T)
 ```
 
+write out
+```{r}
+```
 
 
 ## Explore Results: each operating model
