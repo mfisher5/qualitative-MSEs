@@ -63,20 +63,7 @@ triage_df %>% filter(triage_noEquiv=='false positive') %>%
   arrange(species,management_strategy)
 ##
 
-## make table of false positive frequencies
-table_c4 <- triage_df %>% 
-  group_by(management_strategy,species) %>%
-  mutate(total_n=length(unique(operating_model))) %>%
-  ungroup() %>%
-  filter(triage=="false positive" | triage_noEquiv == "false positive") %>%
-  pivot_longer(cols=c(triage,triage_noEquiv), names_to='triage_type',values_to='decision') %>%
-  group_by(management_strategy, variable_out,species, total_n, triage_type, decision) %>% summarise(n=n()) %>%
-  mutate(p=n/total_n) %>% dplyr::select(-n) %>%
-  pivot_wider(names_from=variable_out,values_from=p) %>%
-  arrange(species,management_strategy)
-
-View(filter(table_c4, grepl('1', species)))
-View(filter(table_c4, grepl('2', species)))
+## 
 
 
 

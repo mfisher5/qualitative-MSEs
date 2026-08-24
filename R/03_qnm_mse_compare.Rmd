@@ -224,7 +224,7 @@ write_csv(speciesALL_compare, here('data','results',paste0('mseVqnm_prob-psim_sp
 
 
 
-## Explore results: across OMs
+## Explore mismatches: across OMs
 
 
 I find it more helpful to look at tables, but I'll also do some plotting below.
@@ -367,11 +367,6 @@ out2 %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
    column_spec(1, bold=T) %>%
   row_spec(c(6,12), italic=T)
 ```
- 
-```{r eval=FALSE}
-  write_csv(out2, here('data','results',paste0('qnmVmse_mismatch_count_byOMbyHCR',sim.date,'_2026review.csv')))
-```
-
 
 what happens when we include equivocal results?
 ```{r}
@@ -405,10 +400,11 @@ out2e %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
 ```
 
 
-```{r eval=FALSE}
+```{r eval=FALSE}  
+write_csv(out2, here('data','results',paste0('qnmVmse_mismatch_count_byOMbyHCR',sim.date,'_2026review.csv')))
+
   write_csv(out2e, here('data','results',paste0('qnmVmse_mismatch_count_equiv_byOMbyHCR',sim.date,'_2026review.csv')))
 ```
-
 
 
 plotting. aggregate across HCRs; look at OMs (x facet) by species (y facet)
@@ -473,7 +469,7 @@ dev.off()
 
 
 
-## Explore results: equivocal QNM
+## Explore mismatches: equivocal QNM
 
 when the QNM was qualitatively *equivocal* ( <60% stable matrices had same response direction), did the direction generally agree with the quant MSE?
 
@@ -586,7 +582,7 @@ write out
 ```
 
 
-## Explore Results: each operating model
+## Explore mismatches: each operating model
 
 for specific operating models, break out comparisons by management strategies and species
 ```{r eval=write_out}
@@ -622,6 +618,337 @@ speciesALL_compare %>%
        title="MSE 3 v. QNM 3 (Lower Productivity)") +
   theme_bw() + theme(legend.title=element_blank())
 dev.off()
+```
+
+
+
+
+## False positives / negatives
+
+classify mismatches as either false positive or false negative
+```{r}
+triage_df <- speciesALL_compare  %>%
+  dplyr::select(-model.x) %>% rename(species=model.y) %>%
+  rename(qnm_psims=psims, mse_prob=prob) %>%
+  mutate(species=case_when(
+    grepl("Species1", species) ~ "(sp.1) med longevity", 
+    grepl("Species2", species) ~ "(sp.2) short lived")) %>%
+  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
+         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) %>%
+  # mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 40, 'true negative',
+  #                      ifelse(qnm_psims > 0 & mse_prob > 60, 'true positive',
+  mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 50, 'true negative',
+                       ifelse(qnm_psims > 0 & mse_prob > 50, 'true positive',
+                              ifelse(qnm_psims > 0 & mse_prob < 50, 'false positive',
+                                     ifelse(qnm_psims < 0 & mse_prob > 50, 'false negative', NA))))) %>%
+                       #        ifelse(qnm_psims > 0 & mse_prob < 40, 'false positive',
+                       #               ifelse(qnm_psims < 0 & mse_prob > 60, 'false negative', NA))))) %>%
+  mutate(triage_noEquiv=ifelse(qnm_equiv==0, triage, NA))
+```
+
+take a quick look at false negatives
+```{r}
+triage_df %>% filter(triage=='false negative') %>%
+  group_by(management_strategy, variable_out,qnm_equiv,mse_equiv,species) %>% summarise(n=n())
+```
+
+save. 
+```{r}
+write_csv(triage_df,here('data','results','fig6_data.csv'))
+```
+
+
+### Table 4 
+
+
+by ms
+```{r}
+tbl4_ms <- triage_df %>% filter(triage_noEquiv=='false positive') %>%
+  group_by(management_strategy, variable_out,species) %>% summarise(n=n()) %>%
+  pivot_wider(names_from=variable_out,values_from=n) %>%
+  mutate(mismatch='false positive, no equiv') %>%
+  arrange(mismatch,species,management_strategy) %>%
+  bind_rows(
+    triage_df %>% filter(triage=='false positive') %>%
+      group_by(management_strategy, variable_out,species) %>% summarise(n=n()) %>%
+      pivot_wider(names_from=variable_out,values_from=n) %>%
+      mutate(mismatch='false positive') %>%
+      arrange(mismatch,species,management_strategy)
+  ) %>%
+  bind_rows(
+    triage_df %>% filter(triage_noEquiv=='false negative') %>%
+      group_by(management_strategy, variable_out,species) %>% summarise(n=n()) %>%
+      pivot_wider(names_from=variable_out,values_from=n) %>%
+      mutate(mismatch='false negative, no equiv') %>%
+      arrange(mismatch,species,management_strategy),
+    triage_df %>% filter(triage=='false negative') %>%
+      group_by(management_strategy, variable_out,species) %>% summarise(n=n()) %>%
+      pivot_wider(names_from=variable_out,values_from=n) %>%
+      mutate(mismatch='false negative') %>%
+      arrange(mismatch,species,management_strategy)
+  ) 
+```
+
+
+by om
+```{r}
+tbl4_om <- triage_df %>% filter(triage_noEquiv=='false positive') %>%
+  group_by(operating_model, variable_out,species) %>% summarise(n=n()) %>%
+  pivot_wider(names_from=variable_out,values_from=n, values_fill=0) %>%
+  mutate(mismatch='false positive, no equiv') %>%
+  arrange(mismatch,species,operating_model) %>%
+  bind_rows(
+    triage_df %>% filter(triage=='false positive') %>%
+      group_by(operating_model, variable_out,species) %>% summarise(n=n()) %>%
+      pivot_wider(names_from=variable_out,values_from=n, values_fill=0) %>%
+      mutate(mismatch='false positive') %>%
+      arrange(mismatch,species,operating_model)
+  ) %>%
+  bind_rows(
+    triage_df %>% filter(triage_noEquiv=='false negative') %>%
+      group_by(operating_model, variable_out,species) %>% summarise(n=n()) %>%
+      pivot_wider(names_from=variable_out,values_from=n, values_fill=0) %>%
+      mutate(mismatch='false negative, no equiv') %>%
+      arrange(mismatch,species,operating_model),
+    triage_df %>% filter(triage=='false negative') %>%
+      group_by(operating_model, variable_out,species) %>% summarise(n=n()) %>%
+      pivot_wider(names_from=variable_out,values_from=n, values_fill=0) %>%
+      mutate(mismatch='false negative') %>%
+      arrange(mismatch,species,operating_model)
+  )
+```
+
+
+```{r}
+tbl4_ms2 <- tbl4_ms %>%
+  pivot_longer(cols=c('total_catch','fishery_1_catch','fishery_2_catch','spawning_biomass'),
+               names_to='variable',values_to='count') %>%
+  pivot_wider(names_from=mismatch, values_from=count, values_fill=0) %>%
+  mutate(across(.cols=where(is.numeric), .fns = \(x) replace_na(x,replace=0))) %>%
+  ## combine columns to make "non-equiv (equiv)"
+  mutate(`false positive, no equiv`=case_when(
+    `false positive, no equiv`==`false positive` ~ '',
+    `false positive, no equiv`==0 ~ '',
+    .default=paste0('(',`false positive, no equiv`,')')
+  )) %>%
+  unite(`false positive`,`false positive, no equiv`, col='fp',sep=' ') %>%
+  ## all false negs are equivocal. add "0 ()"
+  rename(fn=`false negative`) %>% 
+  mutate(fn=case_when(
+    fn > 0 ~ paste0('0 (',fn,')'), 
+    .default=as.character(fn)))
+
+tbl4_om2 <- tbl4_om %>%
+  pivot_longer(cols=c('total_catch','fishery_1_catch','fishery_2_catch','spawning_biomass'),
+               names_to='variable',values_to='count') %>%
+  pivot_wider(names_from=mismatch, values_from=count, values_fill=0) %>%
+  mutate(across(.cols=where(is.numeric), .fns = \(x) replace_na(x,replace=0))) %>%
+    ## combine columns to make "non-equiv (equiv)"
+  mutate(`false positive, no equiv`=case_when(
+    `false positive, no equiv`==`false positive` ~ '',
+    `false positive, no equiv`==0 ~ '',
+    .default=paste0('(',`false positive, no equiv`,')')
+  )) %>%
+  unite(`false positive`,`false positive, no equiv`, col='fp',sep=' ') %>%
+  ## all false negs are equivocal. add "0 ()"
+  rename(fn=`false negative`)  %>% 
+  mutate(fn=case_when(
+    fn > 0 ~ paste0('0 (',fn,')'), 
+    .default=as.character(fn)))
+  
+  
+tbl4_ms2 %>% dplyr::select(-`false negative`) %>%
+  pivot_wider(names_from='variable',values_from='fp', values_fill='0') %>%
+  rename(strategy_or_om=management_strategy) %>% bind_rows(
+    tbl4_om2 %>% dplyr::select(-`false negative`) %>%
+  pivot_wider(names_from='variable',values_from='fp', values_fill='0') %>%
+  rename(strategy_or_om=operating_model)
+  ) %>%
+  write_csv(here('data','results','tbl4_positives_bySpbyMS_20240923_2026review.csv'))
+
+tbl4_ms2 %>% dplyr::select(-fp) %>%
+  pivot_wider(names_from='variable',values_from='fn', values_fill='0') %>%
+  rename(strategy_or_om=management_strategy) %>% mutate(type='1_strat') %>%
+  bind_rows(
+    tbl4_om2  %>% dplyr::select(-fp) %>%
+  pivot_wider(names_from='variable',values_from='fn', values_fill='0') %>%
+  rename(strategy_or_om=operating_model) %>% mutate(type='2_om')
+  ) %>% arrange(species,type,strategy_or_om) %>%
+  write_csv(here('data','results','tbl4_negatives_bySpbyMS_20240923_2026review.csv'))
+```
+
+
+### Table s. False positive frequencies
+
+make table of false positive frequencies for the supplement
+```{r}
+table_c4 <- triage_df %>% 
+  group_by(management_strategy,species) %>%
+  mutate(total_n=length(unique(operating_model))) %>%
+  ungroup() %>%
+  filter(grepl("false positive", triage_equiv)) %>%
+  # pivot_longer(cols=c(triage,triage_noEquiv), names_to='triage_type',values_to='decision') %>%
+  # filter(!is.na(decision)) %>% ungroup() %>%
+  group_by(management_strategy, variable_out,species, total_n, triage_equiv) %>% summarise(n=n()) %>%
+  pivot_wider(names_from='triage_equiv',values_from='n', values_fill=0) %>%
+  rename(fp=`false positive`, fp_only_equiv=`false positive, equiv`) %>%
+  mutate(fp_include_equiv=fp+fp_only_equiv)
+  
+  
+table_c4 %>% dplyr::select(-fp_only_equiv) %>%
+  mutate(fp=fp/total_n) %>% mutate(fp_include_equiv=fp_include_equiv/total_n) %>%
+  mutate(across(.cols=contains('fp'), .fns = \(x) as.character(round(x, 2)))) %>%
+  mutate(fp_include_equiv=case_when(
+    fp_include_equiv==fp ~ '',
+    fp_include_equiv==0 ~ '',
+    .default=paste0('(',fp_include_equiv,')'))) %>%
+   unite(fp,fp_include_equiv, col='fp',sep=' ') %>%
+  arrange(species,management_strategy) %>%
+  ungroup() %>% dplyr::select(-total_n) %>%
+  pivot_wider(names_from=variable_out, values_from=fp, values_fill='0') %>%
+  arrange(species,management_strategy) %>%
+  write_csv(here('data','results','stbl_false_pos_rate_bySpbyMS_20240923_2026review.csv'))
+```
+
+
+
+
+## Catch - Biomass Trade-offs
+
+these are the possible trade-offs:
+```{r}
+tradeoffs_vec <- c("catch increases,\nbiomass increases","catch increases,\nbiomass decreases","catch decreases,\nbiomass increases", "catch decreases,\nbiomass decreases")
+
+## create a pairwise df of all possible trade-offs
+pairwise_df <- data.frame(MSE= rep(tradeoffs_vec,each=4),
+  QNM=rep(tradeoffs_vec, 4))
+pairwise_df %<>% 
+  mutate(species="(sp.1) med longevity") %>%
+  bind_rows(
+    pairwise_df %>% mutate(species="(sp.2) short lived")
+  )
+```
+
+
+prepare a df to describe trade-offs. we don't want to use equivocal output to make triage decisions in the main text, so NA-out equivocal QNM output. 
+```{r}
+tos <- speciesALL_compare  %>%
+  dplyr::select(-model.x) %>%
+  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
+  mutate(species=case_when(
+    species=="MSE-Species1" ~ "(sp.1) med longevity", 
+    species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
+  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
+         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) %>%
+  mutate(qnm_psims=ifelse(qnm_equiv==1, NA, qnm_psims)) 
+```
+
+
+this version of the trade-offs df has "increase" and "decrease" for use in a table.
+```{r}
+tost_list <- list()
+i = 1
+for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
+  tmpdat <- tos %>%
+    filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+    dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
+    pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
+    mutate(QNM=case_when(
+      is.na(catch) & spawning_biomass > 0 ~ ' catch, increase biomass', 
+      is.na(catch) & spawning_biomass < 0 ~ ' catch, increase biomass', 
+      catch > 0 & is.na(spawning_biomass) ~ 'decrease catch,  biomass',
+      catch < 0 & is.na(spawning_biomass) ~ 'increase catch,  biomass',
+      catch > 0 & spawning_biomass > 0 ~ 'decrease catch, decrease biomass',
+      catch < 0 & spawning_biomass > 0 ~ 'increase catch, decrease biomass',
+      catch < 0 & spawning_biomass < 0 ~ 'increase catch, increase biomass',
+      catch > 0 & spawning_biomass < 0 ~ 'decrease catch, increase biomass', 
+      is.na(catch) & is.na(spawning_biomass) ~ ' catch,  biomass'
+    )) %>%
+    filter(QNM != ' catch,  biomass') %>%
+    dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
+    left_join(
+      tos %>%
+         filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+        group_by(species,operating_model, management_strategy, code) %>%
+        mutate(tot_mse_equiv=sum(mse_equiv)) %>% ungroup() %>%
+        dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species, tot_mse_equiv) %>%
+        pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
+        mutate(MSE=case_when(
+          catch > 50 & spawning_biomass > 50 ~ 'decrease catch, decrease biomass',
+          catch < 50 & spawning_biomass > 50 ~ 'increase catch, decrease biomass',
+          catch < 50 & spawning_biomass < 50 ~ 'increase catch, increase biomass',
+          catch > 50 & spawning_biomass < 50 ~ 'decrease catch, increase biomass'
+        ))  %>%
+        dplyr::select(operating_model, management_strategy, code, species, MSE, tot_mse_equiv)
+
+    )
+  tost_list[[i]] <- tmpdat
+  names(tost_list)[i] <- v
+  i = i + 1
+}
+```
+
+
+save as an RDS 
+```{r}
+saveRDS(tost_list, here('data','results','fig7_data_text.rds'))
+```
+
+
+
+
+
+this version of the trade-offs df has arrows, for use in fig 7.
+```{r}
+tos_list <- list()
+i = 1
+for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
+  tmpdat <- tos %>%
+    filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+    dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
+    pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
+    mutate(QNM=case_when(
+      is.na(catch) & spawning_biomass > 0 ~ '? catch,\n\u2191 biomass', 
+      is.na(catch) & spawning_biomass < 0 ~ '? catch,\n\u2193 biomass', 
+      catch > 0 & is.na(spawning_biomass) ~ '\u2191 catch,\n? biomass',
+      catch < 0 & is.na(spawning_biomass) ~ '\u2193 catch,\n? biomass',
+      catch > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
+      catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+      catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+      catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass', 
+      is.na(catch) & is.na(spawning_biomass) ~ '? catch,\n? biomass'
+    )) %>%
+    filter(QNM != '? catch,\n? biomass') %>%
+    dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
+    left_join(
+      tos %>%
+         filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+        group_by(species,operating_model, management_strategy, code) %>%
+        mutate(tot_mse_equiv=sum(mse_equiv)) %>% ungroup() %>%
+        dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species, tot_mse_equiv) %>%
+        pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
+        mutate(MSE=case_when(
+          catch > 50 & spawning_biomass > 50 ~ '\u2191 catch,\n\u2191 biomass',
+          catch < 50 & spawning_biomass > 50 ~ '\u2193 catch,\n\u2191 biomass',
+          catch < 50 & spawning_biomass < 50 ~ '\u2193 catch,\n\u2193 biomass',
+          catch > 50 & spawning_biomass < 50 ~ '\u2191 catch,\n\u2193 biomass'
+        ))  %>%
+        dplyr::select(operating_model, management_strategy, code, species, MSE, tot_mse_equiv)
+
+    )
+  tos_list[[i]] <- tmpdat
+  names(tos_list)[i] <- v
+  i = i + 1
+}
+```
+
+save as an RDS 
+```{r}
+saveRDS(tos_list, here('data','results','fig7_data_arrows.rds'))
 ```
 
 
