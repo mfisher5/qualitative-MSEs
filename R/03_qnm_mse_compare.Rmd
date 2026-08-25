@@ -951,5 +951,91 @@ save as an RDS
 saveRDS(tos_list, here('data','results','fig7_data_arrows.rds'))
 ```
 
+this version of the trade-offs df has arrows, for use in fig 7, but allow equivocal QNM responses to contribute to the count in the appropriate increase/decrease category.
+
+```{r}
+tos_allqnm <- speciesALL_compare  %>%
+  dplyr::select(-model.x) %>%
+  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
+  mutate(species=case_when(
+    species=="MSE-Species1" ~ "(sp.1) med longevity", 
+    species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
+  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
+         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0))
+
+tos_allqnm_list <- list()
+i = 1
+for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
+  tmpdat <- tos_allqnm %>%
+    filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+    dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
+    pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
+    mutate(QNM=case_when(
+      catch > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
+      catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+      catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+      catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass', 
+      is.na(catch) & is.na(spawning_biomass) ~ '? catch,\n? biomass'
+    )) %>%
+    dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
+    left_join(
+      tos %>%
+         filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+        group_by(species,operating_model, management_strategy, code) %>%
+        mutate(tot_mse_equiv=sum(mse_equiv)) %>% ungroup() %>%
+        dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species, tot_mse_equiv) %>%
+        pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
+        mutate(MSE=case_when(
+          catch > 50 & spawning_biomass > 50 ~ '\u2191 catch,\n\u2191 biomass',
+          catch < 50 & spawning_biomass > 50 ~ '\u2193 catch,\n\u2191 biomass',
+          catch < 50 & spawning_biomass < 50 ~ '\u2193 catch,\n\u2193 biomass',
+          catch > 50 & spawning_biomass < 50 ~ '\u2191 catch,\n\u2193 biomass'
+        ))  %>%
+        dplyr::select(operating_model, management_strategy, code, species, MSE, tot_mse_equiv)
+
+    )
+  tos_allqnm_list [[i]] <- tmpdat
+  names(tos_allqnm_list )[i] <- v
+  i = i + 1
+}
+```
+
+save as an RDS 
+```{r}
+saveRDS(tos_allqnm_list , here('data','results',
+                               paste0('fig7_data_arrows_countEquiv_',sim.date,'.rds')))
+```
 
 
+use Fig 7 data frame to produce table C6
+```{r}
+tbl_c6_list <- list()
+i = 1
+for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
+tbl_c6_list[[i]] <- tos_list[[v]] %>% 
+    mutate(MSE=case_when(
+      grepl('\u2191',MSE) | grepl('\n\u2191',MSE) ~ str_replace_all(MSE,'\u2191','+'),
+      .default=MSE),
+    MSE=case_when(
+      grepl('\u2193',MSE) | grepl('\n\u2193',MSE) ~ str_replace_all(MSE,'\u2193','-'),
+      .default=MSE),
+    MSE=case_when(grepl('\n',MSE) ~ str_replace_all(MSE,'\n',' '),
+                  .default=MSE)) %>%
+    mutate(QNM=case_when(
+        grepl('\u2191',QNM) | grepl('\n\u2191',QNM) ~ str_replace_all(QNM,'\u2191','+'),
+        .default=QNM),
+      QNM=case_when(
+        grepl('\u2193',QNM) | grepl('\n\u2193',QNM) ~ str_replace_all(QNM,'\u2193','-'),
+        .default=QNM),
+      QNM=case_when(grepl('\n',QNM) ~ str_replace_all(QNM,'\n',' '),
+                    .default=QNM)) %>%
+    mutate(MSE=paste0('"',MSE,'"'), QNM=paste0('"',QNM,'"')) %>%
+    mutate(catch_metric=v)
+i = i + 1
+}
+
+tblc6_out <- do.call(rbind,tbl_c6_list)
+write_csv(tblc6_out, file=here('data','results',paste0('tableC6_tradeoffs_byOMbyHCRbySp_',sim.date,'.csv')), quote='all')
+```

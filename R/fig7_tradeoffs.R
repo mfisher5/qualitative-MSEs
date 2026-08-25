@@ -1,12 +1,11 @@
-########## Create Table 7 ###########
+########## Create Fig 7 ###########
 #
-# Table 7 summarizes trade-offs in catch, biomass  
+# Fig 7 summarizes trade-offs in catch, biomass  
 #    comparing QNM v MSE output. 
 #    Data required for this script are created in "03_qnm_mse_compare.R"
-#    Also use this script to create: Table C6, 
 #
 # Written 2024-12-27 M Fisher
-# Last Updated: 2025-11-16
+# Last Updated: 2026-08-24
 #
 ################################################################
 
@@ -14,7 +13,6 @@
 # Set up ------------------------------------------------------------------
 
 sim.date <- '20240923'      # date sims were run (in object names)
-update.supplement <- FALSE  # do you want to save out new supplementary tables, figures?
 
 ## Functions
 library(here)
@@ -30,32 +28,7 @@ library(cowplot)
 
 # Data --------------------------------------------------------------------
 
-speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv')))
-
-## fix variable names for legend
-speciesALL_compare %<>% 
-  filter(code != "2-A") %>%     # QNM 2 HCR A doesn't have a perturbation
-  mutate(variable_out=fct_recode(variable_out,"Fishery 1 Catch"="fishery_1_catch",
-                                 "Fishery 2 Catch"="fishery_2_catch",
-                                 "Total Catch"="total_catch",
-                                 "Spawning Biomass"="spawning_biomass"))
-
-## prep df to describe trade-offs
-tos <- speciesALL_compare  %>%
-  ## rename oms!
-  mutate(operating_model=case_when(
-    operating_model=="2. Thorson effort" ~ "1. Thorson effort",
-    operating_model=="3. Lower productivity" ~ "2. Lower productivity",
-    operating_model=="4. Move \"far offshore\"" ~ "3. Move \"far offshore\"",
-    operating_model=="5. Lower growth rate" ~ "4. Lower growth rate",
-    .default=operating_model
-  )) %>%
-  dplyr::select(-model.x) %>%
-  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
-  mutate(species=case_when(
-    species=="MSE-Species1" ~ "(sp.1) med longevity", 
-    species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
-  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0))
+tos_list <- readRDS(here('data','results','fig7_data_arrows.rds'))
 
 ## create full pairwise df 
 tradeoffs_vec <- c("catch increases,\nbiomass increases","catch increases,\nbiomass decreases","catch decreases,\nbiomass increases", "catch decreases,\nbiomass decreases")
@@ -91,141 +64,30 @@ tradeoffs_vec2_equiv <- c('\u2191 catch,\n\u2191 biomass',
                           '? catch,\n\u2193 biomass',
                           '? catch,\n? biomass')
 
-# Write to excel to manually code -----------------------------------------
-# 
-# tos %>%
-#   filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
-#   mutate(variable_out=case_when(
-#     variable_out == "Total Catch" ~ "Total Catch QNM",
-#     variable_out == "Spawning Biomass" ~ "Spawning Biomass QNM"
-#   )) %>%
-#   dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
-#   pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
-#   left_join(
-# 
-#     tos %>%
-#       filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
-#       mutate(variable_out=case_when(
-#         variable_out == "Total Catch" ~ "Total Catch MSE",
-#         variable_out == "Spawning Biomass" ~ "Spawning Biomass MSE"
-#       )) %>%
-#       dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
-#       pivot_wider(names_from=variable_out, values_from=mse_prob)
-#   ) %>%
-#   write_csv(here('data','results',paste0('mseVqnm_tradeoffs_species1-2_allHCRallOM_',sim.date,'.csv')))
 
+############### separate equivocal output  ##############
+#########################################################
 
+# Total catch -------------------------------------------------------------
 
-
-# Total catch: allow equiv -------------------------------------------------------------
-
-tos_total <- tos %>%
-  filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Total Catch","total_catch","spawning_biomass")) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
-  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
-  ## \u2191 for increasing, \u2193 for decreasing
-  mutate(QNM=case_when(
-    total_catch > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-    total_catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-    total_catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-    total_catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-  )) %>%
-  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
-  left_join(
-    
-    tos %>%
-      filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
-      mutate(variable_out=ifelse(variable_out=="Total Catch","total_catch","spawning_biomass")) %>%
-      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
-      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
-      mutate(MSE=case_when(
-        total_catch > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-        total_catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-        total_catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-        total_catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-      ))  %>%
-      dplyr::select(operating_model, management_strategy, code, species, MSE)
-    
-    
-  )
-
-
-pal=pnw_palette("Moth",100)
-tos_total %>%
-  group_by(species, QNM, MSE) %>%
-  summarise(n=length(unique(code))) %>%
-  full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2)), fill=n)) +
-  geom_tile() + 
-  geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
-                ymin=c(3.5),ymax=c(4.5)), fill='transparent',col='black') +
-  geom_rect(aes(xmin=1.5, xmax=2.5,
-                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
-  geom_rect(aes(xmin=2.5, xmax=3.5,
-                ymin=1.5, ymax=2.5), fill='transparent',col='black') +
-  geom_rect(aes(xmin=3.5, xmax=4.5,
-                ymin=0.5, ymax=1.5), fill='transparent',col='black') +
-  facet_wrap(~species,strip.position='bottom') +
-  labs(x="MSE outcome",y="QNM outcome") +
-  scale_x_discrete(position='top') +
-  scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,23)) +
-  theme_bw() +
-  theme(legend.title=element_blank()) -> plot.total
-
-plot.total
-
-# Total catch: no equiv -------------------------------------------------------------
-
-tos2_total <- tos %>%
-  filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Total Catch","total_catch","spawning_biomass")) %>%
-  mutate(qnm_psims=ifelse(qnm_equiv==1, NA, qnm_psims)) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
-  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
-  mutate(QNM=case_when(
-    is.na(total_catch) & spawning_biomass > 0 ~ '? catch,\n\u2191 biomass', 
-    is.na(total_catch) & spawning_biomass < 0 ~ '? catch,\n\u2193 biomass', 
-    total_catch > 0 & is.na(spawning_biomass) ~ '\u2191 catch,\n? biomass',
-    total_catch < 0 & is.na(spawning_biomass) ~ '\u2193 catch,\n? biomass',
-    total_catch > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-    total_catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-    total_catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-    total_catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass', 
-    is.na(total_catch) & is.na(spawning_biomass) ~ '? catch,\n? biomass'
-  )) %>%
-  filter(QNM != '? catch,\n? biomass') %>%
-  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
-  left_join(
-    
-    tos %>%
-      filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
-      mutate(variable_out=ifelse(variable_out=="Total Catch","total_catch","spawning_biomass")) %>%
-      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
-      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
-      mutate(MSE=case_when(
-        total_catch > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-        total_catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-        total_catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-        total_catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-      ))  %>%
-      dplyr::select(operating_model, management_strategy, code, species, MSE)
-    
-    
-  )
-
+tos2_total <- tos_list[['total_catch']]
 tradeoffs_vec2_qnm <- tradeoffs_vec2_equiv[
   which((tradeoffs_vec2_equiv %in% tradeoffs_vec2) | (tradeoffs_vec2_equiv %in% unique(tos2_total$QNM)))
 ]
 pal=pnw_palette("Shuksan",100)
-tos2_total %>%
+to_plot <- tos2_total %>%
   group_by(species, QNM, MSE) %>%
-  summarise(n=length(unique(code))) %>%
+  summarise(n=length(unique(code)),
+            mse_equiv=sum(tot_mse_equiv)) %>%
   full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  mutate(n=ifelse(is.na(n), 0, n),n_lab=ifelse(n==0,NA,n),n_col=ifelse(n>12,'gray90','gray40')) %>%
-  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
+  mutate(n=ifelse(is.na(n), 0, n),
+         n_lab=ifelse(n==0,NA,n),
+         n_col=ifelse(n>12,'gray90','gray40')) %>%
+  mutate(n_lab=ifelse(mse_equiv==1, paste0(n_lab,'*'),paste0(n_lab)))
+
+plot.total.equiv <- ggplot(to_plot, aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
   geom_tile() + 
-  geom_text(aes(label=n_lab, fontface='italic'), col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
+  geom_text(aes(label=n_lab, fontface='italic'), col=to_plot$n_col) + # col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -244,142 +106,31 @@ tos2_total %>%
 
 plot.total.equiv
 
-## update Table C6
-if(update.supplement){
-  tos2_total %>% 
-    mutate(MSE=case_when(
-      grepl('\u2191',MSE) | grepl('\n\u2191',MSE) ~ str_replace_all(MSE,'\u2191','+'),
-      .default=MSE),
-    MSE=case_when(
-      grepl('\u2193',MSE) | grepl('\n\u2193',MSE) ~ str_replace_all(MSE,'\u2193','-'),
-      .default=MSE),
-    MSE=case_when(grepl('\n',MSE) ~ str_replace_all(MSE,'\n',' '),
-                  .default=MSE)) %>%
-    mutate(QNM=case_when(
-        grepl('\u2191',QNM) | grepl('\n\u2191',QNM) ~ str_replace_all(QNM,'\u2191','+'),
-        .default=QNM),
-      QNM=case_when(
-        grepl('\u2193',QNM) | grepl('\n\u2193',QNM) ~ str_replace_all(QNM,'\u2193','-'),
-        .default=QNM),
-      QNM=case_when(grepl('\n',QNM) ~ str_replace_all(QNM,'\n',' '),
-                    .default=QNM)) %>%
-    mutate(MSE=paste0('"',MSE,'"'), QNM=paste0('"',QNM,'"')) %>%
-    mutate(catch_metric='Total catch') %>%
-    write_csv(file=here('data','results',paste0('tableC6_qnmVmse_tradeoffs_byOMbyHCRbySp_',sim.date,'.csv')), quote='all')
-}
 
 
 
 
-# Fishery 1: allow equiv ---------------------------------------------------------
+# Fishery 1 -----------------------------------------------
 
-tos_fish1 <- tos %>%
-  filter(variable_out %in% c("Fishery 1 Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Fishery 1 Catch","fishery1","spawning_biomass")) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
-  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
-  mutate(QNM=case_when(
-    fishery1 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-    fishery1 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-    fishery1 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-    fishery1 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-  )) %>%
-  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
-  left_join(
-    
-    tos %>%
-      filter(variable_out %in% c("Fishery 1 Catch", "Spawning Biomass")) %>%
-      mutate(variable_out=ifelse(variable_out=="Fishery 1 Catch","fishery1","spawning_biomass")) %>%
-      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
-      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
-      mutate(MSE=case_when(
-        fishery1 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-        fishery1 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-        fishery1 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-        fishery1 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-      ))  %>%
-      dplyr::select(operating_model, management_strategy, code, species, MSE)
-    
-    
-  )
-
-pal=pnw_palette("Moth",100)
-tos_fish1 %>%
-  group_by(species, QNM, MSE) %>%
-  summarise(n=length(unique(code))) %>%
-  full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2)), fill=n)) +
-  geom_tile() + 
-  geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
-                ymin=c(3.5),ymax=c(4.5)), fill='transparent',col='black') +
-  geom_rect(aes(xmin=1.5, xmax=2.5,
-                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
-  geom_rect(aes(xmin=2.5, xmax=3.5,
-                ymin=1.5, ymax=2.5), fill='transparent',col='black') +
-  geom_rect(aes(xmin=3.5, xmax=4.5,
-                ymin=0.5, ymax=1.5), fill='transparent',col='black') +
-  facet_wrap(~species,strip.position='bottom') +
-  labs(x="MSE outcome",y="QNM outcome") +
-  scale_x_discrete(position='top') +
-  scale_fill_gradientn(colours = rev(pal), na.value='white') +
-  theme_bw() +
-  theme(legend.title=element_blank()) -> plot.fish1
-
-plot.fish1
-
-
-# Fishery 1: no equiv -----------------------------------------------
-
-### remove equivocal QNM results as 'uncertain'
-tos2_fish1 <- tos %>%
-  filter(variable_out %in% c("Fishery 1 Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Fishery 1 Catch","fishery1","spawning_biomass")) %>%
-  mutate(qnm_psims=ifelse(qnm_equiv==1, NA, qnm_psims)) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
-  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
-  mutate(QNM=case_when(
-    is.na(fishery1) & spawning_biomass > 0 ~ '? catch,\n\u2191 biomass', 
-    is.na(fishery1) & spawning_biomass < 0 ~ '? catch,\n\u2193 biomass', 
-    fishery1 > 0 & is.na(spawning_biomass) ~ '\u2191 catch,\n? biomass',
-    fishery1 < 0 & is.na(spawning_biomass) ~ '\u2193 catch,\n? biomass',
-    fishery1 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-    fishery1 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-    fishery1 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-    fishery1 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass', 
-    is.na(fishery1) & is.na(spawning_biomass) ~ '? catch,\n? biomass'
-  )) %>%
-  filter(QNM != '? catch,\n? biomass') %>%
-  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
-  left_join(
-    
-    tos %>%
-      filter(variable_out %in% c("Fishery 1 Catch", "Spawning Biomass")) %>%
-      mutate(variable_out=ifelse(variable_out=="Fishery 1 Catch","fishery1","spawning_biomass")) %>%
-      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
-      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
-      mutate(MSE=case_when(
-        fishery1 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-        fishery1 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-        fishery1 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-        fishery1 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-      ))  %>%
-      dplyr::select(operating_model, management_strategy, code, species, MSE)
-    
-    
-  )
+tos2_fish1 <- tos_list[['fishery_1_catch']]
 
 tradeoffs_vec2_qnm <- tradeoffs_vec2_equiv[
   which((tradeoffs_vec2_equiv %in% tradeoffs_vec2) | (tradeoffs_vec2_equiv %in% unique(tos2_fish1$QNM)))
 ]
 pal=pnw_palette("Shuksan",100)
-tos2_fish1 %>%
+to_plot <- tos2_fish1 %>%
   group_by(species, QNM, MSE) %>%
-  summarise(n=length(unique(code))) %>%
+  summarise(n=length(unique(code)),
+            mse_equiv=sum(tot_mse_equiv)) %>%
   full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  mutate(n=ifelse(is.na(n), 0, n), n_lab=ifelse(n==0,NA,n)) %>%
-  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
+  mutate(n=ifelse(is.na(n), 0, n),
+         n_lab=ifelse(n==0,NA,n),
+         n_col=ifelse(n>12,'gray90','gray40')) %>%
+  mutate(n_lab=ifelse(mse_equiv==1, paste0(n_lab,'*'),paste0(n_lab)))
+
+plot.f1.equiv <- ggplot(to_plot, aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
   geom_tile() + 
-  geom_text(aes(label=n_lab, fontface='italic'), color='gray40', ) +
+  geom_text(aes(label=n_lab, fontface='italic'), col=to_plot$n_col) + # col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -394,145 +145,32 @@ tos2_fish1 %>%
   scale_x_discrete(position='top') +
   scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
-  theme(legend.title=element_blank(), strip.text=element_blank()) -> plot.fish1.equiv
+  theme(legend.title=element_blank(), strip.text=element_blank())
 
-plot.fish1.equiv
-
-## update Table C6
-if(update.supplement){
-  tos2_fish1 %>% 
-    mutate(MSE=case_when(
-      grepl('\u2191',MSE) | grepl('\n\u2191',MSE) ~ str_replace_all(MSE,'\u2191','+'),
-      .default=MSE),
-      MSE=case_when(
-        grepl('\u2193',MSE) | grepl('\n\u2193',MSE) ~ str_replace_all(MSE,'\u2193','-'),
-        .default=MSE),
-      MSE=case_when(grepl('\n',MSE) ~ str_replace_all(MSE,'\n',' '),
-                    .default=MSE)) %>%
-    mutate(QNM=case_when(
-      grepl('\u2191',QNM) | grepl('\n\u2191',QNM) ~ str_replace_all(QNM,'\u2191','+'),
-      .default=QNM),
-      QNM=case_when(
-        grepl('\u2193',QNM) | grepl('\n\u2193',QNM) ~ str_replace_all(QNM,'\u2193','-'),
-        .default=QNM),
-      QNM=case_when(grepl('\n',QNM) ~ str_replace_all(QNM,'\n',' '),
-                    .default=QNM)) %>%
-    mutate(MSE=paste0('"',MSE,'"'), QNM=paste0('"',QNM,'"')) %>%
-    mutate(catch_metric='Fishery 1 catch') %>%
-    write_csv(file=here('data','results',paste0('tableC6_qnmVmse_tradeoffs_byOMbyHCRbySp_',sim.date,'.csv')), quote='all', append=TRUE)
-}
+plot.f1.equiv
 
 
+# Fishery 2 catch -----------------------------------------------
 
-# Fishery 2: allow equiv ---------------------------------------------------------
-
-tos_fish2 <- tos %>%
-  filter(variable_out %in% c("Fishery 2 Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Fishery 2 Catch","fishery2","spawning_biomass")) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
-  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
-  mutate(QNM=case_when(
-    fishery2 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-    fishery2 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-    fishery2 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-    fishery2 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-  )) %>%
-  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
-  left_join(
-    
-    tos %>%
-      filter(variable_out %in% c("Fishery 2 Catch", "Spawning Biomass")) %>%
-      mutate(variable_out=ifelse(variable_out=="Fishery 2 Catch","fishery2","spawning_biomass")) %>%
-      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
-      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
-      mutate(MSE=case_when(
-        fishery2 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-        fishery2 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-        fishery2 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-        fishery2 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-      ))  %>%
-      dplyr::select(operating_model, management_strategy, code, species, MSE)
-    
-    
-  )
-
-pal=pnw_palette("Moth",100)
-tos_fish2 %>%
-  group_by(QNM, MSE, species) %>%
-  summarise(n=length(unique(code))) %>%
-  full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2)), fill=n)) +
-  geom_tile() + 
-  geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
-                ymin=c(3.5),ymax=c(4.5)), fill='transparent',col='black') +
-  geom_rect(aes(xmin=1.5, xmax=2.5,
-                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
-  geom_rect(aes(xmin=2.5, xmax=3.5,
-                ymin=1.5, ymax=2.5), fill='transparent',col='black') +
-  geom_rect(aes(xmin=3.5, xmax=4.5,
-                ymin=0.5, ymax=1.5), fill='transparent',col='black') +
-  facet_wrap(~species, strip.position='bottom') +
-  labs(x="MSE outcome",y="QNM outcome") +
-  scale_x_discrete(position='top') +
-  scale_fill_gradientn(colours = rev(pal), na.value='white') +
-  theme_bw() +
-  theme(legend.title=element_blank()) -> plot.fish2
-
-plot.fish2
-
-
-# Fishery 2 catch: no equiv -----------------------------------------------
-
-### remove equivocal QNM results as 'uncertain'
-tos2_fish2 <- tos %>%
-  filter(variable_out %in% c("Fishery 2 Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Fishery 2 Catch","fishery2","spawning_biomass")) %>%
-  mutate(qnm_psims=ifelse(qnm_equiv==1, NA, qnm_psims)) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
-  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
-  mutate(QNM=case_when(
-    is.na(fishery2) & spawning_biomass > 0 ~ '? catch,\n\u2191 biomass', 
-    is.na(fishery2) & spawning_biomass < 0 ~ '? catch,\n\u2193 biomass', 
-    fishery2 > 0 & is.na(spawning_biomass) ~ '\u2191 catch,\n? biomass',
-    fishery2 < 0 & is.na(spawning_biomass) ~ '\u2193 catch,\n? biomass',
-    fishery2 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-    fishery2 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-    fishery2 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-    fishery2 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass', 
-    is.na(fishery2) & is.na(spawning_biomass) ~ '? catch,\n? biomass'
-  )) %>%
-  filter(QNM != '? catch,\n? biomass') %>%
-  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
-  left_join(
-    
-    tos %>%
-      filter(variable_out %in% c("Fishery 2 Catch", "Spawning Biomass")) %>%
-      mutate(variable_out=ifelse(variable_out=="Fishery 2 Catch","fishery2","spawning_biomass")) %>%
-      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
-      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
-      mutate(MSE=case_when(
-        fishery2 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
-        fishery2 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
-        fishery2 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
-        fishery2 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
-      ))  %>%
-      dplyr::select(operating_model, management_strategy, code, species, MSE)
-    
-    
-  )
+tos2_fish2 <- tos_list[['fishery_2_catch']]
 
 tradeoffs_vec2_qnm <- tradeoffs_vec2_equiv[
   which((tradeoffs_vec2_equiv %in% tradeoffs_vec2) | (tradeoffs_vec2_equiv %in% unique(tos2_fish2$QNM)))
 ]
 pal=pnw_palette("Shuksan",100)
-tos2_fish2 %>%
-  group_by(QNM, MSE, species) %>%
-  summarise(n=length(unique(code))) %>%
+to_plot <- tos2_fish2 %>%
+  group_by(species, QNM, MSE) %>%
+  summarise(n=length(unique(code)),
+            mse_equiv=sum(tot_mse_equiv)) %>%
   full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
-  mutate(n=ifelse(is.na(n), 0, n),n_lab=ifelse(n==0,NA,n)) %>%
-  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2_qnm)), fill=n)) +
+  mutate(n=ifelse(is.na(n), 0, n),
+         n_lab=ifelse(n==0,NA,n),
+         n_col=ifelse(n>12,'gray90','gray40')) %>%
+  mutate(n_lab=ifelse(mse_equiv==1, paste0(n_lab,'*'),paste0(n_lab)))
+
+plot.f2.equiv <- ggplot(to_plot, aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, c(rev(tradeoffs_vec2_qnm))), fill=n)) +
   geom_tile() + 
-  geom_text(aes(label=n_lab, fontface='italic'), col=c(rep('gray40',2),'gray99','gray99',rep('gray40',32))) +
+  geom_text(aes(label=n_lab, fontface='italic'), col=to_plot$n_col) + # col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
                 ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
@@ -542,65 +180,23 @@ tos2_fish2 %>%
   geom_rect(aes(xmin=3.5, xmax=4.5,
                 ymin=2.5, ymax=3.5), fill='transparent',col='black') +
   geom_hline(aes(yintercept=2.5)) +
-  facet_wrap(~species, strip.position='bottom') +
+  facet_wrap(~species,strip.position='bottom') +
   labs(x="Quant MSE",y="QNM") +
   scale_x_discrete(position='top') +
   scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,15)) +
   theme_bw() +
-  theme(legend.title=element_blank(), strip.text=element_blank()) -> plot.fish2.equiv
+  theme(legend.title=element_blank(), strip.text=element_blank())
 
-plot.fish2.equiv
+plot.f2.equiv
 
-## update Table C6
-if(update.supplement){
-  tos2_fish2 %>% 
-    mutate(MSE=case_when(
-      grepl('\u2191',MSE) | grepl('\n\u2191',MSE) ~ str_replace_all(MSE,'\u2191','+'),
-      .default=MSE),
-      MSE=case_when(
-        grepl('\u2193',MSE) | grepl('\n\u2193',MSE) ~ str_replace_all(MSE,'\u2193','-'),
-        .default=MSE),
-      MSE=case_when(grepl('\n',MSE) ~ str_replace_all(MSE,'\n',' '),
-                    .default=MSE)) %>%
-    mutate(QNM=case_when(
-      grepl('\u2191',QNM) | grepl('\n\u2191',QNM) ~ str_replace_all(QNM,'\u2191','+'),
-      .default=QNM),
-      QNM=case_when(
-        grepl('\u2193',QNM) | grepl('\n\u2193',QNM) ~ str_replace_all(QNM,'\u2193','-'),
-        .default=QNM),
-      QNM=case_when(grepl('\n',QNM) ~ str_replace_all(QNM,'\n',' '),
-                    .default=QNM)) %>%
-    mutate(MSE=paste0('"',MSE,'"'), QNM=paste0('"',QNM,'"')) %>%
-    mutate(catch_metric='Fishery 2 catch') %>%
-    write_csv(file=here('data','results',paste0('tableC6_qnmVmse_tradeoffs_byOMbyHCRbySp_',sim.date,'.csv')), quote='all', append=TRUE)
-}
-
-  
 
 # FIGURE 7 ----------------------------------------------------------
 
-
-plot_grid(plotlist=list(
-  plot.total + ggtitle("(A) Total catch"),
-  plot.fish1 + ggtitle("(B) Fishery 1 catch"),
-  plot.fish2 + ggtitle("(C) Fishery 2 catch")
-), ncol=1, nrow=3)
-
-
-
-png(here('data','results','fig8-tradeoffs-include-equiv.png'), res=300,height=2800,width=2200)
-plot_grid(plotlist=list(
-  plot.total + ggtitle("(A) Total catch"),
-  plot.fish1 + ggtitle("(B) Fishery 1 catch"),
-  plot.fish2 + ggtitle("(C) Fishery 2 catch")
-), ncol=1, nrow=3)
-dev.off()
-
-png(here('data','results','fig7-tradeoffs-separate-equiv.png'), res=300,height=2600,width=2100)
+png(here('doc','fig7-tradeoffs.png'), res=300,height=2600,width=2100)
 ggdraw(plot_grid(plotlist=list(
   plot.total.equiv+theme(legend.position='none',plot.margin = unit(c(1, 3.75, 2, 2), "lines"), axis.title=element_blank()),
-  plot.fish1.equiv+theme(plot.margin = unit(c(0, 0, 2, 2), "lines"), axis.title=element_blank()),
-  plot.fish2.equiv+theme(legend.position='none',plot.margin = unit(c(0, 3.75, 2, 2), "lines"), axis.title=element_blank())
+  plot.f1.equiv+theme(plot.margin = unit(c(0, 0, 2, 2), "lines"), axis.title=element_blank()),
+  plot.f2.equiv+theme(legend.position='none',plot.margin = unit(c(0, 3.75, 2, 2), "lines"), axis.title=element_blank())
 ), labels=c("(a) Total catch (sp.1)                           (d) Total catch (sp.2)", 
             "(b) Fishery 1 catch (sp.1)                    (e) Fishery 1 catch (sp.2)", 
             "(c) Fishery 2 catch (sp.1)                    (f) Fishery 2 catch (sp.2)"), 
@@ -1161,3 +757,203 @@ tos_fish2 %>%
         axis.text.x=element_text(angle=20,hjust=0)) -> plot.fish2
 
 plot.fish2
+
+
+
+
+
+
+
+
+############### allow equivocal output to count to QNM directions ##############
+################################################################################
+
+# Total catch: allow equiv -------------------------------------------------------------
+
+tos_total0 <- tos_list[['total_catch']]
+tos_total0 <- tos_total0 %>%
+  mutate(QNM=case_when(
+    QNM > 0 ~ '\u2191 catch,\n\u2191 biomass',
+    total_catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+    total_catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+    total_catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
+  )) %>%
+  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
+  left_join(
+    
+    tos %>%
+      filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
+      mutate(variable_out=ifelse(variable_out=="Total Catch","total_catch","spawning_biomass")) %>%
+      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
+      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
+      mutate(MSE=case_when(
+        total_catch > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
+        total_catch < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+        total_catch < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+        total_catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
+      ))  %>%
+      dplyr::select(operating_model, management_strategy, code, species, MSE)
+    
+    
+  )
+
+
+pal=pnw_palette("Moth",100)
+tos_total %>%
+  group_by(species, QNM, MSE) %>%
+  summarise(n=length(unique(code))) %>%
+  full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
+  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2)), fill=n)) +
+  geom_tile() + 
+  geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
+                ymin=c(3.5),ymax=c(4.5)), fill='transparent',col='black') +
+  geom_rect(aes(xmin=1.5, xmax=2.5,
+                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
+  geom_rect(aes(xmin=2.5, xmax=3.5,
+                ymin=1.5, ymax=2.5), fill='transparent',col='black') +
+  geom_rect(aes(xmin=3.5, xmax=4.5,
+                ymin=0.5, ymax=1.5), fill='transparent',col='black') +
+  facet_wrap(~species,strip.position='bottom') +
+  labs(x="MSE outcome",y="QNM outcome") +
+  scale_x_discrete(position='top') +
+  scale_fill_gradientn(colours = rev(pal), na.value='white', limits=c(0,23)) +
+  theme_bw() +
+  theme(legend.title=element_blank()) -> plot.total
+
+plot.total
+
+# Fishery 1: allow equiv ---------------------------------------------------------
+
+tos_fish1 <- tos %>%
+  filter(variable_out %in% c("Fishery 1 Catch", "Spawning Biomass")) %>%
+  mutate(variable_out=ifelse(variable_out=="Fishery 1 Catch","fishery1","spawning_biomass")) %>%
+  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
+  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
+  mutate(QNM=case_when(
+    fishery1 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
+    fishery1 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+    fishery1 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+    fishery1 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
+  )) %>%
+  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
+  left_join(
+    
+    tos %>%
+      filter(variable_out %in% c("Fishery 1 Catch", "Spawning Biomass")) %>%
+      mutate(variable_out=ifelse(variable_out=="Fishery 1 Catch","fishery1","spawning_biomass")) %>%
+      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
+      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
+      mutate(MSE=case_when(
+        fishery1 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
+        fishery1 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+        fishery1 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+        fishery1 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
+      ))  %>%
+      dplyr::select(operating_model, management_strategy, code, species, MSE)
+    
+    
+  )
+
+pal=pnw_palette("Moth",100)
+tos_fish1 %>%
+  group_by(species, QNM, MSE) %>%
+  summarise(n=length(unique(code))) %>%
+  full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
+  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2)), fill=n)) +
+  geom_tile() + 
+  geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
+                ymin=c(3.5),ymax=c(4.5)), fill='transparent',col='black') +
+  geom_rect(aes(xmin=1.5, xmax=2.5,
+                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
+  geom_rect(aes(xmin=2.5, xmax=3.5,
+                ymin=1.5, ymax=2.5), fill='transparent',col='black') +
+  geom_rect(aes(xmin=3.5, xmax=4.5,
+                ymin=0.5, ymax=1.5), fill='transparent',col='black') +
+  facet_wrap(~species,strip.position='bottom') +
+  labs(x="MSE outcome",y="QNM outcome") +
+  scale_x_discrete(position='top') +
+  scale_fill_gradientn(colours = rev(pal), na.value='white') +
+  theme_bw() +
+  theme(legend.title=element_blank()) -> plot.fish1
+
+plot.fish1
+
+
+
+
+# Fishery 2: allow equiv ---------------------------------------------------------
+
+tos_fish2 <- tos %>%
+  filter(variable_out %in% c("Fishery 2 Catch", "Spawning Biomass")) %>%
+  mutate(variable_out=ifelse(variable_out=="Fishery 2 Catch","fishery2","spawning_biomass")) %>%
+  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
+  pivot_wider(names_from=variable_out, values_from=qnm_psims) %>%
+  mutate(QNM=case_when(
+    fishery2 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
+    fishery2 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+    fishery2 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+    fishery2 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
+  )) %>%
+  dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
+  left_join(
+    
+    tos %>%
+      filter(variable_out %in% c("Fishery 2 Catch", "Spawning Biomass")) %>%
+      mutate(variable_out=ifelse(variable_out=="Fishery 2 Catch","fishery2","spawning_biomass")) %>%
+      dplyr::select(operating_model, management_strategy, code, variable_out, mse_prob, species) %>%
+      pivot_wider(names_from=variable_out, values_from=mse_prob) %>%
+      mutate(MSE=case_when(
+        fishery2 > 0 & spawning_biomass > 0 ~ '\u2191 catch,\n\u2191 biomass',
+        fishery2 < 0 & spawning_biomass > 0 ~ '\u2193 catch,\n\u2191 biomass',
+        fishery2 < 0 & spawning_biomass < 0 ~ '\u2193 catch,\n\u2193 biomass',
+        fishery2 > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass'
+      ))  %>%
+      dplyr::select(operating_model, management_strategy, code, species, MSE)
+    
+    
+  )
+
+pal=pnw_palette("Moth",100)
+tos_fish2 %>%
+  group_by(QNM, MSE, species) %>%
+  summarise(n=length(unique(code))) %>%
+  full_join(pairwise_arrows, by=c("QNM","MSE","species")) %>%
+  ggplot(aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_relevel(QNM, rev(tradeoffs_vec2)), fill=n)) +
+  geom_tile() + 
+  geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
+                ymin=c(3.5),ymax=c(4.5)), fill='transparent',col='black') +
+  geom_rect(aes(xmin=1.5, xmax=2.5,
+                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
+  geom_rect(aes(xmin=2.5, xmax=3.5,
+                ymin=1.5, ymax=2.5), fill='transparent',col='black') +
+  geom_rect(aes(xmin=3.5, xmax=4.5,
+                ymin=0.5, ymax=1.5), fill='transparent',col='black') +
+  facet_wrap(~species, strip.position='bottom') +
+  labs(x="MSE outcome",y="QNM outcome") +
+  scale_x_discrete(position='top') +
+  scale_fill_gradientn(colours = rev(pal), na.value='white') +
+  theme_bw() +
+  theme(legend.title=element_blank()) -> plot.fish2
+
+plot.fish2
+
+
+
+# FIGURE 7: allow equiv ----------------------------------------------------------
+
+
+plot_grid(plotlist=list(
+  plot.total + ggtitle("(A) Total catch"),
+  plot.fish1 + ggtitle("(B) Fishery 1 catch"),
+  plot.fish2 + ggtitle("(C) Fishery 2 catch")
+), ncol=1, nrow=3)
+
+
+
+png(here('data','results','fig8-tradeoffs-include-equiv.png'), res=300,height=2800,width=2200)
+plot_grid(plotlist=list(
+  plot.total + ggtitle("(A) Total catch"),
+  plot.fish1 + ggtitle("(B) Fishery 1 catch"),
+  plot.fish2 + ggtitle("(C) Fishery 2 catch")
+), ncol=1, nrow=3)
+dev.off()
