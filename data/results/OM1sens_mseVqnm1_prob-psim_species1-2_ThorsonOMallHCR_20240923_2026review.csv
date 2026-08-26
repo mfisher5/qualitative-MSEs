@@ -1,0 +1,97 @@
+code,ms-code,operating_model,management_strategy,variable_out,psims,model.x,mse_code,om-code,prob,model.y
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,total_catch,-59,QNM,1-B,1,96,MSE-Species1
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,total_catch,-59,QNM,1-B,1,35.5,MSE-Species2
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,total_catch,-59,QNM,6-B,6,100,MSE-Species1
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,total_catch,-59,QNM,6-B,6,38,MSE-Species2
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,total_catch,-59,QNM,7-B,7,65.5,MSE-Species1
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,total_catch,-59,QNM,7-B,7,34,MSE-Species2
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,fishery_1_catch,-100,QNM,1-B,1,0,MSE-Species1
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,fishery_1_catch,-100,QNM,1-B,1,0,MSE-Species2
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,6-B,6,0,MSE-Species1
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,6-B,6,0,MSE-Species2
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,7-B,7,0,MSE-Species1
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,fishery_1_catch,-100,QNM,7-B,7,0,MSE-Species2
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,fishery_2_catch,100,QNM,1-B,1,100,MSE-Species1
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,fishery_2_catch,100,QNM,1-B,1,99.5,MSE-Species2
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,fishery_2_catch,100,QNM,6-B,6,100,MSE-Species1
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,fishery_2_catch,100,QNM,6-B,6,99.5,MSE-Species2
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,fishery_2_catch,100,QNM,7-B,7,100,MSE-Species1
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,fishery_2_catch,100,QNM,7-B,7,99.5,MSE-Species2
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,spawning_biomass,100,QNM,1-B,1,93,MSE-Species1
+1-B,B,Target 1x Biomass (OG),B. Eliminate fishery 1,spawning_biomass,100,QNM,1-B,1,89,MSE-Species2
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,spawning_biomass,100,QNM,6-B,6,99.5,MSE-Species1
+1-B,B,Target 0.75x Biomass,B. Eliminate fishery 1,spawning_biomass,100,QNM,6-B,6,97.5,MSE-Species2
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,spawning_biomass,100,QNM,7-B,7,56.5,MSE-Species1
+1-B,B,Target 1.25x Biomass,B. Eliminate fishery 1,spawning_biomass,100,QNM,7-B,7,75.5,MSE-Species2
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,1-C,1,94,MSE-Species1
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,1-C,1,58,MSE-Species2
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,6-C,6,100,MSE-Species1
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,6-C,6,47,MSE-Species2
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,7-C,7,90,MSE-Species1
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",total_catch,66,QNM,7-C,7,71.5,MSE-Species2
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,1-C,1,100,MSE-Species1
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,1-C,1,68.5,MSE-Species2
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,6-C,6,100,MSE-Species1
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,6-C,6,56,MSE-Species2
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,7-C,7,100,MSE-Species1
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_1_catch,63,QNM,7-C,7,82.5,MSE-Species2
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,1-C,1,0,MSE-Species1
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,1-C,1,0,MSE-Species2
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,6-C,6,0,MSE-Species1
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,6-C,6,0,MSE-Species2
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,7-C,7,0,MSE-Species1
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",fishery_2_catch,62,QNM,7-C,7,0,MSE-Species2
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,1-C,1,5,MSE-Species1
+1-C,C,Target 1x Biomass (OG),"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,1-C,1,70,MSE-Species2
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,6-C,6,37,MSE-Species1
+1-C,C,Target 0.75x Biomass,"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,6-C,6,90.5,MSE-Species2
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,7-C,7,0.5,MSE-Species1
+1-C,C,Target 1.25x Biomass,"C. Fishery 1 in ""offshore"" only",spawning_biomass,85,QNM,7-C,7,45,MSE-Species2
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,total_catch,57,QNM,1-D,1,98.5,MSE-Species1
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,total_catch,57,QNM,1-D,1,36,MSE-Species2
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,total_catch,57,QNM,6-D,6,100,MSE-Species1
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,total_catch,57,QNM,6-D,6,43,MSE-Species2
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,total_catch,57,QNM,7-D,7,95.5,MSE-Species1
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,total_catch,57,QNM,7-D,7,33.5,MSE-Species2
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,fishery_1_catch,55,QNM,1-D,1,84,MSE-Species1
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,fishery_1_catch,55,QNM,1-D,1,28,MSE-Species2
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,fishery_1_catch,55,QNM,6-D,6,100,MSE-Species1
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,fishery_1_catch,55,QNM,6-D,6,35.5,MSE-Species2
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,fishery_1_catch,55,QNM,7-D,7,80.5,MSE-Species1
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,fishery_1_catch,55,QNM,7-D,7,28,MSE-Species2
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,fishery_2_catch,58,QNM,1-D,1,100,MSE-Species1
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,fishery_2_catch,58,QNM,1-D,1,97,MSE-Species2
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,fishery_2_catch,58,QNM,6-D,6,100,MSE-Species1
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,fishery_2_catch,58,QNM,6-D,6,99,MSE-Species2
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,fishery_2_catch,58,QNM,7-D,7,100,MSE-Species1
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,fishery_2_catch,58,QNM,7-D,7,88.5,MSE-Species2
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,spawning_biomass,58,QNM,1-D,1,99.5,MSE-Species1
+1-D,D,Target 1x Biomass (OG),D. Increase fishery mesh size,spawning_biomass,58,QNM,1-D,1,92.5,MSE-Species2
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,spawning_biomass,58,QNM,6-D,6,100,MSE-Species1
+1-D,D,Target 0.75x Biomass,D. Increase fishery mesh size,spawning_biomass,58,QNM,6-D,6,97.5,MSE-Species2
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,spawning_biomass,58,QNM,7-D,7,93.5,MSE-Species1
+1-D,D,Target 1.25x Biomass,D. Increase fishery mesh size,spawning_biomass,58,QNM,7-D,7,80.5,MSE-Species2
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",total_catch,66,QNM,1-E,1,98.5,MSE-Species1
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",total_catch,66,QNM,1-E,1,32.5,MSE-Species2
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",total_catch,66,QNM,6-E,6,100,MSE-Species1
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",total_catch,66,QNM,6-E,6,38,MSE-Species2
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",total_catch,66,QNM,7-E,7,93.5,MSE-Species1
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",total_catch,66,QNM,7-E,7,30.5,MSE-Species2
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",fishery_1_catch,58,QNM,1-E,1,81.5,MSE-Species1
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",fishery_1_catch,58,QNM,1-E,1,23.5,MSE-Species2
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_1_catch,58,QNM,6-E,6,99.5,MSE-Species1
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_1_catch,58,QNM,6-E,6,27,MSE-Species2
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_1_catch,58,QNM,7-E,7,79,MSE-Species1
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_1_catch,58,QNM,7-E,7,25,MSE-Species2
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",fishery_2_catch,81,QNM,1-E,1,100,MSE-Species1
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",fishery_2_catch,81,QNM,1-E,1,96,MSE-Species2
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_2_catch,81,QNM,6-E,6,100,MSE-Species1
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_2_catch,81,QNM,6-E,6,98.5,MSE-Species2
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_2_catch,81,QNM,7-E,7,99.5,MSE-Species1
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",fishery_2_catch,81,QNM,7-E,7,89.5,MSE-Species2
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",spawning_biomass,96,QNM,1-E,1,99.5,MSE-Species1
+1-E,E,Target 1x Biomass (OG),"E. Fishery 1 in ""offshore"" only",spawning_biomass,96,QNM,1-E,1,91,MSE-Species2
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",spawning_biomass,96,QNM,6-E,6,100,MSE-Species1
+1-E,E,Target 0.75x Biomass,"E. Fishery 1 in ""offshore"" only",spawning_biomass,96,QNM,6-E,6,97.5,MSE-Species2
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",spawning_biomass,96,QNM,7-E,7,85.5,MSE-Species1
+1-E,E,Target 1.25x Biomass,"E. Fishery 1 in ""offshore"" only",spawning_biomass,96,QNM,7-E,7,79,MSE-Species2
