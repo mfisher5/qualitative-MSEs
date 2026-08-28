@@ -1,0 +1,11 @@
+model.y,variable_out,case_n,false negative,false positive,match,split
+MSE-Species1,fishery_1_catch,6,0.333,0.167,0.5,0
+MSE-Species1,fishery_2_catch,4,0,0.25,0.75,0
+MSE-Species1,spawning_biomass,3,0,0,0.667,0.333
+MSE-Species1,total_catch,8,0.375,0.25,0.375,0
+MSE-Species2,fishery_1_catch,6,0,0.667,0.333,0
+MSE-Species2,fishery_2_catch,4,0.5,0,0.5,0
+MSE-Species2,spawning_biomass,3,0,0,0.667,0.333
+MSE-Species2,total_catch,8,0,0.5,0.5,0
+MSE-Species1,Overall,21,0.238,0.19,0.524,0.048
+MSE-Species2,Overall,21,0.095,0.381,0.476,0.048

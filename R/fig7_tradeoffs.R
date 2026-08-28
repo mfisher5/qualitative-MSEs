@@ -213,40 +213,14 @@ dev.off()
 
 # FIGURE C3 ----------------------------------------------------------
 
+figs_list <- readRDS(file=here('data','results',paste0('figs_tradeoffs_expanded_byOMbyHCRbySp_',sim.date,'.RDS')))
+
 # Species 1 ---------------------------------------------------------------
-## tabulate "+" and "-" by OM / MS
-tos_total2 <- tos %>%
-  filter(variable_out %in% c("Total Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Total Catch","total_catch","spawning_biomass")) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, qnm_equiv, mse_prob, species) %>%
-  mutate(QNM=case_when(
-    (qnm_psims > 0 & qnm_equiv==0) ~ '+',
-    (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
-    (qnm_psims < 0 & qnm_equiv==0) ~ '-',
-    (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
-    abs(qnm_psims)==50 ~ ''
-  )) %>%
-  mutate(MSE=case_when(
-    (mse_prob > 60) ~ '+',
-    (mse_prob > 50) ~ '(+)',
-    (mse_prob < 40) ~ '-',
-    (mse_prob < 50) ~ '(-)'))
-
-any(is.na(tos_total2$MSE))
-any(is.na(tos_total2$QNM))
-
-tos_total2 %<>% 
-  mutate(qnm_compare=case_when(
-    (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
-    ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
-    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
-    QNM=="" ~ "50/50"))
-
-tos_total2 %<>% 
+## total catch
+tos_total2 <- figs_list[[1]] %>%
   mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
 any(is.na(tos_total2$qnm_compare))
 
-## create table
 p2_total <- tos_total2 %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   rename(qMSE=MSE) %>%
@@ -259,7 +233,7 @@ p2_total <- tos_total2 %>%
   )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
-    variable_out=="total_catch" ~ "catch"
+    .default=variable_out
   )) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
@@ -283,41 +257,12 @@ p2_total <- tos_total2 %>%
 
 p2_total
 
-
-## tabulate "+" and "-" by OM / MS
-tos3_fish1 <- tos %>%
-  filter(variable_out %in% c("Fishery 1 Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Fishery 1 Catch","fish1","spawning_biomass")) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, qnm_equiv, mse_prob, species) %>%
-  mutate(QNM=case_when(
-    (qnm_psims > 0 & qnm_equiv==0) ~ '+',
-    (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
-    (qnm_psims < 0 & qnm_equiv==0) ~ '-',
-    (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
-    abs(qnm_psims)==50 ~ ''
-  )) %>%
-  mutate(MSE=case_when(
-    (mse_prob > 60) ~ '+',
-    (mse_prob > 50) ~ '(+)',
-    (mse_prob < 40) ~ '-',
-    (mse_prob < 50) ~ '(-)'))
-
-any(is.na(tos3_fish1$MSE))
-any(is.na(tos3_fish1$QNM))
-
-tos3_fish1 %<>% 
-  mutate(qnm_compare=case_when(
-    (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
-    ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
-    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
-    QNM=="" ~ "50/50"))
-
-tos3_fish1 %<>% 
+## fishery 1
+tos3_fish1 <- figs_list[[2]] %>%
   mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
 any(is.na(tos3_fish1$qnm_compare))
 
 
-## create table
 p2_fish1 <- tos3_fish1 %>%
   rename(qMSE=MSE) %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
@@ -330,7 +275,7 @@ p2_fish1 <- tos3_fish1 %>%
   )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
-    variable_out=="fish1" ~ "catch"
+    .default=variable_out
   )) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
@@ -352,39 +297,11 @@ p2_fish1 <- tos3_fish1 %>%
 
 p2_fish1
 
-## tabulate "+" and "-" by OM / MS
-tos3_fish2 <- tos %>%
-  filter(variable_out %in% c("Fishery 2 Catch", "Spawning Biomass")) %>%
-  mutate(variable_out=ifelse(variable_out=="Fishery 2 Catch","fish2","spawning_biomass")) %>%
-  dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, qnm_equiv, mse_prob, species) %>%
-  mutate(QNM=case_when(
-    (qnm_psims > 0 & qnm_equiv==0) ~ '+',
-    (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
-    (qnm_psims < 0 & qnm_equiv==0) ~ '-',
-    (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
-    abs(qnm_psims)==50 ~ ''
-  )) %>%
-  mutate(MSE=case_when(
-    (mse_prob > 60) ~ '+',
-    (mse_prob > 50) ~ '(+)',
-    (mse_prob < 40) ~ '-',
-    (mse_prob < 50) ~ '(-)'))
-
-any(is.na(tos3_fish2$MSE))
-any(is.na(tos3_fish2$QNM))
-
-tos3_fish2 %<>% 
-  mutate(qnm_compare=case_when(
-    (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
-    ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
-    ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
-    QNM=="" ~ "50/50"))
-
-tos3_fish2 %<>% 
+## fishery 2
+tos3_fish2 <- figs_list[[3]] %>% 
   mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
 any(is.na(tos3_fish2$qnm_compare))
 
-## create table
 p2_fish2 <- tos3_fish2 %>%
   rename(qMSE=MSE) %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
@@ -397,7 +314,7 @@ p2_fish2 <- tos3_fish2 %>%
   )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
-    variable_out=="fish2" ~ "catch"
+    .default=variable_out
   )) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
@@ -432,7 +349,7 @@ pout <- plot_grid(plotlist=list(
   ncol=3, nrow=1, rel_widths=c(1,0.55,0.6))
 pout
 
-png(here('doc','supplement','figC5_tradeoffs_expanded_sp1.png'), res=300,height=1500,width=3000)
+png(here('doc','supplement','figC_tradeoffs_expanded_sp1.png'), res=300,height=1500,width=3000)
 pout + draw_text(c('(A) Total Catch','(B) Fishery 1 Catch',
                    '(C) Fishery 2 Catch', 'SPECIES 1: '), 
                  x=c(0.265, 0.547, 0.805, 0.13), 
@@ -455,7 +372,7 @@ p2s2_total <- tos_total2 %>%
   )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
-    variable_out=="total_catch" ~ "catch"
+    .default=variable_out
   )) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
@@ -466,7 +383,7 @@ p2s2_total <- tos_total2 %>%
   labs(y="",x="") +
   scale_x_discrete(position='bottom') +
   scale_y_discrete(position='right')+
-  scale_fill_manual(values=c("goldenrod","#8da0cb","white","gray80"), na.value="white",name='QNM is...') +
+  scale_fill_manual(values=c("goldenrod","white","gray80"), na.value="white",name='QNM is...') +
   guides(fill=guide_legend(nrow=2, position='bottom')) +
   theme_bw() +
   theme(strip.background=element_rect(fill='white'),
@@ -494,7 +411,7 @@ p2s2_fish1 <- tos3_fish1 %>%
   )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
-    variable_out=="fish1" ~ "catch"
+    .default=variable_out
   )) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
@@ -529,7 +446,7 @@ p2s2_fish2 <- tos3_fish2 %>%
   )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
-    variable_out=="fish2" ~ "catch"
+    .default=variable_out
   )) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
@@ -563,7 +480,7 @@ pout2 <- plot_grid(plotlist=list(
                    strip.text.y.left = element_blank())),
   ncol=3, nrow=1, rel_widths=c(1,0.6,0.65))
 
-png(here('doc','supplement','figC5_tradeoffs_expanded_sp2.png'), res=300,height=1200,width=3000)
+png(here('doc','supplement','figC_tradeoffs_expanded_sp2.png'), res=300,height=1200,width=3000)
 pout2 + draw_text(c('(D) Total Catch','(E) Fishery 1 Catch',
                    '(F) Fishery 2 Catch', 'SPECIES 2: '), 
                  x=c(0.265, 0.529, 0.795, 0.13), 

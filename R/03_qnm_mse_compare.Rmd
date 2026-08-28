@@ -226,8 +226,7 @@ write_csv(compareThorson, here('data','results',paste0('OM1sens_mseVqnm1_prob-ps
 
 ## Explore mismatches: across OMs
 
-
-I find it more helpful to look at tables, but I'll also do some plotting below.
+This script mostly produces tables, with figures on separate scripts. but I'll also do some plotting below.
 
 For each variable, look at cases where the direction of change was not a match. then break this down to determine whether the QNM was equivocal (aka, we wouldn't want to make a decision off of the QNM response direction) or not (aka we would make a 'wrong' decision from the QNM response direction).
 
@@ -401,9 +400,9 @@ out2e %<>% mutate_at(vars(OM), function(x){ifelse(x=='-','total',x)})
 
 
 ```{r eval=FALSE}  
-write_csv(out2, here('data','results',paste0('qnmVmse_mismatch_count_byOMbyHCR',sim.date,'_2026review.csv')))
+write_csv(out2, here('data','results',paste0('tblS7_qnmVmse_mismatch_count_byOMbyHCR',sim.date,'_2026review.csv')))
 
-  write_csv(out2e, here('data','results',paste0('qnmVmse_mismatch_count_equiv_byOMbyHCR',sim.date,'_2026review.csv')))
+  # write_csv(out2e, here('data','results',paste0('qnmVmse_mismatch_count_equiv_byOMbyHCR',sim.date,'_2026review.csv')))
 ```
 
 
@@ -518,11 +517,22 @@ thout1_pequiv <- thorson_mismatches_summary %>%
 
 ```
 
+For table A1, I'd also like to summarise total *n* mismatches by case.
+```{r}
+thout2 <- thorson_mismatches %>%
+  group_by(species,code,mse_code,operating_model,compare_dir) %>%
+  summarise(n=n()) %>%
+  pivot_wider(names_from="compare_dir",values_from="n", values_fill = 0) %>%
+  ungroup() %>%
+  arrange(species,code, operating_model)
+```
+
+
 Save tables.
 ```{r}
 # as excel
-thx <- list(thout1_pall, thorson_mismatches_summary, thout1_pcertain, thout1_pequiv, thorson_mismatches)
-names(thx) <- c('table_3','case_counts','table_3_nonequiv_only','table_3_equiv_only','all_data')
+thx <- list(thout1_pall, thorson_mismatches_summary, thout1_pcertain, thout1_pequiv,thout2, thorson_mismatches)
+names(thx) <- c('table_3','case_counts','table_3_nonequiv_only','table_3_equiv_only','var_counts','all_data')
 writexl::write_xlsx(
   thx,
   path = here('data','results',paste0('OM1sens_table3_mseVqnm1_mismatches_bySpbyVar',sim.date,'_2026review.xlsx')),
@@ -538,112 +548,58 @@ QNM 2 x HCR C seems to perform better when target set to 1.25x biomass in the qu
 
 when the QNM was qualitatively *equivocal* ( <60% stable matrices had same response direction), did the direction generally agree with the quant MSE?
 
-We can look at this with 50/50 results: 
+"split" = the QNM output was 50/50
+
+"match" = the QNM direction was the same as the MSE direction (+/+ or -/-)
+
+"false positive" = QNM direction positive and qMSE direction negative
+
+"false negative" = QNM direction negative and qMSE direction positive
+
 ```{r}
 speciesALL_equiv_split <- speciesALL_compare %>%
   filter((psims < 60 & psims > 0) | (psims > -60 & psims < 0))
 
 speciesALL_equiv_split %<>% mutate(match_direction=ifelse(psims==50 | psims==-50,"split",
-                                                    ifelse(psims < 0 & prob > 0, "negQNM-->posMSE",
-                                                    ifelse(psims > 0 & prob < 0, "posQNM-->negMSE","match"))))
+                                                    ifelse(psims < 0 & prob > 50, "false negative",
+                                                    ifelse(psims > 0 & prob < 50, "false positive","match"))))
 ```
 
-Or without 50/50 results:
+is any qMSE prediction equivocal? recall we're just marking these, not excluding them from results. nope!
 ```{r}
-speciesALL_equiv <- speciesALL_compare %>%
-  filter((psims < 60 & psims > 50) | (psims > -60 & psims < -50))
-
-speciesALL_equiv %<>% mutate(match_direction=ifelse(psims==50 | psims==-50,"split",
-                                                    ifelse(psims < 0 & prob > 0, "negQNM-->posMSE",
-                                                    ifelse(psims > 0 & prob < 0, "posQNM-->negMSE","match"))))
+speciesALL_equiv_split %>% filter(prob < 60 & prob > 40)
 ```
 
-
-#### Species 1
-
-"split" = the QNM output was 50/50
-
-"match" = the QNM direction was the same as the MSE direction (+/+ or -/-)
-
-"QNM-->MSE" = the QNM direction was different than the MSE direction. Directional difference in heading.
 ```{r echo=FALSE}
-with(filter(speciesALL_equiv_split,grepl("Species1",model.y)), table(match_direction)/dim(filter(speciesALL_equiv_split,grepl("Species1",model.y)))[1])
-
-speciesALL_equiv_split %>% filter(grepl("Species1",model.y)) %>%
-  group_by(variable_out) %>%
-  mutate(var_n=n()) %>%
+equiv_mismatches_summary <- speciesALL_equiv_split %>% 
+  group_by(model.y,variable_out) %>%
+  mutate(case_n=n()) %>%
   ungroup() %>%
-  group_by(variable_out,var_n,match_direction) %>%
+  group_by(model.y,variable_out,case_n,match_direction) %>%
   summarise(ndiff=n()) %>%
-  mutate(pdiff=round(ndiff/var_n,3)) %>%
-  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
-  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
-  kbl() %>% kable_paper(full_width=T)
-```
-
-**remove splits**
-```{r echo=FALSE}
-with(filter(speciesALL_equiv,grepl("Species1",model.y)), table(match_direction)/dim(filter(speciesALL_equiv,grepl("Species1",model.y)))[1])
-
-speciesALL_equiv %>% filter(grepl("Species1",model.y)) %>%
-  group_by(variable_out) %>%
-  mutate(var_n=n()) %>%
-  ungroup() %>%
-  group_by(variable_out,var_n,match_direction) %>%
+  mutate(pdiff=round(ndiff/case_n,3)) %>%
+  bind_rows(
+    speciesALL_equiv_split %>% 
+  group_by(model.y) %>%
+  mutate(case_n=n()) %>%
+    ungroup() %>%
+  group_by(model.y,case_n,match_direction) %>%
   summarise(ndiff=n()) %>%
-  mutate(pdiff=round(ndiff/var_n,3)) %>%
-  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
-  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
-  kbl() %>% kable_paper(full_width=T)
-```
- 
+  mutate(pdiff=round(ndiff/case_n,3)) %>% mutate(variable_out='Overall')
+  )
 
-#### Species 2
-
-"split" = the QNM output was 50/50
-
-"match" = the QNM direction was the same as the MSE direction (+/+ or -/-)
-
-"QNM-->MSE" = the QNM direction was different than the MSE direction. Directional difference in heading.
-
-```{r echo=FALSE}
-with(filter(speciesALL_equiv_split,grepl("Species2",model.y)), table(match_direction)/dim(filter(speciesALL_equiv_split,grepl("Species2",model.y)))[1])
-
-speciesALL_equiv_split %>% filter(grepl("Species2",model.y)) %>%
-  group_by(variable_out) %>%
-  mutate(var_n=n()) %>%
-  ungroup() %>%
-  group_by(variable_out,var_n,match_direction) %>%
-  summarise(ndiff=n()) %>%
-  mutate(pdiff=round(ndiff/var_n,2)) %>%
-  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
-  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
-  kbl() %>% kable_paper(full_width=T)
-```
-match_direction
-          match negQNM-->posMSE posQNM-->negMSE           split 
-     0.40909091      0.09090909      0.40909091      0.09090909 
-     
-
-**remove split**
-
-```{r echo=FALSE}
-with(filter(speciesALL_equiv,grepl("Species2",model.y)), table(match_direction)/dim(filter(speciesALL_equiv,grepl("Species2",model.y)))[1])
-
-speciesALL_equiv %>% filter(grepl("Species2",model.y)) %>%
-  group_by(variable_out) %>%
-  mutate(var_n=n()) %>%
-  ungroup() %>%
-  group_by(variable_out,var_n,match_direction) %>%
-  summarise(ndiff=n()) %>%
-  mutate(pdiff=round(ndiff/var_n,2)) %>%
-  dplyr::select(variable_out,match_direction,var_n, pdiff) %>%
+equiv_mismatches_summary %>%
+  dplyr::select(model.y,variable_out,match_direction,case_n, pdiff) %>%
   pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
   kbl() %>% kable_paper(full_width=T)
 ```
 
 write out
 ```{r}
+equiv_mismatches_summary%>%
+  dplyr::select(model.y,variable_out,match_direction,case_n, pdiff) %>%
+  pivot_wider(names_from=match_direction, values_from=pdiff, values_fill=0) %>%
+  write_csv(here('data','results',paste0('tblC9_equiv_mismatches_',sim.date,'.csv')))
 ```
 
 
@@ -724,7 +680,6 @@ write_csv(triage_df,here('data','results','fig6_data.csv'))
 
 
 ### Table 4 
-
 
 by ms
 ```{r}
@@ -821,7 +776,9 @@ tbl4_om2 <- tbl4_om %>%
     fn > 0 ~ paste0('0 (',fn,')'), 
     .default=as.character(fn)))
   
-  
+```
+
+```{r eval=write_out}
 tbl4_ms2 %>% dplyr::select(-fn) %>%
   pivot_wider(names_from='variable',values_from='fp', values_fill='0') %>%
   rename(strategy_or_om=management_strategy) %>% bind_rows(
@@ -852,11 +809,15 @@ table_c4 <- triage_df %>%
   group_by(management_strategy,species) %>%
   mutate(total_n=length(unique(operating_model))) %>%
   ungroup() %>%
-  filter(grepl("false positive", triage_equiv)) %>%
+  filter(grepl("false positive", triage)) %>%
+  mutate(triage=case_when(
+    triage=='false positive' & is.na(triage_noEquiv) ~ 'false positive, equiv',
+    .default=triage)
+  ) %>% dplyr::select(-triage_noEquiv) %>%
   # pivot_longer(cols=c(triage,triage_noEquiv), names_to='triage_type',values_to='decision') %>%
   # filter(!is.na(decision)) %>% ungroup() %>%
-  group_by(management_strategy, variable_out,species, total_n, triage_equiv) %>% summarise(n=n()) %>%
-  pivot_wider(names_from='triage_equiv',values_from='n', values_fill=0) %>%
+  group_by(management_strategy, variable_out,species, total_n, triage) %>% summarise(n=n()) %>%
+  pivot_wider(names_from='triage',values_from='n', values_fill=0) %>%
   rename(fp=`false positive`, fp_only_equiv=`false positive, equiv`) %>%
   mutate(fp_include_equiv=fp+fp_only_equiv)
   
@@ -873,7 +834,7 @@ table_c4 %>% dplyr::select(-fp_only_equiv) %>%
   ungroup() %>% dplyr::select(-total_n) %>%
   pivot_wider(names_from=variable_out, values_from=fp, values_fill='0') %>%
   arrange(species,management_strategy) %>%
-  write_csv(here('data','results','stbl_false_pos_rate_bySpbyMS_20240923_2026review.csv'))
+  write_csv(here('data','results','tbls10_false_pos_rate_bySpbyMS_20240923_2026review.csv'))
 ```
 
 
@@ -898,14 +859,16 @@ pairwise_df %<>%
 
 prepare a df to describe trade-offs. we don't want to use equivocal output to make triage decisions in the main text, so NA-out equivocal QNM output. 
 ```{r}
-tos <- speciesALL_compare  %>%
+tos_equiv <- speciesALL_compare  %>%
   dplyr::select(-model.x) %>%
   rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
   mutate(species=case_when(
     species=="MSE-Species1" ~ "(sp.1) med longevity", 
     species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
   mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
-         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) %>%
+         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) 
+
+tos <- tos_equiv %>%
   mutate(qnm_psims=ifelse(qnm_equiv==1, NA, qnm_psims)) 
 ```
 
@@ -931,7 +894,7 @@ for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
       catch > 0 & spawning_biomass < 0 ~ 'decrease catch, increase biomass', 
       is.na(catch) & is.na(spawning_biomass) ~ ' catch,  biomass'
     )) %>%
-    filter(QNM != ' catch,  biomass') %>%
+    # filter(QNM != ' catch,  biomass') %>%
     dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
     left_join(
       tos %>%
@@ -987,7 +950,7 @@ for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
       catch > 0 & spawning_biomass < 0 ~ '\u2191 catch,\n\u2193 biomass', 
       is.na(catch) & is.na(spawning_biomass) ~ '? catch,\n? biomass'
     )) %>%
-    filter(QNM != '? catch,\n? biomass') %>%
+    # filter(QNM != '? catch,\n? biomass') %>%
     dplyr::select(operating_model, management_strategy, code, species, QNM) %>%
     left_join(
       tos %>%
@@ -1017,22 +980,13 @@ save as an RDS
 saveRDS(tos_list, here('data','results','fig7_data_arrows.rds'))
 ```
 
-this version of the trade-offs df has arrows, for use in fig 7, but allow equivocal QNM responses to contribute to the count in the appropriate increase/decrease category.
+this version of the trade-offs df has arrows, for use in fig 7, but allows equivocal QNM responses to contribute to the count in the appropriate increase/decrease category.
 
 ```{r}
-tos_allqnm <- speciesALL_compare  %>%
-  dplyr::select(-model.x) %>%
-  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
-  mutate(species=case_when(
-    species=="MSE-Species1" ~ "(sp.1) med longevity", 
-    species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
-  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
-         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0))
-
 tos_allqnm_list <- list()
 i = 1
 for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
-  tmpdat <- tos_allqnm %>%
+  tmpdat <- tos_equiv %>%
     filter(variable_out %in% c(v, "spawning_biomass")) %>%
     mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
     dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
@@ -1074,6 +1028,40 @@ saveRDS(tos_allqnm_list , here('data','results',
                                paste0('fig7_data_arrows_countEquiv_',sim.date,'.rds')))
 ```
 
+use Fig 7 data frame to produce a table for fig c3
+```{r}
+figs_list <- list()
+i = 1
+for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
+
+  figs_list[[i]] <- tos_equiv %>%
+    filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+    mutate(QNM=case_when(
+      (qnm_psims > 0 & qnm_equiv==0) ~ '+',
+      (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
+      (qnm_psims < 0 & qnm_equiv==0) ~ '-',
+      (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
+      abs(qnm_psims)==50 ~ ''
+    )) %>%
+    mutate(MSE=case_when(
+      (mse_prob > 60) ~ '+',
+      (mse_prob > 50) ~ '(+)',
+      (mse_prob < 40) ~ '-',
+      (mse_prob < 50) ~ '(-)')) %>%
+    mutate(qnm_compare=case_when(
+      (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
+      ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
+      ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
+      QNM=="" ~ "50/50"))
+  i = i + 1
+}
+
+names(figs_list) <- c('total_catch','fishery_1_catch','fishery_2_catch')
+```
+```{r eval=write_out}
+saveRDS(figs_list, file=here('data','results',paste0('figs_tradeoffs_expanded_byOMbyHCRbySp_',sim.date,'.RDS')))
+```
 
 use Fig 7 data frame to produce table C6
 ```{r}
@@ -1103,5 +1091,7 @@ i = i + 1
 }
 
 tblc6_out <- do.call(rbind,tbl_c6_list)
+```
+```{r eval=write_out}
 write_csv(tblc6_out, file=here('data','results',paste0('tableC6_tradeoffs_byOMbyHCRbySp_',sim.date,'.csv')), quote='all')
 ```
