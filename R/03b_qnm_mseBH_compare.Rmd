@@ -131,10 +131,10 @@ If this isn't the first time running the script, read in the data frames from th
 
 ```{r eval=TRUE}
 
-speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
+speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_bh_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
   filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
 
-compareThorson <- read_csv(here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'.csv')))
+compareThorson <- read_csv(here('data','results',paste0('OM1sens_mseVqnm1_bh_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'_2026review.csv')))
 
 ```
 
@@ -859,14 +859,16 @@ pairwise_df %<>%
 
 prepare a df to describe trade-offs. we don't want to use equivocal output to make triage decisions in the main text, so NA-out equivocal QNM output. 
 ```{r}
-tos <- speciesALL_compare  %>%
+tos_equiv <- speciesALL_compare  %>%
   dplyr::select(-model.x) %>%
   rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
   mutate(species=case_when(
     species=="MSE-Species1" ~ "(sp.1) med longevity", 
     species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
   mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
-         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) %>%
+         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0))
+
+tos <- tos_equiv %>%
   mutate(qnm_psims=ifelse(qnm_equiv==1, NA, qnm_psims)) 
 ```
 
@@ -981,19 +983,10 @@ saveRDS(tos_list, here('data','results','fig7_bh_data_arrows.rds'))
 this version of the trade-offs df has arrows, for use in fig 7, but allows equivocal QNM responses to contribute to the count in the appropriate increase/decrease category.
 
 ```{r}
-tos_allqnm <- speciesALL_compare  %>%
-  dplyr::select(-model.x) %>%
-  rename(qnm_psims=psims, mse_prob=prob, species=model.y) %>%
-  mutate(species=case_when(
-    species=="MSE-Species1" ~ "(sp.1) med longevity", 
-    species=="MSE-Species2" ~ "(sp.2) short lived")) %>%
-  mutate(qnm_equiv=ifelse(abs(qnm_psims) < 60, 1, 0),
-         mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0))
-
-tos_allqnm_list <- list()
+tos_equiv_list <- list()
 i = 1
 for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
-  tmpdat <- tos_allqnm %>%
+  tmpdat <- tos_equiv %>%
     filter(variable_out %in% c(v, "spawning_biomass")) %>%
     mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
     dplyr::select(operating_model, management_strategy, code, variable_out, qnm_psims, species) %>%
@@ -1023,16 +1016,52 @@ for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
         dplyr::select(operating_model, management_strategy, code, species, MSE, tot_mse_equiv)
 
     )
-  tos_allqnm_list [[i]] <- tmpdat
-  names(tos_allqnm_list )[i] <- v
+  tos_equiv_list [[i]] <- tmpdat
+  names(tos_equiv_list )[i] <- v
   i = i + 1
 }
 ```
 
 save as an RDS 
 ```{r eval=write_out}
-saveRDS(tos_allqnm_list , here('data','results',
+saveRDS(tos_equiv_list , here('data','results',
                                paste0('fig7_bh_data_arrows_countEquiv_',sim.date,'.rds')))
+```
+
+
+use Fig 7 data frame to produce a table for fig c3
+```{r}
+figs_list <- list()
+i = 1
+for(v in c('total_catch','fishery_1_catch','fishery_2_catch')){
+
+  figs_list[[i]] <- tos_equiv %>%
+    filter(variable_out %in% c(v, "spawning_biomass")) %>%
+    mutate(variable_out=case_when(grepl('catch',variable_out) ~ 'catch',.default=variable_out)) %>%
+    mutate(QNM=case_when(
+      (qnm_psims > 0 & qnm_equiv==0) ~ '+',
+      (qnm_psims > 0 & qnm_equiv==1 & qnm_psims != 50) ~ '(+)',
+      (qnm_psims < 0 & qnm_equiv==0) ~ '-',
+      (qnm_psims < 0 & qnm_equiv==1 & qnm_psims != -50) ~ '(-)',
+      abs(qnm_psims)==50 ~ ''
+    )) %>%
+    mutate(MSE=case_when(
+      (mse_prob > 60) ~ '+',
+      (mse_prob > 50) ~ '(+)',
+      (mse_prob < 40) ~ '-',
+      (mse_prob < 50) ~ '(-)')) %>%
+    mutate(qnm_compare=case_when(
+      (QNM==MSE | (QNM=="(+)" & MSE=="+") | (QNM=="+" & MSE=="(+)") | (QNM=="(-)" & MSE=="-")) ~ "same", 
+      ((QNM=="+" | QNM=="(+)" ) & (MSE=="-"  | MSE=="(-)")) ~ "optimistic",
+      ((QNM=="-" | QNM=="(-)" ) & (MSE=="+"  | MSE=="(+)")) ~ "pessimistic",
+      QNM=="" ~ "50/50"))
+  i = i + 1
+}
+
+names(figs_list) <- c('total_catch','fishery_1_catch','fishery_2_catch')
+```
+```{r eval=write_out}
+saveRDS(figs_list, file=here('data','results',paste0('figs_bh_tradeoffs_expanded_byOMbyHCRbySp_',sim.date,'.RDS')))
 ```
 
 

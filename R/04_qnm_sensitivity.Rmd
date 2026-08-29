@@ -534,7 +534,7 @@ biomass_run_times <- c()
 This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
 ```{r}
 counter = 1
-for(i in c("A","B","c","D","E")){  # HCRs
+for(i in c("A","B","C","D","E")){  # HCRs
 
   for(j in c(0,2,3,4,5)){  # OMs
     
@@ -593,24 +593,15 @@ ran:
 ```{r}
 names(biomass.br.list)
 ```
- [1] "QNM-4-HCR-A" "QNM-0-HCR-B" "QNM-2-HCR-B" "QNM-3-HCR-B" "QNM-4-HCR-B" "QNM-5-HCR-B"
- [7] "QNM-0-HCR-c" "QNM-2-HCR-c" "QNM-3-HCR-c" "QNM-4-HCR-c" "QNM-5-HCR-c" "QNM-0-HCR-D"
-[13] "QNM-2-HCR-D" "QNM-3-HCR-D" "QNM-4-HCR-D" "QNM-5-HCR-D" "QNM-0-HCR-E" "QNM-2-HCR-E"
-[19] "QNM-3-HCR-E" "QNM-4-HCR-E" "QNM-5-HCR-E"
+ [1] "QNM-4-HCR-A" "QNM-3-HCR-B" "QNM-4-HCR-B" "QNM-0-HCR-C" "QNM-2-HCR-C" "QNM-3-HCR-C"
+ [7] "QNM-4-HCR-C" "QNM-5-HCR-C" "QNM-2-HCR-D" "QNM-3-HCR-D" "QNM-4-HCR-D" "QNM-2-HCR-E"
+[13] "QNM-3-HCR-E" "QNM-4-HCR-E"
 
 how long did that take?
 ```{r}
-biomass_run_times_df <- as.data.frame(biomass_run_times) %>%
-  rownames_to_column(var='name') %>%
-  separate(col=name, into=c('hcr','om'), sep="_") %>%
-   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
-                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
-  rename(run_time=hcr_run_times)
-# save
-write_csv(run_times_df, here('data','sensitivity','biomass_gbm_run_times.csv'))
-#
-
-ggplot(biomass_run_times_df, aes(x=run_time)) + geom_histogram() + theme_bw()
+ggplot(biomass_run_times_df, aes(x=run_time)) + geom_histogram() + 
+  ggtitle(paste0(round(sum(biomass_run_times_df$run_time)/60,3), ' hours'))+
+  theme_bw()
 ```
 total: 7.4 hrs
 
@@ -651,6 +642,103 @@ fish2.br.list <- list()
 fish2_run_times <- c()
 counter = 1
 ```
+
+attempt to parallelize
+```{r}
+library(furrr)
+library(purrr)
+library(stringr)
+
+# set up parallel plan (leave 1 core free)
+plan(multisession, workers = parallel::detectCores() - 4)
+
+# build the full grid of combinations, in the same order as your nested loop
+grid <- expand.grid(i = c("B","C","D","E"), j = c(0,2,3,4,5),
+                     stringsAsFactors = FALSE)
+
+fit_one <- function(i, j, sim.date) {
+  
+  tmp_in <- readRDS(here('data','qnm_out','sensitivity',
+                          paste0('gbmIn_QNM',j,'-HCR',i,'_',sim.date,'.rds')))
+  
+  if(length(unique(tmp_in[,"Fishery 2"])) > 1){
+    
+    d1 <- which(str_detect(colnames(tmp_in),"_"))[1]
+    d2 <- dim(tmp_in)[2]
+    d <- cbind(tmp_in[,"Fishery 2"], tmp_in[,d1:d2])
+    
+    s <- Sys.time()
+    fit.gbm <- gbm.step(data = d, gbm.x = 2:dim(d)[2], gbm.y = 1,
+                         family = "gaussian", tree.complexity = 5,
+                         learning.rate = 0.01, bag.fraction = 0.5)
+    elapsed <- Sys.time() - s
+    
+    list(
+      name    = paste0('QNM-', j, '-HCR-', i),
+      fit     = fit.gbm,
+      time    = elapsed,
+      time_id = paste(i, j, sep = "_"),
+      skipped = FALSE
+    )
+    
+  } else {
+    list(
+      name    = paste0('QNM-', j, '-HCR-', i),
+      skipped = TRUE
+    )
+  }
+}
+
+# run in parallel, one call per grid row
+results <- future_pmap(
+  grid,
+  fit_one,
+  sim.date = sim.date,
+  .options = furrr_options(packages = c("here", "stringr", "dismo"), seed = TRUE)
+)
+
+plan(sequential)  # reset to sequential when done
+
+# reassemble outputs sequentially, preserving your original structure
+fish2.br.list <- list()
+fish2_run_times <- c()
+counter <- 1
+
+walk(results, function(res){
+  if(!res$skipped){
+    fish2.br.list[[counter]] <<- res$fit
+    names(fish2.br.list)[counter] <<- res$name
+    
+    fish2_run_times[length(fish2_run_times)+1] <<- res$time
+    names(fish2_run_times)[length(fish2_run_times)] <<- res$time_id
+    
+    counter <<- counter + 1
+  } else {
+    message('skipping ', res$name, ' for this variable. no variation in response to perturbation.')
+  }
+})
+
+
+## save 
+saveRDS(fish2.br.list, here('data','qnm_out','sensitivity',paste0('gbmOut_Fishery2_GaussTr5Lr01_',sim.date,'.rds')))
+
+
+## how long did that take?
+fish2_run_times_df <- as.data.frame(fish2_run_times) %>%
+  rownames_to_column(var='name') %>%
+  separate(col=name, into=c('hcr','om'), sep="_") %>%
+   mutate(om=case_when(om=='OM O' ~ 'OM 0 Status Quo',
+                      om=='OM 3' ~ 'OM 3 Reduced Productivity', .default=om)) %>%
+  rename(run_time=biomass_run_times)
+# save
+write_csv(biomass_run_times_df, here('data','qnm_out','sensitivity','fishery2_gbm_run_times.csv'))
+#
+
+beepr::beep()
+```
+
+!!!! will have to rerun the save code so that biomass data are not saved into fish2-named objects !!!
+
 
 This loop will do a sensitivity analysis for the given variable in all QNM perturbations where that variable had variation in response
 ```{r}

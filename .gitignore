@@ -1,22 +1,32 @@
+## r project files ##
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-drafts/Abs 492 2024-07-29.docx
+.positai
+qualitative-MSEs.Rproj
+R/.RDataTmp
+
+## large data objects ##
 data/**/*.rds
 data/**/*.xlsx
 data/qnm_out/sensitivity/*.csv
+data/qnm_out/sensitivity/sensitivity/*.csv
 data/qnm_out/retired/**
 data/results/old_runs/**
 data/qnm_out/sensitivity.zip
-doc/*.docx
 *.zip
-qualitative-MSEs.Rproj
-R/.RDataTmp
+
+
+## old paper drafts ##
+drafts/Abs 492 2024-07-29.docx
+doc/*.docx
+/doc/archive
+doc/tradeoff decisions.xlsx
+
+## literature ##
 doc/lit/Qualitative Models to Complement Quantitative Ecosystem Models for the Analysis of Data-Limited Marine Ecosystems and Fisheries.pdf
 doc/lit/Herr-et-al-qualitative-modeling-for-NPP-quant-modeling-research-priorities.pdf
 doc/lit/using-a-qualitative-model-to-explore-the-impacts-of-ecosystem-and-anthropogenic-drivers-upon-declining-marine-survival-in-pacific-salmon.pdf
-/doc/archive
-doc/tradeoff decisions.xlsx
 doc/lit/Vasslides_Jensen_2017_JCR.pdf
-.positai
+R/Rplots.pdf

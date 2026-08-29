@@ -29,6 +29,10 @@ library(cowplot)
 # Data --------------------------------------------------------------------
 
 tos_list <- readRDS(here('data','results','fig7_data_arrows.rds'))
+tos2_total <- tos_list[['total_catch']]
+tos2_fish1 <- tos_list[['fishery_1_catch']]
+tos2_fish2 <- tos_list[['fishery_2_catch']]
+
 
 ## create full pairwise df 
 tradeoffs_vec <- c("catch increases,\nbiomass increases","catch increases,\nbiomass decreases","catch decreases,\nbiomass increases", "catch decreases,\nbiomass decreases")
@@ -70,7 +74,6 @@ tradeoffs_vec2_equiv <- c('\u2191 catch,\n\u2191 biomass',
 
 # Total catch -------------------------------------------------------------
 
-tos2_total <- tos_list[['total_catch']]
 tradeoffs_vec2_qnm <- tradeoffs_vec2_equiv[
   which((tradeoffs_vec2_equiv %in% tradeoffs_vec2) | (tradeoffs_vec2_equiv %in% unique(tos2_total$QNM)))
 ]
@@ -112,8 +115,6 @@ plot.total.equiv
 
 # Fishery 1 -----------------------------------------------
 
-tos2_fish1 <- tos_list[['fishery_1_catch']]
-
 tradeoffs_vec2_qnm <- tradeoffs_vec2_equiv[
   which((tradeoffs_vec2_equiv %in% tradeoffs_vec2) | (tradeoffs_vec2_equiv %in% unique(tos2_fish1$QNM)))
 ]
@@ -151,9 +152,6 @@ plot.f1.equiv
 
 
 # Fishery 2 catch -----------------------------------------------
-
-tos2_fish2 <- tos_list[['fishery_2_catch']]
-
 tradeoffs_vec2_qnm <- tradeoffs_vec2_equiv[
   which((tradeoffs_vec2_equiv %in% tradeoffs_vec2) | (tradeoffs_vec2_equiv %in% unique(tos2_fish2$QNM)))
 ]
@@ -214,14 +212,17 @@ dev.off()
 # FIGURE C3 ----------------------------------------------------------
 
 figs_list <- readRDS(file=here('data','results',paste0('figs_tradeoffs_expanded_byOMbyHCRbySp_',sim.date,'.RDS')))
+tos_total <- figs_list[['total_catch']]
+tos_fish1 <- figs_list[['fishery_1_catch']]
+tos_fish2 <- figs_list[['fishery_2_catch']]
 
 # Species 1 ---------------------------------------------------------------
 ## total catch
-tos_total2 <- figs_list[[1]] %>%
+tos_total <- tos_total %>%
   mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
-any(is.na(tos_total2$qnm_compare))
+any(is.na(tos_total$qnm_compare))
 
-p2_total <- tos_total2 %>%
+p2_total <- tos_total %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   rename(qMSE=MSE) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
@@ -258,12 +259,12 @@ p2_total <- tos_total2 %>%
 p2_total
 
 ## fishery 1
-tos3_fish1 <- figs_list[[2]] %>%
+tos_fish1 <- tos_fish1 %>%
   mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
-any(is.na(tos3_fish1$qnm_compare))
+any(is.na(tos_fish1$qnm_compare))
 
 
-p2_fish1 <- tos3_fish1 %>%
+p2_fish1 <- tos_fish1 %>%
   rename(qMSE=MSE) %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   pivot_longer(cols=c(QNM,qMSE), names_to="model", values_to="change") %>%
@@ -298,11 +299,11 @@ p2_fish1 <- tos3_fish1 %>%
 p2_fish1
 
 ## fishery 2
-tos3_fish2 <- figs_list[[3]] %>% 
+tos_fish2 <- tos_fish2 %>% 
   mutate(qnm_compare=factor(qnm_compare,levels=c('optimistic','pessimistic','same','50/50')))
-any(is.na(tos3_fish2$qnm_compare))
+any(is.na(tos_fish2$qnm_compare))
 
-p2_fish2 <- tos3_fish2 %>%
+p2_fish2 <- tos_fish2 %>%
   rename(qMSE=MSE) %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
@@ -360,7 +361,7 @@ dev.off()
 # Species 2 ---------------------------------------------------------------
 
 ## create table
-p2s2_total <- tos_total2 %>%
+p2s2_total <- tos_total %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   rename(qMSE=MSE) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
@@ -399,7 +400,7 @@ p2s2_total
 
 
 ## create table
-p2s2_fish1 <- tos3_fish1 %>%
+p2s2_fish1 <- tos_fish1 %>%
   rename(qMSE=MSE) %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   pivot_longer(cols=c(QNM,qMSE), names_to="model", values_to="change") %>%
@@ -434,7 +435,7 @@ p2s2_fish1 <- tos3_fish1 %>%
 p2s2_fish1
 
 ## create table
-p2s2_fish2 <- tos3_fish2 %>%
+p2s2_fish2 <- tos_fish2 %>%
   rename(qMSE=MSE) %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
@@ -471,12 +472,12 @@ p2s2_fish2
 ## FIGURE C3 - ALL TOGETHER
 
 pout2 <- plot_grid(plotlist=list(
-  p2_total + theme(legend.position='none', plot.margin = unit(c(1.7, 0, 0, 1), "lines"),
+  p2s2_total + theme(legend.position='none', plot.margin = unit(c(1.7, 0, 0, 1), "lines"),
                    axis.text.y=element_blank()),
-  p2_fish1 + theme(legend.position='none',plot.margin = unit(c(1.7, 0, 0,0), "lines"),
+  p2s2_fish1 + theme(legend.position='none',plot.margin = unit(c(1.7, 0, 0,0), "lines"),
                    axis.text.y=element_blank(),
                    strip.text.y.left = element_blank()),
-  p2_fish2 + theme(legend.position='none',plot.margin = unit(c(1.7, 0, 0, 0), "lines"),
+  p2s2_fish2 + theme(legend.position='none',plot.margin = unit(c(1.7, 0, 0, 0), "lines"),
                    strip.text.y.left = element_blank())),
   ncol=3, nrow=1, rel_widths=c(1,0.6,0.65))
 
@@ -492,6 +493,9 @@ dev.off()
 
 
 
+# pasture -----------------------------------------------------------------
+
+### warning: old code! everything below is not updated for manuscript.
 ##########################################################################
 ##########################################################################
 ##########################################################################
