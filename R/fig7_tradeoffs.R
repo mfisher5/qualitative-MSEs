@@ -92,14 +92,14 @@ plot.total.equiv <- ggplot(to_plot, aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fc
   geom_tile() + 
   geom_text(aes(label=n_lab, fontface='italic'), col=to_plot$n_col) + # col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
-                ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
+                ymin=c(6.5),ymax=c(7.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
-                ymin=4.5, ymax=5.5), fill='transparent',col='black') +
+                ymin=5.5, ymax=6.5), fill='transparent',col='black') +
   geom_rect(aes(xmin=2.5, xmax=3.5,
-                ymin=3.5, ymax=4.5), fill='transparent',col='black') +
+                ymin=4.5, ymax=5.5), fill='transparent',col='black') +
   geom_rect(aes(xmin=3.5, xmax=4.5,
-                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
-  geom_hline(aes(yintercept=2.5)) +
+                ymin=3.5, ymax=4.5), fill='transparent',col='black') +
+  geom_hline(aes(yintercept=3.5)) +
   facet_wrap(~species,strip.position='bottom') +
   labs(x="Quant MSE",y="QNM") +
   scale_x_discrete(position='top') +
@@ -133,14 +133,14 @@ plot.f1.equiv <- ggplot(to_plot, aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_r
   geom_tile() + 
   geom_text(aes(label=n_lab, fontface='italic'), col=to_plot$n_col) + # col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
-                ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
+                ymin=c(6.5),ymax=c(7.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
-                ymin=4.5, ymax=5.5), fill='transparent',col='black') +
+                ymin=5.5, ymax=6.5), fill='transparent',col='black') +
   geom_rect(aes(xmin=2.5, xmax=3.5,
-                ymin=3.5, ymax=4.5), fill='transparent',col='black') +
+                ymin=4.5, ymax=5.5), fill='transparent',col='black') +
   geom_rect(aes(xmin=3.5, xmax=4.5,
-                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
-  geom_hline(aes(yintercept=2.5)) +
+                ymin=3.5, ymax=4.5), fill='transparent',col='black') +
+  geom_hline(aes(yintercept=3.5)) +
   facet_wrap(~species,strip.position='bottom') +
   labs(x="Quant MSE",y="QNM") +
   scale_x_discrete(position='top') +
@@ -170,14 +170,14 @@ plot.f2.equiv <- ggplot(to_plot, aes(x=fct_relevel(MSE, tradeoffs_vec2), y=fct_r
   geom_tile() + 
   geom_text(aes(label=n_lab, fontface='italic'), col=to_plot$n_col) + # col=c(rep('gray40',9),'gray99',rep('gray40',27))) +
   geom_rect(aes(xmin=c(0.5),xmax=c(1.5),
-                ymin=c(5.5),ymax=c(6.5)), fill='transparent',col='black') +
+                ymin=c(6.5),ymax=c(7.5)), fill='transparent',col='black') +
   geom_rect(aes(xmin=1.5, xmax=2.5,
-                ymin=4.5, ymax=5.5), fill='transparent',col='black') +
+                ymin=5.5, ymax=6.5), fill='transparent',col='black') +
   geom_rect(aes(xmin=2.5, xmax=3.5,
-                ymin=3.5, ymax=4.5), fill='transparent',col='black') +
+                ymin=4.5, ymax=5.5), fill='transparent',col='black') +
   geom_rect(aes(xmin=3.5, xmax=4.5,
-                ymin=2.5, ymax=3.5), fill='transparent',col='black') +
-  geom_hline(aes(yintercept=2.5)) +
+                ymin=3.5, ymax=4.5), fill='transparent',col='black') +
+  geom_hline(aes(yintercept=3.5)) +
   facet_wrap(~species,strip.position='bottom') +
   labs(x="Quant MSE",y="QNM") +
   scale_x_discrete(position='top') +
@@ -212,9 +212,24 @@ dev.off()
 # FIGURE C3 ----------------------------------------------------------
 
 figs_list <- readRDS(file=here('data','results',paste0('figs_tradeoffs_expanded_byOMbyHCRbySp_',sim.date,'.RDS')))
-tos_total <- figs_list[['total_catch']]
-tos_fish1 <- figs_list[['fishery_1_catch']]
-tos_fish2 <- figs_list[['fishery_2_catch']]
+tos_total <- figs_list[['total_catch']] %>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+
+tos_fish1 <- figs_list[['fishery_1_catch']] %>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+
+tos_fish2 <- figs_list[['fishery_2_catch']] %>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+
 
 # Species 1 ---------------------------------------------------------------
 ## total catch
@@ -227,11 +242,6 @@ p2_total <- tos_total %>%
   rename(qMSE=MSE) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
   filter(grepl("1", species))  %>%
-  mutate(management_strategy=ifelse(
-    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
-    "C. Fishery 1 in \"offshore\" only,\n effort changes",
-    management_strategy
-  )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
     .default=variable_out
@@ -269,11 +279,6 @@ p2_fish1 <- tos_fish1 %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   pivot_longer(cols=c(QNM,qMSE), names_to="model", values_to="change") %>%
   filter(grepl("1", species))  %>%
-  mutate(management_strategy=ifelse(
-    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
-    "C. Fishery 1 in \"offshore\" only,\n effort changes",
-    management_strategy
-  )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
     .default=variable_out
@@ -312,10 +317,6 @@ p2_fish2 <- tos_fish2 %>%
     management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
     "C. Fishery 1 in \"offshore\" only,\n effort changes",
     management_strategy
-  )) %>%
-  mutate(variable_out=case_when(
-    variable_out=="spawning_biomass" ~ "biomass",
-    .default=variable_out
   )) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
@@ -366,11 +367,6 @@ p2s2_total <- tos_total %>%
   rename(qMSE=MSE) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
   filter(grepl("2", species))  %>%
-  mutate(management_strategy=ifelse(
-    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
-    "C. Fishery 1 in \"offshore\" only,\n effort changes",
-    management_strategy
-  )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
     .default=variable_out
@@ -405,11 +401,6 @@ p2s2_fish1 <- tos_fish1 %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   pivot_longer(cols=c(QNM,qMSE), names_to="model", values_to="change") %>%
   filter(grepl("2", species))  %>%
-  mutate(management_strategy=ifelse(
-    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
-    "C. Fishery 1 in \"offshore\" only,\n effort changes",
-    management_strategy
-  )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
     .default=variable_out
@@ -440,11 +431,6 @@ p2s2_fish2 <- tos_fish2 %>%
   dplyr::select(-qnm_psims,-qnm_equiv,-mse_prob) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
   filter(grepl("2", species))  %>%
-  mutate(management_strategy=ifelse(
-    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
-    "C. Fishery 1 in \"offshore\" only,\n effort changes",
-    management_strategy
-  )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
     .default=variable_out

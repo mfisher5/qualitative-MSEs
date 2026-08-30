@@ -92,23 +92,21 @@ dat.top10 <- fit.df %>% group_by(Variable) %>%
 
 Read in the data and format as for fig 6
 ```{r}
-speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'.csv')))
+speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv')))
 
-speciesALL_compare %<>% 
-  filter(code != "2-A") %>%     # QNM 2 HCR A doesn't have a perturbation
+speciesALL_compare2 <- speciesALL_compare %>%
   mutate(variable_out=fct_recode(variable_out,"Fishery 1 catch"="fishery_1_catch",
                                  "Fishery 2 catch"="fishery_2_catch",
                                  "Total catch"="total_catch",
                                  "Spawning biomass"="spawning_biomass"))  %>%
-  filter(code != "2-A") %>%
-  mutate(equiv=ifelse(abs(psims)<60, 'y','n')) %>%
+  mutate(equiv=ifelse(abs(psims)< 60, 'y','n')) %>%
   mutate(match=ifelse((psims < 0 & prob < 0) | (psims > 0 & prob > 0), "match","mismatch")) %>%
   mutate(match_is_equiv=ifelse(match=='match' & equiv=='y','match, qnm equiv',
                                ifelse(match=='mismatch'& equiv=='y','mismatch, qnm equiv',match))) %>%
   mutate(match_is_equiv=fct_relevel(match_is_equiv, c('match','match, qnm equiv','mismatch','mismatch, qnm equiv'))) %>%
   mutate(model.y=case_when(model.y=="MSE-Species1"~'(sp.1) med longevity',.default='(sp.2) short longevity')) %>%
   separate(code, into=c("OM", "HCR"), sep="-") %>% dplyr::select(-model.x,-psims,-prob,-equiv)
-head(speciesALL_compare)
+head(speciesALL_compare2)
 ```
 
 
@@ -127,14 +125,28 @@ fit.df %>% dplyr::select(Variable,edge_density) %>%
 
 Great, not so different. which QNMs were represented for which variables?
 ```{r}
-fit.df %>% dplyr::select(Variable,OM,HCR) %>% 
+fit.df.plot <- fit.df %>% dplyr::select(Variable,OM,HCR) %>% 
+  mutate(OM=case_when(
+    OM=='2' ~ '1',
+    OM=='3' ~ '2',
+    OM=='4' ~ '3',
+    OM=='5' ~ '4',.default=OM
+  )) %>%
   distinct() %>%
   unite(col=code, OM,HCR, sep="-") %>%
   mutate(present='yes') %>%
   pivot_wider(names_from=code, values_from=present, values_fill='no') %>%
-  pivot_longer(cols=2:21, names_to='OM_HCR',values_to='present') %>%
-  mutate(Variable=factor(Variable, levels=rev(c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass")))) %>%
-  ggplot() +
+  pivot_longer(cols=2:22, names_to='OM_HCR',values_to='present') %>%
+  bind_rows(
+    ## 2A missing from all because all super negative
+    data.frame(Variable=c('Total catch','Fishery 1 catch','Fishery 2 catch','Spawning biomass'),
+               OM_HCR=rep('2-A',4),
+               present=rep('no',4))
+  ) %>%
+  mutate(Variable=factor(Variable, levels=rev(c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))))
+  
+
+ggplot(fit.df.plot) +
   geom_tile(aes(x=Variable, y=OM_HCR, fill=as.factor(present))) +
   geom_vline(aes(xintercept=1.5), col='black') +
   geom_vline(aes(xintercept=2.5), col='black') +
@@ -164,25 +176,20 @@ pbox <- fit.df %>% dplyr::select(Variable,edge_density) %>%
   theme_bw() + theme(plot.margin=margin(t=5,r=0.25,b=15,l=5))
 
 
-p2 <- fit.df %>% dplyr::select(Variable,OM,HCR) %>% 
-  distinct() %>%
-  unite(col=code, OM,HCR, sep="-") %>%
-  mutate(present='yes') %>%
-  pivot_wider(names_from=code, values_from=present, values_fill='no') %>%
-  pivot_longer(cols=2:21, names_to='QNM',values_to='present') %>%
+p2 <-   fit.df.plot %>%
   mutate(Variable=factor(Variable, levels=c("Total catch", "Fishery 1 catch", "Fishery 2 catch", "Spawning biomass"))) %>%
   ggplot() +
-  geom_tile(aes(y=Variable, x=QNM, fill=as.factor(present))) +
+  geom_tile(aes(y=Variable, x=OM_HCR, fill=as.factor(present))) +
   geom_hline(aes(yintercept=0.5), col='black') +
   geom_hline(aes(yintercept=1.5), col='black') +
   geom_hline(aes(yintercept=2.5), col='black') +
   geom_hline(aes(yintercept=3.5), col='black') +
   geom_hline(aes(yintercept=4.5), col='black') +
-  scale_fill_manual(values=c("darkred","gray65"), name='in BRTs') +
+  scale_fill_manual(values=c("darkred","gray65"), name='in BRTs') + labs(x='Case') +
   theme_bw() + theme(axis.text.x=element_text(angle=45,hjust=1),
                      axis.text.y=element_blank(), axis.title.y=element_blank())
 
-png(here('data','qnm_out','sensitivity','gbmOut_qnms_x_ed.png'),res=300,height=900,width=2300)
+png(here('doc','supplement','gbmOut_qnms_x_ed.png'),res=300,height=900,width=2400)
 plot_grid(pbox,p2,ncol=2)
 dev.off()
 ```
@@ -439,8 +446,15 @@ I had a theory that variables with greater spread of relative influence values i
 merge data sets.
 ```{r}
 fits_v_match <- fits.gamma2 %>%
-  mutate(HCR=ifelse(HCR=="c","C",HCR)) %>%
-  left_join(speciesALL_compare, by=c("Variable"="variable_out","OM","HCR"))
+  mutate(OM=case_when(
+    OM==2 ~ '1', 
+    OM==3 ~ '2', 
+    OM==4 ~ '3',
+    OM==5 ~ '4',.default=paste0(OM)
+  )) %>%
+  left_join(speciesALL_compare2 %>%
+              mutate(variable_out=as.character(variable_out)),
+            by=c("Variable"="variable_out","OM","HCR"))
 ```
 
 
@@ -489,7 +503,7 @@ plot.out <- fits_v_match %>%
 plot.out
 ```
 ```{r}
-png(here('data','qnm_out','sensitivity','gbmOut_relinfGamma_V_mismatches_byVar.png'),res=300,height=1200,width=1800)
+png(here('doc','supplement','figC_relinfGamma_V_mismatches_byVar.png'),res=300,height=1200,width=1800)
 plot.out
 dev.off()
 ```
@@ -504,9 +518,9 @@ fits_v_match %>%
   summarise(mean_param=mean(value), n_match=n()) %>%
   mutate(p_match=n_match/n_compare) %>%
   filter(model.y=="(sp.1) med longevity") %>%
-  ggplot(aes(x=mean_param, y=p_match)) +
+  ggplot(aes(x=mean_param, y=p_match, col=match)) +
     geom_point() +
-    facet_grid(cols=vars(match), rows=vars(parameters)) +
+    facet_grid(rows=vars(parameters)) +
   labs(x='mean by OM, Variable',y='prop comparisons match') +
     labs(subtitle="(sp.1) med longevity", title="Gamma Parameters v. Matches") + theme_bw()
 ```
@@ -521,9 +535,9 @@ fits_v_match %>%
   summarise(mean_param=mean(value), n_match=n()) %>%
   mutate(p_match=n_match/n_compare) %>%
   filter(model.y=="(sp.2) short longevity") %>%
-  ggplot(aes(x=mean_param, y=p_match)) +
+  ggplot(aes(x=mean_param, y=p_match, col=match)) +
     geom_point() +
-    facet_grid(cols=vars(match), rows=vars(parameters)) +
+    facet_grid(rows=vars(parameters)) +
   labs(x='mean by OM, Variable',y='prop comparisons match') +
     labs(subtitle="(sp.2) short longevity", title="Gamma Parameters v. Matches") + theme_bw()
 ```

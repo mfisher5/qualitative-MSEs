@@ -31,7 +31,9 @@ library(cowplot)
 
 tos_list <- readRDS(here('data','results','fig7_bh_data_arrows.rds'))
 tos2_total <- tos_list[['total_catch']]
+
 tos2_fish1 <- tos_list[['fishery_1_catch']]
+
 tos2_fish2 <- tos_list[['fishery_2_catch']]
 
 
@@ -213,9 +215,23 @@ dev.off()
 # FIGURE C3 ----------------------------------------------------------
 
 figs_list <- readRDS(file=here('data','results',paste0('figs_bh_tradeoffs_expanded_byOMbyHCRbySp_',sim.date,'.RDS')))
-tos_total <- figs_list[['total_catch']]
-tos_fish1 <- figs_list[['fishery_1_catch']]
-tos_fish2 <- figs_list[['fishery_2_catch']]
+tos_total <- figs_list[['total_catch']] %>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+
+tos_fish1 <- figs_list[['fishery_1_catch']] %>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+
+tos_fish2 <- figs_list[['fishery_2_catch']] %>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
 
 # Species 1 ---------------------------------------------------------------
 ## total catch
@@ -228,11 +244,6 @@ p2_total <- tos_total %>%
   rename(qMSE=MSE) %>%
   pivot_longer(cols=c(QNM, qMSE), names_to="model", values_to="change") %>%
   filter(grepl("1", species))  %>%
-  mutate(management_strategy=ifelse(
-    management_strategy=="C. Fishery 1 in \"offshore\" only, effort changes",
-    "C. Fishery 1 in \"offshore\" only,\n effort changes",
-    management_strategy
-  )) %>%
   mutate(variable_out=case_when(
     variable_out=="spawning_biomass" ~ "biomass",
     .default=variable_out

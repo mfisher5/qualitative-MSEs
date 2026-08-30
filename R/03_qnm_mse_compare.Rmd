@@ -134,6 +134,13 @@ If this isn't the first time running the script, read in the data frames from th
 speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
   filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
 
+speciesALL_compare %<>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+
+
 compareThorson <- read_csv(here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'.csv')))
 
 ```
@@ -408,62 +415,84 @@ write_csv(out2, here('data','results',paste0('tblS7_qnmVmse_mismatch_count_byOMb
 
 plotting. aggregate across HCRs; look at OMs (x facet) by species (y facet)
 ```{r eval=FALSE}
-ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
-  geom_point() +
-  geom_hline(aes(yintercept=60), col="orange", lty=2) +
-  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
-  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
-  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
+to_plot <- speciesALL_compare %>%
+  mutate(model.y=case_when(
+    grepl('1',model.y) ~ "sp.1 (med longevity)",
+    .default="sp.2 (short lived)"
+  )) %>%
+  mutate(variable_out=fct_recode(variable_out,"Fishery 1 Catch"="fishery_1_catch",
+                                       "Fishery 2 Catch"="fishery_2_catch",
+                                       "Total Catch"="total_catch",
+                                       "Spawning Biomass"="spawning_biomass")) %>% 
+  mutate(variable_out=factor(variable_out,levels=c("Total Catch","Fishery 1 Catch",
+                                                   "Fishery 2 Catch","Spawning Biomass"))) %>%
+  mutate(management_strategy=case_when(
+    management_strategy=="C. Fishery 1 in \"offshore\" only" ~"C. Fishery 1 in \"offshore\"\n only, effort changes",
+    management_strategy=="E. Fishery 1 in \"offshore\" only" ~"E. Fishery 1 in\n \"offshore\" only",
+    management_strategy=="D. Increase fishery mesh size" ~"D. Increase fishery\nmesh size",
+    .default=management_strategy
+  ))
+
+label_om <- to_plot %>%
+  mutate(mismatch_type=case_when(
+    psims < -50 & prob > 50 ~ 'fn',
+    psims > 50 & prob < 50 ~ 'fp',
+    .default=NA
+  )) %>%
+  filter(!is.na(mismatch_type)) %>%
+  group_by(model.y, operating_model,mismatch_type) %>%
+  summarise(n=n()) %>%
+  mutate(lbl = paste0('n=',n),
+         lbl_x=case_when(
+           mismatch_type=='fp' ~ 10, 
+           .default=90),
+         lbl_y=case_when(
+           mismatch_type=='fp' ~ 45,
+           .default=-40
+         )) 
+png(here('doc','supplement','figC_scatterplot_OMxSp_2026-08.png'), width=2700,height=1400,res=300)
+ggplot(to_plot, aes(x=prob,y=psims)) +
+  geom_rect(aes(xmin=-5,xmax=105,ymin=-60,ymax=60), fill='gray90')+
+  geom_point(aes(pch=variable_out)) +
+  geom_text(data=label_om, aes(x=lbl_x,y=lbl_y,label=lbl, col=mismatch_type), cex=3.5) +
   facet_grid(cols=vars(operating_model), rows=vars(model.y)) +
-  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Simulations with Increase/Decrease",
-       title="MSE v. QNM") +
-  theme_bw() + theme(legend.title=element_blank())
-
-
-png(here('data','results','qnmVmse_scatterplot_OM_by_species_2026-08.png'), width=2800,height=2000,res=300)
-ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
-  geom_point() +
-  geom_hline(aes(yintercept=60), col="orange", lty=2) +
-  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
-  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
-  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
-  facet_grid(cols=vars(operating_model), rows=vars(model.y)) +
-  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
-  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion with Increase/Decrease",
-       title="MSE v. QNM") +
-  theme_bw() + theme(legend.title=element_blank())
-dev.off()
-```
-
-for each species, look at OM (x facet) by hcr (y facet)
-```{r eval=FALSE}
-png(here('data','results','qnmVmse_scatterplot_OM_by_HCR_2026-08.png'), width=2600,height=2000,res=300)
-ggplot(speciesALL_compare, aes(x=prob,y=psims, pch=variable_out)) +
-  geom_point() +
-  geom_hline(aes(yintercept=60), col="orange", lty=2) +
-  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
-  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
-  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
-  facet_grid(cols=vars(operating_model), rows=vars(management_strategy)) +
-  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
+  scale_shape_manual(values=c(0,1,2,4)) +
+  scale_color_manual(values=c("darkblue","darkorange"),guide='none') +
   labs(x="MSE: Probability of Increase",y="QNM: Proportion Simulations with Increase/Decrease",
-       title="MSE Species 2 v. QNM") +
-  theme_bw() + theme(strip.text.y=element_text(hjust=0))
+       subtitle="(a) by operating model scenario") +
+  theme_bw() + theme(legend.title=element_blank())
 dev.off()
-# 
-# png(here('data','results','qnmVmse_scatterplot_sp1_OM_by_HCR_2024-03-28.png'), width=2800,height=2000,res=300)
-# ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
-#   geom_point() +
-#   geom_hline(aes(yintercept=60), col="orange", lty=2) +
-#   geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
-#   geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
-#   geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
-#   scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
-#   facet_grid(cols=vars(operating_model), rows=vars(management_strategy)) +
-#   labs(x="MSE: Probability of Increase",y="QNM: Proportion Simulations with Increase/Decrease",
-#        title="MSE Species 1 v. QNM") +
-#   theme_bw() + theme(strip.text.y=element_text(hjust=0))
-# dev.off()
+
+
+label_ms <- to_plot %>%
+  mutate(mismatch_type=case_when(
+    psims < -50 & prob > 50 ~ 'fn',
+    psims > 50 & prob < 50 ~ 'fp',
+    .default=NA
+  )) %>%
+  filter(!is.na(mismatch_type)) %>%
+  group_by(model.y, management_strategy,mismatch_type) %>%
+  summarise(n=n()) %>%
+  mutate(lbl = paste0('n=',n),
+         lbl_x=case_when(
+           mismatch_type=='fp' ~ 10, 
+           .default=90),
+         lbl_y=case_when(
+           mismatch_type=='fp' ~ 45,
+           .default=-40
+         )) 
+png(here('doc','supplement','figC_scatterplot_HCRxSp_2026-08.png'), width=2800,height=1400,res=300)
+ggplot(to_plot, aes(x=prob,y=psims)) +
+  geom_rect(aes(xmin=-5,xmax=105,ymin=-60,ymax=60), fill='gray90')+
+  geom_point(aes(pch=variable_out)) +
+  geom_text(data=label_ms, aes(x=lbl_x,y=lbl_y,label=lbl, col=mismatch_type), cex=3.5) +
+  facet_grid(cols=vars(management_strategy), rows=vars(model.y)) +
+  scale_shape_manual(values=c(0,1,2,4)) +
+  scale_color_manual(values=c("darkblue","darkorange"),guide='none') +
+  labs(x="MSE: Probability of Increase",y="QNM: Proportion Simulations with Increase/Decrease",
+       subtitle="(b) by management strategy") +
+  theme_bw() + theme(legend.title=element_blank())
+dev.off()
 ```
 
 
@@ -1094,4 +1123,137 @@ tblc6_out <- do.call(rbind,tbl_c6_list)
 ```
 ```{r eval=write_out}
 write_csv(tblc6_out, file=here('data','results',paste0('tableC6_tradeoffs_byOMbyHCRbySp_',sim.date,'.csv')), quote='all')
+```
+
+
+## Effect of consistency threshold
+
+how does the sign consistency threshold that we use for the QNMs affect the proportion of cases that are labeled as false positive / false negative?
+
+```{r}
+speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
+  filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
+
+to_triage <- speciesALL_compare  %>%
+    dplyr::select(-model.x) %>% rename(species=model.y) %>%
+    rename(qnm_psims=psims, mse_prob=prob) %>%
+    mutate(species=case_when(
+      grepl("Species1", species) ~ "(sp.1) med longevity", 
+      grepl("Species2", species) ~ "(sp.2) short lived"))
+```
+
+```{r}
+thresholds <- c(51,seq(55,100,by=5))
+
+tdat <- do.call(rbind, 
+                      lapply(thresholds, FUN=function(x){
+                        to_triage %>%
+                          mutate(qnm_equiv=ifelse(abs(qnm_psims) < x, 1, 0)) %>%
+                          # mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 40, 'true negative',
+                          #                      ifelse(qnm_psims > 0 & mse_prob > 60, 'true positive',
+                          mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 50, 'true negative',
+                                               ifelse(qnm_psims > 0 & mse_prob > 50, 'true positive',
+                                                      ifelse(qnm_psims > 0 & mse_prob < 50, 'false positive',
+                                                             ifelse(qnm_psims < 0 & mse_prob > 50, 'false negative', NA))))) %>%
+                          #        ifelse(qnm_psims > 0 & mse_prob < 40, 'false positive',
+                          #               ifelse(qnm_psims < 0 & mse_prob > 60, 'false negative', NA))))) %>%
+                          mutate(triage_noEquiv=ifelse(qnm_equiv==0, triage, NA)) %>%
+                          mutate(threshold=x)
+                      })
+)
+```
+
+how does the proportion of all predictions (n=23 cases x 4 variables) which are categorized as *non-equivocal* false negative / positive change with the threshold?
+```{r}
+tdat_summary <- tdat %>%
+  group_by(threshold,species) %>%
+  mutate(total_cases=n()) %>%  # should be 23*4
+  ungroup() %>%
+  group_by(threshold,species,total_cases,triage_noEquiv) %>%
+  summarise(n=n()) %>%
+  mutate(p=n/total_cases)
+
+tdat_summary %>% filter(grepl('false',triage_noEquiv)) %>%
+  dplyr::select(-n) %>%
+  pivot_wider(values_from=p,names_from=triage_noEquiv, values_fill=0) %>%
+  pivot_longer(cols=c('false negative','false positive'), names_to='triage_noEquiv',values_to='p') %>%
+ggplot(aes(x=threshold,y=p,col=species))+
+  geom_point() +
+  geom_path() +
+  geom_vline(aes(xintercept=60),lty=2) +
+  facet_wrap(~triage_noEquiv) +
+  labs(x='Minimum sign consistency (%)',y='Proportion of predictions') +
+  ylim(c(0,1)) +
+  theme_bw()
+```
+
+
+```{r}
+tdat_mismatch_summary <- tdat %>%
+  filter(grepl('false',triage)) %>%
+  group_by(threshold,species) %>%
+  mutate(total_cases=n()) %>%
+  ungroup() %>%
+  group_by(threshold,species,total_cases,triage,qnm_equiv) %>%
+  summarise(n=n()) %>%
+  mutate(p=n/total_cases)
+
+tdat_mismatch_summary %>%
+  dplyr::select(-n) %>%
+  pivot_wider(values_from=p,names_from=triage, values_fill=0) %>%
+  pivot_longer(cols=c('false negative','false positive'), names_to='triage',values_to='p') %>%
+  mutate(`QNM equivocal`=as.factor(qnm_equiv)) %>%
+ggplot(aes(x=threshold,y=p,col=`QNM equivocal`,pch=species))+
+  geom_point() +
+  geom_path() +
+  geom_vline(aes(xintercept=60),lty=2) +
+  geom_hline(aes(yintercept=0)) +
+  facet_grid(cols=vars(species),rows=vars(triage)) +
+  scale_shape_manual(values=c(2,19), guide='none') +
+  labs(x='Minimum sign consistency (%)',y='Proportion of mismatched predictions') +
+  ylim(c(0,1)) +
+  scale_color_manual(values=c('gray20','goldenrod'))+
+  theme_bw() -> p2
+
+p2
+```
+
+
+
+```{r}
+tdat_summary_nonequiv <- tdat %>%
+  filter(qnm_equiv==0) %>%
+  group_by(threshold,species) %>%
+  mutate(total_cases=n()) %>%
+  ungroup() %>%
+  group_by(threshold,species,total_cases,triage_noEquiv) %>%
+  summarise(n=n()) %>%
+  mutate(p=n/total_cases)
+
+p1 <- tdat_summary_nonequiv %>% filter(grepl('false',triage_noEquiv)) %>%
+  dplyr::select(-n) %>%
+  pivot_wider(values_from=p,names_from=triage_noEquiv, values_fill=0) %>%
+  pivot_longer(cols=c('false negative','false positive'), names_to='triage_noEquiv',values_to='p') %>%
+ggplot(aes(x=threshold,y=p,pch=species))+
+  geom_point() +
+  geom_path() +
+  geom_vline(aes(xintercept=60),lty=2) +
+  geom_hline(aes(yintercept=0)) +
+  facet_grid(rows=vars(triage_noEquiv)) + 
+  scale_shape_manual(values=c(2,19)) +
+  labs(x='Minimum sign consistency (%)',y='Proportion of non-equivocal predictions') +
+  ylim(c(0,1)) +
+  theme_bw()
+p1
+```
+
+
+save.
+```{r}
+png(here('doc','supplement','figC_equiv_threshold_effect.png'), res=300,width=2800,height=1400)
+plot_grid(p1 + labs(y='prop predictions:\n all non-equivocal') + theme(axis.title.x=element_blank(), legend.position='bottom'),
+          p2 + labs(y='prop predictions:\n all mismatched')+ 
+            theme(legend.position='bottom'),ncol=2,
+          labels='AUTO')
+dev.off()
 ```
