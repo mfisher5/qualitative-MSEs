@@ -5,7 +5,7 @@
 #    Data required for this script are created in "03_qnm_mse_compare.R"
 #
 # Written 2024-11-13 M Fisher
-# Last Updated: 
+# Last Updated: 2026-08-30
 #
 ################################################################
 
@@ -33,6 +33,13 @@ triage_df %<>%
                                  "Total Catch"="total_catch",
                                  "Spawning Biomass"="spawning_biomass"))
 
+## fix OM / HCR names
+triage_df %<>% mutate(operating_model=ifelse(grepl('4',operating_model),
+                                             "4. Higher growth rate", operating_model),
+                      management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+## which QNM is split?
+triage_df %>% filter(triage=='split') %>% dplyr::select(species,code)
 
 
 # Figure 6 -------------------------------------------------------------------
@@ -49,8 +56,12 @@ triage_df %>%
   filter(triage %in% c('false negative','false positive')) %>%
   ggplot(aes(x=operating_model,y=management_strategy, fill=triage_equiv, alpha=triage_equiv)) +
   geom_tile() +
+  ## no 0-A
   geom_point(aes(x=c(1),y=c(5)),pch=4, col='gray50', size=3, show.legend=FALSE) +
+  ## no 1-A
   geom_point(aes(x=c(2),y=c(5)),pch=4, col='gray50', size=3, show.legend=FALSE) +
+  ## no 3-A because results 50/50 -- decided not to mark this the same as 0A/1A
+  # geom_point(aes(x=c(4),y=c(5)),pch=4, col='gray50', size=3, show.legend=FALSE) +  # 
   facet_grid(rows=vars(species), cols=vars(variable_out)) +
   scale_fill_manual(values=c('darkorange','dodgerblue4','dodgerblue4')) + theme_bw() +
   scale_alpha_manual(values=c(0.5,1,0.5)) +

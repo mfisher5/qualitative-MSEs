@@ -318,6 +318,7 @@ p2_fish2 <- tos_fish2 %>%
     "C. Fishery 1 in \"offshore\" only,\n effort changes",
     management_strategy
   )) %>%
+  mutate(variable_out=ifelse(variable_out=='spawning_biomass','biomass',variable_out)) %>%
   ggplot(aes(y=model,x=variable_out, fill=qnm_compare)) +
   geom_tile() +
   geom_text(aes(label=change)) +

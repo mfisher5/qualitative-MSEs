@@ -36,7 +36,9 @@ write_out <- TRUE
 
 
 
-## Data
+## Prep Data: first run of script
+
+### QNM 
 
 The QNM table is from script 02
 ```{r}
@@ -59,6 +61,7 @@ qnm %<>% mutate(operating_model=case_when(
 ))
 ```
 
+### MSE
 The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
 ```{r eval=TRUE}
 mse_format <- read_csv(here('data','results','table1_mse0-4_species1-2_Ricker_20260819.csv'))
@@ -122,24 +125,7 @@ mse_format %>%
 ```
 
 
-
-## Prep data
-
-### rerunning script
-
-If this isn't the first time running the script, read in the data frames from the next section. set code chunks to false.
-
-```{r eval=TRUE}
-
-speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_bh_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
-  filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
-
-compareThorson <- read_csv(here('data','results',paste0('OM1sens_mseVqnm1_bh_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'_2026review.csv')))
-
-```
-
-
-### first run of script
+### combine
 
 melt tables so that they can be combined
 ```{r eval=FALSE}
@@ -161,34 +147,12 @@ match mse species 1 / qnm
 ```{r eval=FALSE}
 species1_compare <- qnm %>% filter(code != "1-A") %>%
   left_join(mse1, by=c("code","variable_out"))
-ggplot(species1_compare, aes(x=prob,y=psims, pch=variable_out)) +
-  geom_point() +
-  geom_hline(aes(yintercept=60), col="orange", lty=2) +
-  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
-  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
-  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
-  facet_grid(cols=vars(operating_model)) +
-  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
-  labs(x="MSE: Probability of Increase",y="QNM: Proportion Matrices with Increase/Decrease",
-       title="MSE Species 1 v. QNM") +
-  theme_bw()
 ```
 
 match mse species 2 / qnm
 ```{r eval=FALSE}
 species2_compare <- qnm %>% filter(code != "1-A") %>%
   left_join(mse2, by=c("code","variable_out"))
-ggplot(species2_compare, aes(x=prob,y=psims, pch=variable_out)) +
-  geom_point() +
-  geom_hline(aes(yintercept=60), col="orange", lty=2) +
-  geom_hline(aes(yintercept=80), col="darkorange", lty=2) +
-  geom_hline(aes(yintercept=-60), col="lightblue", lty=2) +
-  geom_hline(aes(yintercept=-80), col="darkblue", lty=2) +
-  facet_grid(cols=vars(operating_model)) +
-  scale_shape_manual(values=c(0,1,2,4), name="Output Metric") +
-  labs(x="MSE: Probability of Increase/Decrease",y="QNM: Proportion Matrices with Increase/Decrease",
-       title="MSE Species 2 v. QNM") +
-  theme_bw()
 ```
 
 match multiple MSE versions of 2 Thorson Effort to QNM
@@ -222,6 +186,20 @@ write_csv(compareThorson, here('data','results',paste0('OM1sens_mseVqnm1_bh_prob
 ```
 
 
+
+
+## Data
+
+If this isn't the first time running the script, read in the data frames from the previous section. set code chunks in previous section to false.
+
+```{r eval=TRUE}
+
+speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_bh_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
+  filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
+
+compareThorson <- read_csv(here('data','results',paste0('OM1sens_mseVqnm1_bh_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'_2026review.csv')))
+
+```
 
 
 ## Explore mismatches: across OMs
@@ -283,7 +261,7 @@ out1_pall <- out1 %>%
 
 # percent out of number of non-equivocal
 out1_pcertain <- out1 %>%
-  dplyr::select(-contains('equivocal')) %>%
+  dplyr::select(-contains('equivocal'),-split) %>%
   adorn_percentages(denominator="row")
 
 # percent out of equivocal

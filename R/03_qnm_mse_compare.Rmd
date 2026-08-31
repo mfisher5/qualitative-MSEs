@@ -38,6 +38,8 @@ write_out <- FALSE
 
 ## Data
 
+### qnm
+
 The QNM table is from script 02
 ```{r}
 qnm <- read_csv(here('data','results',paste0('qnm0-5_hcra-e_pSims_',sim.date,'.csv'))) %>% clean_names()
@@ -59,11 +61,8 @@ qnm %<>% mutate(operating_model=case_when(
 ))
 ```
 
-The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table. If it is, skip to below.
-```{r eval=TRUE}
-mse_format <- read_csv(here('data','results','table1_mse0-4_species1-2_Ricker_20260819.csv'))
-```
 
+### mse
 
 First time running the script? We need to clean up a little and re-format the original MSE output table.
 ```{r eval=FALSE}
@@ -121,32 +120,7 @@ mse_format %>%
   write_csv(here('data','results','table1_qnmstyle_mse0-4_hcrb-d_species1-2_Ricker_20260819.csv'))
 ```
 
-
-
-## Prep data
-
-### rerunning script
-
-If this isn't the first time running the script, read in the data frames from the next section. set code chunks to false.
-
-```{r eval=TRUE}
-
-speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
-  filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
-
-speciesALL_compare %<>%
-  mutate(operating_model=ifelse(grepl('4',operating_model),
-                                "4. Higher growth rate", operating_model)) %>%
-  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
-                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
-
-
-compareThorson <- read_csv(here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'.csv')))
-
-```
-
-
-### first run of script
+### compare
 
 melt tables so that they can be combined
 ```{r eval=FALSE}
@@ -229,6 +203,34 @@ write_csv(compareThorson, here('data','results',paste0('OM1sens_mseVqnm1_prob-ps
 ```
 
 
+
+## Prep data
+
+### rerunning script
+
+If this isn't the first time running the script, read in the data frames from the next section. set code chunks to false.
+
+```{r eval=TRUE}
+
+speciesALL_compare <- read_csv(here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv'))) %>% 
+  filter(!is.na(model.y))  ## can't compare A. Status Quo for baseline, thorson effort
+
+speciesALL_compare %<>%
+  mutate(operating_model=ifelse(grepl('4',operating_model),
+                                "4. Higher growth rate", operating_model)) %>%
+  mutate(management_strategy=ifelse(grepl("C.",management_strategy),
+                                    "C. Fishery 1 in \"offshore\" only,\neffort changes", management_strategy))
+
+
+compareThorson <- read_csv(here('data','results',paste0('mse2Vqnm2_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'.csv')))
+
+```
+
+
+The original MSE table is from the MSE software. If this isn't the first time running the script, we can read in the R-formatted table.
+```{r eval=TRUE}
+mse_format <- read_csv(here('data','results','table1_mse0-4_species1-2_Ricker_20260819.csv'))
+```
 
 
 ## Explore mismatches: across OMs
@@ -687,12 +689,13 @@ triage_df <- speciesALL_compare  %>%
          mse_equiv=ifelse(mse_prob > 40 & mse_prob < 60, 1, 0)) %>%
   # mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 40, 'true negative',
   #                      ifelse(qnm_psims > 0 & mse_prob > 60, 'true positive',
-  mutate(triage=ifelse(qnm_psims < 0 & mse_prob < 50, 'true negative',
-                       ifelse(qnm_psims > 0 & mse_prob > 50, 'true positive',
-                              ifelse(qnm_psims > 0 & mse_prob < 50, 'false positive',
-                                     ifelse(qnm_psims < 0 & mse_prob > 50, 'false negative', NA))))) %>%
-                       #        ifelse(qnm_psims > 0 & mse_prob < 40, 'false positive',
-                       #               ifelse(qnm_psims < 0 & mse_prob > 60, 'false negative', NA))))) %>%
+  mutate(triage=ifelse(abs(qnm_psims)==50, 'split',
+                       ifelse(qnm_psims < 0 & mse_prob < 50, 'true negative',
+                              ifelse(qnm_psims > 0 & mse_prob > 50, 'true positive',
+                                     ifelse(qnm_psims > 0 & mse_prob < 50, 'false positive',
+                                            ifelse(qnm_psims < 0 & mse_prob > 50, 'false negative', NA)))))) %>%
+  #        ifelse(qnm_psims > 0 & mse_prob < 40, 'false positive',
+  #               ifelse(qnm_psims < 0 & mse_prob > 60, 'false negative', NA))))) %>%
   mutate(triage_noEquiv=ifelse(qnm_equiv==0, triage, NA))
 ```
 
