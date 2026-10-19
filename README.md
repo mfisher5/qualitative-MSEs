@@ -1,11 +1,10 @@
-# Translating quantitative MSEs into qualitative network models
+# Can triage with qualitative models make MSE more efficient?
 
-How do qualitative network models compare to a single-species MSE?
+Mary C Fisher, Chris J Harvey, Tessa B Francis, Kristin N Marshall, Laura K Nelson, Corey Ridings, André E. Punt
 
 ### Abstract
 
-<<<.....>>>
-We see a need for a more systematic and inclusive approach to “triaging” management strategies for an MSE, to identify which are likely to be viable candidates for selection, without developing complex population models and associated software.
+Management strategy evaluation (MSE) is a crucial tool for exploring alternative management strategies. However, expanding an MSE to account for complexities like spatial structure and climate change can further extend a time-consuming process. This is at odds with the need for more responsive fisheries management in the face of climate change. We explored the potential for qualitative network models (QNMs) to shorten the timeline for MSE by “triaging” management strategies. Ideally, triage with QNMs would pre-emptively eliminate strategies that are unlikely to satisfy management objectives, allowing the full MSE to be run for a smaller number of strategies or operating model scenarios. To test QNM performance as a triage tool, we translated a single-species MSE with five operating model scenarios and five management strategies into QNMs. Three of the five operating model scenarios included climate change impacts to the fished species. We then compared directional change in four performance metrics, as predicted by the QNMs versus the quantitative MSE. We considered two aspects of QNM performance as a triage tool: (1) the time to develop and run the QNMs, and (2) the degree to which the QNM predictions matched those of the quantitative MSE. Agreement between the two model types varied widely by performance metric, matching >70% of the time for spawning biomass and <45% of the time for total fishery catch. The QNMs performed well in identifying lose-lose catch-biomass outcomes from status quo or ‘hands-off’ management strategies under scenarios with negative impacts to biomass. However, the QNMs were overly optimistic in predicting increases for fishery catch when the quantitative MSE predicted a decline. As a result, triage would have retained a number of potentially non-viable management strategies, limiting the time saved. We therefore find that, despite their faster runtimes (< 5 seconds per QNM), QNMs are not a generally applicable tool for triage for MSE, and will likely be useful only under limited circumstances. We see greater value in QNMs as a complementary, participatory exercise to support the actual and perceived legitimacy of MSE, and to supplement quantitative model predictions.
 
 
 
