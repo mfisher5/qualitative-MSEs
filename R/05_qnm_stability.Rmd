@@ -38,8 +38,6 @@ sim.date <- '20240923'
 
 ```
 
-## R Markdown
-
 ## Data
 
 Read in the output from perturbations
