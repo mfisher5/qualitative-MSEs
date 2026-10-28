@@ -23,7 +23,10 @@ data/qnm_out/sensitivity.zip
 drafts/Abs 492 2024-07-29.docx
 doc/*.docx
 /doc/archive
+/doc/revisions
 doc/tradeoff decisions.xlsx
+doc/manuscript/ICESJMS-2026-177.R2_Proof_hi.pdf
+doc/manuscript/ICESJMS-2026-177_tracked_changes_for_revisions2.docx
 
 ## literature ##
 doc/lit/Qualitative Models to Complement Quantitative Ecosystem Models for the Analysis of Data-Limited Marine Ecosystems and Fisheries.pdf
