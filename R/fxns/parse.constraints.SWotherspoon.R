@@ -1,3 +1,6 @@
+#' Support function from S Wotherspoon, for QPress
+#'
+#' @export
 
 parse.constraints <- function(lines,edges) {
   ## Parse lines

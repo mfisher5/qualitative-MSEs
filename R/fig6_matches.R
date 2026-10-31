@@ -86,7 +86,7 @@ triage_df %<>%
   mutate(triage_equiv=ifelse(qnm_equiv==1, paste(triage,',\nequiv', sep=''), triage)) 
 
 ## create fig!
-tiff(here('doc','Fig6.tiff'), res=300, height=87,width=170,units='mm')
+tiff(here('doc','Fig6-ices.tiff'), res=300, height=87,width=170,units='mm')
 triage_df %>%
   mutate(triage_equiv=fct_relevel(triage_equiv, c('false negative,\nequiv',
                                                   'false positive', 'false positive,\nequiv'))) %>%

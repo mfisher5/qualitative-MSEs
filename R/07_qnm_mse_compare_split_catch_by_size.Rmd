@@ -11,7 +11,9 @@ output:
 
 ## Description
 
-Compare the outputs for each performance metric (1) when all fish size classes are together, and (2) when fish are split by small / large ("Total Catch" v. "Total Catch Large", "Total Catch Small")
+A re-write of script 07: Compare predictions from the QNMs v. quantitative MSE. In these QNMs, the **Total Catch** and **Fishery 1 Catch** performance metrics are split by fish size (small / large fish).  
+
+This script will compare predictions for performance metrics (1) when all fish size classes are together (main text), and (2) when fish are split by small / large ("Total Catch" v. "Total Catch Large", "Total Catch Small"; supplement).
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)

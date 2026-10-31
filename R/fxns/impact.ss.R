@@ -5,9 +5,12 @@
 ##'    iteration as a row. For example, a dia object with 20 nodes 
 ##'    and a simulation that generated 10,000 stable matrices would
 ##'    have 20 columns and 10,000 rows.
+##'    
+##' Melbourne-Thomas, J., Wotherspoon, S., Raymond, B. and Constable, A. (2012), 
+##' Comprehensive evaluation of model uncertainty in qualitative network analyses. 
+##' Ecological Monographs, 82: 505-519. https://doi.org/10.1890/12-0207.1
 ##'
 ##'
-##' @title Report System Simulate Impact
 ##' @param sim the result from \code{system.simulate}
 ##' @param perturb a named vector that indicates which nodes were perturbed and the relative magnitude of the perturbation.
 ##' @param monitor a named vector of signs (-1,0,1) or NA that indicates the outcome of the perturbation.

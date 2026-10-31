@@ -11,7 +11,7 @@ output:
 
 ## Description
 
-Master Rmd for running the qualitative MSEs. In these QNMs, the **Total Catch** and **Fishery 1 Catch** performance metrics are split by fish size (small / large fish). 
+A re-write of script 01: Master Rmd for running the qualitative MSEs. In these QNMs, the **Total Catch** and **Fishery 1 Catch** performance metrics are split by fish size (small / large fish). 
 
 The last part of the script compares the outputs for each performance metric (1) when all fish size classes are together, and (2) when fish are split by small / large ("Total Catch" v. "Total Catch Large", "Total Catch Small")
 

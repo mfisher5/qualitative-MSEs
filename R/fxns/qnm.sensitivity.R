@@ -1,3 +1,19 @@
+#' Link-specific influence on QNM variables
+#'
+#' Read in a QNM as a Dia object and prepare
+#' for QPress. Just a combination of a few
+#' packaged fxns to keep scripts clean.
+#' 
+#' Borrowed from: https://github.com/mfisher5/ClimateAdaptationQNMs/blob/main/R/qnm.sensitivity.R
+#'
+#' @param dia_name        name of the dia file to read in (no file-type suffix)
+#' @param add_constraints vector of edge constraints, specified as needed by QPress
+#' @param dia_path        path to dia object
+#' @return list with QNM object for QPress, and community matrices (with optional edge constraints)
+#' 
+#' @export
+
+
 qnm_sensitivity <- function(dia.mod, my.sim, perturb=c("HAB")){
   ##### From QPRESS #####
   # percent matrices accepted

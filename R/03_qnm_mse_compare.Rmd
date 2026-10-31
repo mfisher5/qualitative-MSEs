@@ -13,6 +13,11 @@ output:
 Last Updated: 2026-08-18 mcf
 
 ## Description
+
+Compare predictions from the QNMs v. quantitative MSE. Produce comparison tables needed to create manuscript figures / tables, and some preliminary figures to explore results.
+
+At the end of the script, explore the effect of our "equivocal" threshold (set to 60%) on the number of false positives / false negatives predicted by the QNMs.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 

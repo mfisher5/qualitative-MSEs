@@ -13,7 +13,6 @@
 ##' to construct tables or graphs outside of this function.
 ##'
 ##'
-##' @title Qual Sim Table
 ##' @param sim.list the result from \code{system.simulate} as a **named** list
 ##' @param perturb.list a list of named vectors that indicates, for each simulation, which nodes were perturbed and the relative magnitude of the perturbation.
 ##' @param monitor.list a list of named vectors of signs (-1,0,1) or NA that indicates, for each simulation, the required outcome of the perturbation.

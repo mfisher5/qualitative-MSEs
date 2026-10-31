@@ -14,7 +14,6 @@ output:
 
 Certain output variables don't have similar results between the QNMs and the MSEs. Run sensitivity analyses for the following variables in the specific QNMs:
 
-
 Fishery 1 - all. aggregate results separately for QNMs that did / didn't match the MSE direction. 
 
 Total Catch - all. aggregate results separately for QNMs that did / didn't match the MSE direction. 

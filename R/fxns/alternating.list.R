@@ -1,3 +1,16 @@
+#' Merge lists into single alternating list.
+#'
+#' Merge two lists into a single list, which alternates
+#' objects. Support function for re-formatting QNM output
+#' for graphing.
+#'
+#' @param list1 list of QNM output
+#' @param list2 list of QNM output
+#' @param list3 optional third list.
+#' @return list
+#' 
+#' @export
+
 alternating.list <- function(list1,list2,list3=NULL){
   new_list <- list()
   j <- 1
