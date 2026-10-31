@@ -210,16 +210,16 @@ ncol=1, nrow=3))  + draw_label("Quantitative MSE", x = 0.5, y = 0.02, color = "g
 dev.off()
 
 
-tiff(here('doc','fig7-ices.tiff'), res=300,height=240,width=170,units='mm')
+cairo_pdf(here('doc','fig7-ices.pdf'), height=9.448819,width=6.692913)
 ggdraw(plot_grid(plotlist=list(
-  plot.total.equiv+theme(legend.position='none',plot.margin = unit(c(1, 3.75, 2, 2), "lines"), axis.title=element_blank()),
+  plot.total.equiv+theme(legend.position='none',plot.margin = unit(c(1, 3.75, 2.1, 2), "lines"), axis.title=element_blank()),
   plot.f1.equiv+theme(plot.margin = unit(c(0, 0, 2, 2), "lines"), axis.title=element_blank()),
   plot.f2.equiv+theme(legend.position='none',plot.margin = unit(c(0, 3.75, 2, 2), "lines"), axis.title=element_blank())
 ), labels=c("(a) Total catch (sp.1)                           (d) Total catch (sp.2)", 
             "(b) Fishery 1 catch (sp.1)                    (e) Fishery 1 catch (sp.2)", 
             "(c) Fishery 2 catch (sp.1)                    (f) Fishery 2 catch (sp.2)"), 
 label_size=12.5,
-label_x=c(-0.08, -0.1, -0.1),label_y=c(1.01,1.05,1.05), hjust=c(-0.25,-0.25,-0.25), vjust=c(1.2,0.75,0.75), 
+label_x=c(-0.08, -0.1, -0.1),label_y=c(1.00,1.05,1.05), hjust=c(-0.25,-0.25,-0.25), vjust=c(1.2,0.75,0.75), 
 ncol=1, nrow=3))  + draw_label("Quantitative MSE", x = 0.5, y = 0.02, color = "gray20", size=12.5) +
   draw_line(x = c(0.61, 0.9),y = c(0.02, 0.02), color = "gray20", size = 0.25)+
   draw_line(x = c(0.16, 0.39),y = c(0.02, 0.02), color = "gray20", size = 0.25) +

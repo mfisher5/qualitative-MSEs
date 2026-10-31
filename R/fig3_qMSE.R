@@ -137,7 +137,7 @@ ChangKappa <- c(1,0)                                      # Changed growth in th
 ChangeAlpha <- c(0.5,1)                                # changed recruitment in the future (climate)
 
 Base1 <- Stock1()
-png(here('doc','Fig3-ices.tiff'),width=80,height=130,res=300,units='mm')
+pdf(here('doc','Fig3-ices.pdf'),width=3.149606,height=5.11811)
 # par(mfrow=c(3,1),oma=c(2,10,2,10),mar=c(5,6,1,2))
 par(mfrow=c(3,1),oma=c(0,0,1,0),mar=c(4,5,0,2),mgp=c(2, 1, 0))
 AlphaMult <- matrix(1,nrow=Nstock,ncol=Nyear)
