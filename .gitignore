@@ -11,12 +11,13 @@ R/.RDataTmp
 data/**/*.rds
 data/**/*.xlsx
 data/qnm_out/sensitivity/*.csv
+data/qnm_out/sensitivity/archive/
 data/qnm_out/sensitivity/sensitivity/*.csv
+!data/qnm_out/sensitivity/*run_times.csv
 data/qnm_out/retired/**
 data/results/old_runs/**
 data/results/sensitivity/**
 data/qnm_out/sensitivity.zip
-## R project files ##
 
 ## Large files ##
 *.zip
@@ -29,6 +30,8 @@ doc/*.docx
 doc/tradeoff decisions.xlsx
 doc/manuscript/ICESJMS-2026-177.R2_Proof_hi.pdf
 doc/manuscript/ICESJMS-2026-177_tracked_changes_for_revisions2.docx
+/data/mse_out/archive
+/data/qnm_out/sensitivity/brt_holdout_dev
 
 ## literature ##
 doc/lit/*.pdf
