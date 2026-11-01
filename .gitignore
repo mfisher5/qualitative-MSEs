@@ -32,6 +32,7 @@ doc/manuscript/ICESJMS-2026-177.R2_Proof_hi.pdf
 doc/manuscript/ICESJMS-2026-177_tracked_changes_for_revisions2.docx
 /data/mse_out/archive
 /data/qnm_out/sensitivity/brt_holdout_dev
+/data/results/revisions
 
 ## literature ##
 doc/lit/*.pdf
