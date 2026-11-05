@@ -108,9 +108,7 @@ mse_format %<>% mutate(code=case_when(
   grepl('4-',code)~str_replace(code,'4-','3-'),
   grepl('5-',code)~str_replace(code,'5-','4-'),.default=code
 ))
-```
 
-```{r eval=write_out}
 ## save
 write_csv(mse_format, here('data','results','table1_mse0-4_species1-2_Ricker_20260819.csv'))
 
@@ -124,6 +122,11 @@ mse_format %>%
   ) %>%
   write_csv(here('data','results','table1_qnmstyle_mse0-4_hcrb-d_species1-2_Ricker_20260819.csv'))
 ```
+
+```{r}
+mse_format <- read_csv(here('data','results','table1_mse0-4_species1-2_Ricker_20260819.csv'))
+```
+
 
 ### compare
 
@@ -197,14 +200,13 @@ compareThorson$operating_model <- factor(compareThorson$operating_model, levels=
 
 
 save 
-
 ```{r eval=write_out}
 ## all hcrs, oms
 speciesALL_compare <- bind_rows(species1_compare, species2_compare)
 write_csv(speciesALL_compare, here('data','results',paste0('mseVqnm_prob-psim_species1-2_allHCRallOM_',sim.date,'_2026review.csv')))
 
 ## thorson
-write_csv(compareThorson, here('data','results',paste0('OM1sens_mseVqnm1_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'_2026review.csv')))
+write_csv(compareThorson, here('data','results',paste0('mseVqnm1_OM1sens_prob-psim_species1-2_ThorsonOMallHCR_',sim.date,'_2026review.csv')))
 ```
 
 
@@ -571,7 +573,7 @@ thx <- list(thout1_pall, thorson_mismatches_summary, thout1_pcertain, thout1_peq
 names(thx) <- c('table_3','case_counts','table_3_nonequiv_only','table_3_equiv_only','var_counts','all_data')
 writexl::write_xlsx(
   thx,
-  path = here('data','results',paste0('OM1sens_table3_mseVqnm1_mismatches_bySpbyVar',sim.date,'_2026review.xlsx')),
+  path = here('data','results',paste0('table3_OM1sens_mseVqnm1_mismatches_bySpbyVar',sim.date,'_2026review.xlsx')),
   col_names = TRUE
 )
 ```
@@ -823,7 +825,7 @@ tbl4_ms2 %>% dplyr::select(-fn) %>%
   pivot_wider(names_from='variable',values_from='fp', values_fill='0') %>%
   rename(strategy_or_om=operating_model)
   ) %>%
-  write_csv(here('data','results','tbl4_positives_bySpbyMS_20240923_2026review.csv'))
+  write_csv(here('data','results','table4_positives_bySpbyMS_20240923_2026review.csv'))
 
 
 tbl4_ms2 %>% dplyr::select(-fp) %>%
@@ -834,7 +836,7 @@ tbl4_ms2 %>% dplyr::select(-fp) %>%
   pivot_wider(names_from='variable',values_from='fn', values_fill='0') %>%
   rename(strategy_or_om=operating_model) %>% mutate(type='2_om')
   ) %>% arrange(species,type,strategy_or_om) %>%
-  write_csv(here('data','results','tbl4_negatives_bySpbyMS_20240923_2026review.csv'))
+  write_csv(here('data','results','table4_negatives_bySpbyMS_20240923_2026review.csv'))
 ```
 
 

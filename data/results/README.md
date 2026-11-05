@@ -1,18 +1,17 @@
 ## Model run results
 
-This folder contains three types of result objects: 
+This folder will contain results produced in scripts 3 - 7. Key files that are provided are: 
 
-1. QNM perturbation output from QPress, as an R object
+`table1_mse0-4_species1-2_Ricker_20260819` : qMSE results for all runs, aggregated and formatted to make table 1 (Ricker stock-recruit model)
 
-2. Quantitative MSE simulation output, partially processed<sup>1</sup>, as a .csv file
+`table1_mse0-4_species1-2_BH_20260819` : qMSE results from all runs, aggregated and formatted to make table 1 (BH stock-recruit model)
 
-3. Formatted tables 
+`table2_qnm0-5_hcra-e_qualitative_20240923`: QNM results as qualitative categories, aggregated to make table 2
 
+`table2_qnm0-5_hcra-e_pSims_20240923`: QNM results as the proportion of stable matrices with the same directional output, aggregated to make table 2
 
-<sup>1</sup>: For the MSE output: 
+`mseVqnm_prob-psim_species1-2_allHCRallOM_20240923_2026review`: matches the qMSE output (as probability of increase) to the QNM output (as proportion stable matrices) for every case (qMSE using Ricker model). This master file is used to produce the rest of the output files in script 3.
 
-- All of the performance stats are relative to management strategy A, to be comparable to the QNM output
+`mseVqnm_bh_prob-psim_species1-2_allHCRallOM_20240923_2026review`: matches the qMSE output (as probability of increase) to the QNM output (as proportion stable matrices) for every case (qMSE using BH model). This master file is used to produce the rest of the output files in script 3b.
 
-- There are two additional OMs (6, 7) that are also Thorson effort models - OM 2 had a target equal to the biomass at the end of the burn-in; OM 6 has one 0.75 of the  biomass at the end of the burn-in; and OM 7  has one 1.25 of the  biomass at the end of the burn-in.
-
-- *internal versioning:* most updated MSE output Feb 6 2024
+The subfolder **split_tc** contains results for which the catch metrics were split into large/mature and small/immature fish. 

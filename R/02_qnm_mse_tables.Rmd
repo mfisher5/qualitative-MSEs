@@ -194,7 +194,7 @@ bind_rows(table.0,table.2,table.3,table.4,table.5) %>%
   pivot_wider(names_from="variable",values_from="response") %>%
   ## reorder to match vkey specific order
   dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey$variable)) %>%
-  write_csv(here('data','results',paste0('qnm0-5_hcra-e_qualitative_',sim.date,'.csv')))
+  write_csv(here('data','results',paste0('table2_qnm0-5_hcra-e_qualitative_',sim.date,'.csv')))
 
 bind_rows(table.0,table.2,table.3,table.4,table.5) %>% 
   filter(variable %in% vkey$variable) %>%
@@ -204,7 +204,7 @@ bind_rows(table.0,table.2,table.3,table.4,table.5) %>%
   pivot_wider(names_from="variable",values_from="p_sim") %>%
   ## reorder to match vkey specific order
   dplyr::select(Code,`Operating model`,`Management strategy`,all_of(vkey$variable)) %>%
-  write_csv(here('data','results',paste0('qnm0-5_hcra-e_pSims_',sim.date,'.csv')))
+  write_csv(here('data','results',paste0('table2_qnm0-5_hcra-e_pSims_',sim.date,'.csv')))
 ```
 
 
@@ -212,10 +212,10 @@ Then, for every variable in the QNMs
 ```{r}
 bind_rows(table.0,table.2,table.3,table.4,table.5) %>%
   dplyr::select(Code,`Operating model`,`Management strategy`,variable,response) %>%
-  write_csv(here('data','qnm_out',paste0('qnm0-5_hcra-e_qualitative_',sim.date,'.csv')))
+  write_csv(here('data','qnm_out',paste0('table2ext_qnm0-5_hcra-e_qualitative_',sim.date,'.csv')))
 
 bind_rows(table.0,table.2,table.3,table.4,table.5) %>% 
   mutate(p_sim=ifelse(change=="neg",p_sim*-1,p_sim)) %>%
   dplyr::select(Code,`Operating model`,`Management strategy`,variable,p_sim) %>%
-  write_csv(here('data','qnm_out',paste0('qnm0-5_hcra-e_pSims_',sim.date,'.csv')))
+  write_csv(here('data','qnm_out',paste0('table2ext_qnm0-5_hcra-e_pSims_',sim.date,'.csv')))
 ```

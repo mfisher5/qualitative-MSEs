@@ -31,15 +31,13 @@ doc/tradeoff decisions.xlsx
 doc/manuscript/ICESJMS-2026-177.R2_Proof_hi.pdf
 doc/manuscript/ICESJMS-2026-177_tracked_changes_for_revisions2.docx
 data/mse_out/_archive
-data/qnm_out/sensitivity/brt_holdout_dev
-data/results/revisions
+data/results/revisions/**
 
 ## intermediate output ##
-data/results/*
-!data/results/mse1-4_hcrb-d_species1-2_Ricker_20260819.csv
-!data/results/qnm0-5_hcra-e_pSims_20240923.csv
-!data/results/qnm0-5_hcra-e_qualitative_20240923.csv
-!data/results/split_tc/*.csv
+/data/results/script3
+/data/results/archive/revisions
+/data/results/split_tc/archive
+/data/results/supplement
 
 ## literature ##
 doc/lit/*.pdf
