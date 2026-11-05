@@ -28,8 +28,6 @@ doc/*.docx
 /doc/archive
 /doc/revisions
 doc/tradeoff decisions.xlsx
-doc/manuscript/ICESJMS-2026-177.R2_Proof_hi.pdf
-doc/manuscript/ICESJMS-2026-177_tracked_changes_for_revisions2.docx
 data/mse_out/_archive
 data/results/revisions/**
 /doc/manuscript
