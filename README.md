@@ -15,6 +15,12 @@ Management strategy evaluation (MSE) is a crucial tool for exploring alternative
 - `data`: currently contains the QNMs (as dia objects and matrices in CSV files), QPress perturbation output, sensitivity analysis output, and summary data for results
 
 Where can I find....
-- the CSV files with matrices for every QNM: `data/qnm_models`, CSV files are labeled by operating model scenario (QNM_XX) and management strategy (_hcrY)
-- the output from the full quantitative MSEs, for the four performance metrics: `data/results/raw/mse_Table4_Species12_20240206.csv`
-- the code for running boosted regression trees, as sensitivity analysis: `R/04_qnm_sensitivity.Rmd` -- calls `impact.ss.R`, and uses an input data frame that is saved into `data/qnm_out/sensitivity/gbmIn....`
+
+- the DIA objects and/or matrices for every QNM: `data/qnm_models`
+- the output from the quantitative MSE: `data/mse_out`
+- the code to re-produce the figures from the paper: in the `R` folder, R scripts are named according to the figure produced. *These will require you to re-run scripts 3 and 3b, to produce the intermediate files needed for graphing.*
+
+
+### Acknowledgements
+
+

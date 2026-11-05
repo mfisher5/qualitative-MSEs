@@ -71,7 +71,7 @@ qnm %<>% mutate(operating_model=case_when(
 
 First time running the script? We need to clean up a little and re-format the original MSE output table.
 ```{r eval=FALSE}
-mse <- read_csv(here('data','mse_out','Table_Mary_0_1_Ricker_20260821.csv')) %>% clean_names()
+mse <- read_csv(here('data','mse_out','qMSE_0_1_Ricker_20260821.csv')) %>% clean_names()
 mse_column_key <- data.frame(mse_column=c("total_c","cat_fl1","cat_fl2","ssb_ssb",
                                           "eff_fl1","eff_fl2"),
                              new_name=c("total_catch","fishery_1_catch","fishery_2_catch","spawning_biomass",
