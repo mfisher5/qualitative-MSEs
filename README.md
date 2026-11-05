@@ -22,5 +22,4 @@ Where can I find....
 
 
 ### Acknowledgements
-
-
+Funding for this project was provided by the David & Lucile Packard Foundation through the [Ocean Modeling Forum](https://oceanmodelingforum.org/).
