@@ -9,6 +9,7 @@ R/.RDataTmp
 
 ## large data objects ##
 data/**/*.rds
+!data/results/fig7**
 data/**/*.xlsx
 data/qnm_out/sensitivity/*.csv
 data/qnm_out/sensitivity/archive/
