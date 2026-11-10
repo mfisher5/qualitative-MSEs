@@ -14,4 +14,8 @@ This folder will contain results produced in scripts 3 - 7. Key files that are p
 
 `mseVqnm_bh_prob-psim_species1-2_allHCRallOM_20240923_2026review`: matches the qMSE output (as probability of increase) to the QNM output (as proportion stable matrices) for every case (qMSE using BH model). This master file is used to produce the rest of the output files in script 3b.
 
+`fig6...`: data frame required to reproduce Fig 6 in the main text, with QNMs compared against the qMSE run with the Ricker v. Beverton-Holt ("BH") stock-recruit model
+
+`fig7...`: data frame required to reproduce Fig 7 in the main text, with QNMs compared against the qMSE run with the Ricker v. Beverton-Holt ("BH") stock-recruit model
+
 The subfolder **split_tc** contains results for which the catch metrics were split into large/mature and small/immature fish. 
