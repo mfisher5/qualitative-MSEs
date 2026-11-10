@@ -28,9 +28,11 @@ The `fxns` folder contains custom R functions called in the numbered scripts.
 
 
 **Important note:** An earlier version of this study featured an additional MSE operating model scenario that could not be translated to a qualitative model structure. This OM was removed from successive iterations of the analysis. For this reason, some QNM files have differently numbered OMs than are listed in the paper. These files in this repo correspond to the paper QNM such that:
-QNM 0 = QNM 0 paper
-QNM 2 = QNM 1 paper
-QNM 3 = QNM 2 paper
-QNM 4 = QNM 3 paper
-QNM 5 = QNM 4 paper
+
+- QNM 0 = QNM 0 paper
+- QNM 2 = QNM 1 paper
+- QNM 3 = QNM 2 paper
+- QNM 4 = QNM 3 paper
+- QNM 5 = QNM 4 paper
+
 This is accounted for in scripts where this is relevant.
