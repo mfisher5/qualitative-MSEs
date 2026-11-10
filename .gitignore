@@ -48,4 +48,4 @@ doc/lit/*.pdf
 R/Rplots.pdf
 
 ## AEP custom code ##
-R/Misc.AEP
+R/fxns/Misc.AEP.R
