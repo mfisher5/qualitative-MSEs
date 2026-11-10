@@ -1,6 +1,6 @@
 ---
 title: "Compare QNM and MSE output"
-date: `R Sys.Date()`
+date: 
 output: 
   html_document:
     toc: yes
