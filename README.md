@@ -1,6 +1,6 @@
 # Can triage with qualitative models make MSE more efficient?
 
-Mary C Fisher, Chris J Harvey, Tessa B Francis, Kristin N Marshall, Laura K Nelson, Corey Ridings, André E. Punt
+Mary C Fisher, Chris J Harvey, Tessa B Francis, Kristin N Marshall, Laura K Nelson, Corey Ridings, André E Punt
 
 ### Abstract
 
